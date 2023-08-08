@@ -1,0 +1,567 @@
+// ignore_for_file: library_prefixes
+
+import 'dart:convert' as convert;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
+import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
+import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
+import 'package:shakti_employee_app/gatepass/model/PendingGatePassResponse.dart';
+import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
+import 'package:shakti_employee_app/home/model/personalindoresponse.dart';
+import 'package:shakti_employee_app/leave/LeaveRequest.dart';
+import 'package:shakti_employee_app/main.dart';
+import 'package:shakti_employee_app/officialDuty/officalRequest.dart';
+import 'package:shakti_employee_app/officialDuty/officialApprove.dart';
+import 'package:shakti_employee_app/sidemenu/attendance/attendanceReport.dart';
+import 'package:shakti_employee_app/sidemenu/leavereport/LeaveReport.dart';
+import 'package:shakti_employee_app/sidemenu/officaldutyreport/officialdutyReport.dart';
+import 'package:shakti_employee_app/sidemenu/personalinfo/personalinfo.dart';
+import 'package:shakti_employee_app/sidemenu/salaryslip/salaryslip.dart';
+import 'package:shakti_employee_app/task/taskApprove.dart';
+import 'package:shakti_employee_app/task/taskRequest.dart';
+import 'package:shakti_employee_app/theme/color.dart';
+import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
+import 'package:shakti_employee_app/webReport/webreport.dart';
+import 'package:shakti_employee_app/webservice/APIDirectory.dart';
+import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../leave/LeaveApprove.dart';
+import '../theme/string.dart';
+import 'navigation_drawer_widget.dart';
+
+class HomePage extends StatefulWidget {
+  HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String packageName = "null";
+  String version = "null";
+  String? nameValue = "null";
+  bool isLoading = false;
+
+  List<Leavebalance> leaveBalanceList = [];
+  List<Activeemployee> activeEmployeeList = [];
+  List<Attendanceemp> attendenceList = [];
+  List<Leaveemp> leaveEmpList = [];
+  List<Odemp> odEmpList = [];
+  List<PendingTask> pendingTaskList = [];
+  List<Pendingleave> pendingLeaveList = [];
+  List<Pendingod> pendindOdList = [];
+  List<Emp> personalInfo = [];
+  List<Datum> gatePassList = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _handleLocationPermission();
+    downloadingData();
+    getNameValue();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: AppColor.themeColor,
+        elevation: 0,
+        title: robotoTextWidget(
+            textval: appName,
+            colorval: AppColor.whiteColor,
+            sizeval: 15,
+            fontWeight: FontWeight.w800),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Container(
+              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  detailWidget("Leave"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  detailWidget("Official Duty"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  detailWidget("Gate Pass"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  detailWidget("Task"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  localConvenience(),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  dailyAndWebReport("Daily Report", "assets/svg/approved.svg"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  dailyAndWebReport("Web Report", "assets/svg/report.svg"),
+                ],
+              ),
+            ),
+          ),
+          Center(
+            child: isLoading == true
+                ? const CircularProgressIndicator(
+                    color: Colors.black,
+                  )
+                : const SizedBox(),
+          ),
+        ],
+      ),
+      drawer: Drawer(
+          backgroundColor: AppColor.whiteColor,
+          child: NavigationDrawerWidget(name:nameValue!, attendenceList: attendenceList,
+            leaveEmpList:leaveEmpList,
+            odEmpList: odEmpList,
+            personalInfo: personalInfo,)),
+    );
+  }
+
+  detailWidget(String title) {
+    return SizedBox(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height / 5.6,
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 40,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              color: AppColor.themeColor,
+            ),
+            child: Center(
+                child: robotoTextWidget(
+                    textval: title,
+                    colorval: AppColor.whiteColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold)),
+          ),
+          SizedBox(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height / 8,
+            child: Row(
+              children: [
+                InkWell(
+                  child: Container(
+                      width: MediaQuery.of(context).size.width / 2.21,
+                      height: MediaQuery.of(context).size.height / 8,
+                      decoration: const BoxDecoration(
+                        border: Border(
+                          left: BorderSide(
+                            //                   <--- left side
+                            color: Colors.grey,
+                            width: 1,
+                          ),
+                          bottom: BorderSide(
+                            //                    <--- top side
+                            color: Colors.grey,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child:
+                          imageTextWidget("assets/svg/request.svg", "Request")),
+                  onTap: () {
+                    RequestMethod(title);
+                  },
+                ),
+                InkWell(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 2.3,
+                    height: MediaQuery.of(context).size.height / 8,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        left: BorderSide(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                        right: BorderSide(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                        bottom: BorderSide(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child:
+                        imageTextWidget("assets/svg/approved.svg", "Approved"),
+                  ),
+                  onTap: () {
+                    ApprovedMethod(title);
+                  },
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  localConvenience() {
+    return SizedBox(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height / 5.6,
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 40,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              color: AppColor.themeColor,
+            ),
+            child: const Center(
+                child: robotoTextWidget(
+                    textval: "Local Convenience",
+                    colorval: AppColor.whiteColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold)),
+          ),
+          Container(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height / 8,
+            decoration: const BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+                left: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                imageTextWidget("assets/svg/start.svg", "Start"),
+                imageTextWidget("assets/svg/end.svg", "End"),
+                imageTextWidget("assets/svg/offline.svg", "Offline"),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void RequestMethod(String title) {
+    if (title == "Leave") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => LeaveRequestScreen(
+                    LeaveBalanceList: leaveBalanceList,
+                    activeEmpList: activeEmployeeList,
+                  )),
+          (route) => true);
+    }
+
+    if (title == "OfficialDuty") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => OfficialRequest(
+                    activeemployeeList: activeEmployeeList,
+                  )),
+          (route) => true);
+    }
+
+    if (title == "Gatepass") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => GatepassRequestScreen(
+                    activeemployeeList: activeEmployeeList,
+                  )),
+          (route) => true);
+    }
+
+    if (title == "Task") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => TaskRequestScreen(
+                    activeemployeeList: activeEmployeeList,
+                  )),
+          (route) => true);
+    }
+  }
+
+  void ApprovedMethod(String title) {
+    if (title == "Leave") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => LeaveApproved(
+                    pendingLeaveList: pendingLeaveList,
+                  )),
+          (route) => true);
+    }
+
+    if (title == "OfficialDuty") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) =>
+                  OfficialApproved(pendindOdList: pendindOdList)),
+          (route) => true);
+    }
+
+    if (title == "Gatepass") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) =>
+                  GatePassApproved(gatePassList: gatePassList)),
+          (route) => true);
+    }
+
+    if (title == "Task") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+              builder: (context) => TaskApproved(
+                    pendingTaskList: pendingTaskList,
+                    activeemployeeList: activeEmployeeList,
+                  )),
+          (route) => true);
+    }
+  }
+
+  dailyAndWebReport(String title, String svg) {
+    return SizedBox(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height / 5.6,
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 40,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+              color: AppColor.themeColor,
+            ),
+            child: Center(
+                child: robotoTextWidget(
+                    textval: title,
+                    colorval: AppColor.whiteColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold)),
+          ),
+          SizedBox(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height / 8,
+            child: InkWell(
+              child: Container(
+                  width: MediaQuery.of(context).size.width / 2.21,
+                  height: MediaQuery.of(context).size.height / 8,
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                      right: BorderSide(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: imageTextWidget(svg, title)),
+              onTap: () {
+                screenNavigation(title);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> getNameValue() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      nameValue = preferences.getString(name);
+    });
+  }
+
+  buildLocationDialog() {
+    showDialog(
+        context: context,
+        builder: (builder) {
+          return AlertDialog(
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Container(),
+            ),
+          );
+        });
+  }
+
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> downloadingData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    var jsonData = null;
+    var jsonData1 = null;
+
+    dynamic response = await HTTP.get(SyncAndroidToSapAPI(
+        sharedPreferences.getString(sapCodetxt).toString()));
+    if (response != null && response.statusCode == 200) {
+      jsonData = convert.jsonDecode(response.body);
+      SyncAndroidToSapResponse androidToSapResponse =
+          SyncAndroidToSapResponse.fromJson(jsonData);
+
+      setState(() {
+        leaveBalanceList = androidToSapResponse.leavebalance;
+
+        leaveBalanceList
+            .add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
+
+        activeEmployeeList = androidToSapResponse.activeemployee;
+
+        attendenceList = androidToSapResponse.attendanceemp;
+
+        odEmpList = androidToSapResponse.odemp;
+
+        leaveEmpList = androidToSapResponse.leaveemp;
+
+        pendingTaskList = androidToSapResponse.pendingtask;
+
+        pendingLeaveList = androidToSapResponse.pendingleave;
+
+        pendindOdList = androidToSapResponse.pendingod;
+      });
+    }
+
+    dynamic response1 = await HTTP.get(
+        personalInfoAPI(sharedPreferences.getString(sapCodetxt).toString()));
+    if (response1 != null && response1.statusCode == 200) {
+      jsonData1 = convert.jsonDecode(response1.body);
+      PersonalInfoResponse _personalInfo =
+          PersonalInfoResponse.fromJson(jsonData1);
+
+      setState(() {
+        isLoading = false;
+        personalInfo = _personalInfo.emp;
+      });
+    }
+
+    dynamic response2 = await HTTP.get(
+        pendingGatePass(sharedPreferences.getString(sapCodetxt).toString()));
+    if (response2 != null && response2.statusCode == 200) {
+      jsonData1 = convert.jsonDecode(response2.body);
+      PendingGatePassResponse pendingGatePassResponse =
+          PendingGatePassResponse.fromJson(jsonData1);
+
+      gatePassList = pendingGatePassResponse.data;
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void screenNavigation(String title) {
+    if (title == "Web Report") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const WebScreen()),
+          (route) => true);
+    }
+
+    if (title == "Daily Report") {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const DailyReport()),
+          (route) => true);
+    }
+  }
+
+  imageTextWidget(String svg, String msg) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Center(
+            child: SvgPicture.asset(
+              svg,
+              width: 55,
+              height: 55,
+            ),
+          ),
+        ),
+        robotoTextWidget(
+            textval: msg,
+            colorval: AppColor.themeColor,
+            sizeval: 14,
+            fontWeight: FontWeight.w600)
+      ],
+    );
+  }
+
+
+}
