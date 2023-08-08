@@ -12,14 +12,8 @@ import 'package:shakti_employee_app/gatepass/model/PendingGatePassResponse.dart'
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/home/model/personalindoresponse.dart';
 import 'package:shakti_employee_app/leave/LeaveRequest.dart';
-import 'package:shakti_employee_app/main.dart';
 import 'package:shakti_employee_app/officialDuty/officalRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officialApprove.dart';
-import 'package:shakti_employee_app/sidemenu/attendance/attendanceReport.dart';
-import 'package:shakti_employee_app/sidemenu/leavereport/LeaveReport.dart';
-import 'package:shakti_employee_app/sidemenu/officaldutyreport/officialdutyReport.dart';
-import 'package:shakti_employee_app/sidemenu/personalinfo/personalinfo.dart';
-import 'package:shakti_employee_app/sidemenu/salaryslip/salaryslip.dart';
 import 'package:shakti_employee_app/task/taskApprove.dart';
 import 'package:shakti_employee_app/task/taskRequest.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -85,8 +79,9 @@ class _HomePageState extends State<HomePage> {
         children: [
           SingleChildScrollView(
             child: Container(
-              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              margin: const EdgeInsets.only(left: 10, right: 10),
               width: MediaQuery.of(context).size.width,
+
               child: Column(
                 children: [
                   const SizedBox(
@@ -132,152 +127,100 @@ class _HomePageState extends State<HomePage> {
       ),
       drawer: Drawer(
           backgroundColor: AppColor.whiteColor,
-          child: NavigationDrawerWidget(name:nameValue!, attendenceList: attendenceList,
-            leaveEmpList:leaveEmpList,
+          child: NavigationDrawerWidget(
+            name: nameValue!,
+            attendenceList: attendenceList,
+            leaveEmpList: leaveEmpList,
             odEmpList: odEmpList,
-            personalInfo: personalInfo,)),
+            personalInfo: personalInfo,
+          )),
     );
   }
 
   detailWidget(String title) {
-    return SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height / 5.6,
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            height: 40,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-              color: AppColor.themeColor,
+    return  SizedBox(
+          height: MediaQuery.of(context).size.height/4,
+          child: Card(
+            color: AppColor.whiteColor,
+            elevation: 10,
+            semanticContainer: true,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            shape: const RoundedRectangleBorder(
+              side: BorderSide(
+                color: AppColor.greyBorder,
+              ),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20)),
             ),
-            child: Center(
-                child: robotoTextWidget(
-                    textval: title,
-                    colorval: AppColor.whiteColor,
-                    sizeval: 14,
-                    fontWeight: FontWeight.bold)),
-          ),
-          SizedBox(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height / 8,
-            child: Row(
+            child:Column(
               children: [
-                InkWell(
-                  child: Container(
-                      width: MediaQuery.of(context).size.width / 2.21,
-                      height: MediaQuery.of(context).size.height / 8,
-                      decoration: const BoxDecoration(
-                        border: Border(
-                          left: BorderSide(
-                            //                   <--- left side
-                            color: Colors.grey,
-                            width: 1,
-                          ),
-                          bottom: BorderSide(
-                            //                    <--- top side
-                            color: Colors.grey,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child:
-                          imageTextWidget("assets/svg/request.svg", "Request")),
-                  onTap: () {
-                    RequestMethod(title);
-                  },
+                Container(
+                  height: MediaQuery.of(context).size.height/13,
+                  color: AppColor.themeColor,
+                     alignment: Alignment.center,
+                     child: robotoTextWidget(textval: title,
+                         colorval: Colors.white, sizeval: 12, fontWeight: FontWeight.w600),
                 ),
-                InkWell(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width / 2.3,
-                    height: MediaQuery.of(context).size.height / 8,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
-                        right: BorderSide(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
-                        bottom: BorderSide(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                    child:
-                        imageTextWidget("assets/svg/approved.svg", "Approved"),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      imageTextWidget("assets/svg/request.svg", "Request"),
+                      dividerWidget(),
+                      imageTextWidget("assets/svg/request.svg", "Request")
+                    ],
                   ),
-                  onTap: () {
-                    ApprovedMethod(title);
-                  },
                 )
               ],
             ),
-          ),
-        ],
-      ),
-    );
+
+        ));
   }
 
   localConvenience() {
-    return SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height / 5.6,
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            height: 40,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              color: AppColor.themeColor,
+    return  SizedBox(
+        height: MediaQuery.of(context).size.height/4,
+        child: Card(
+          color: AppColor.whiteColor,
+          elevation: 10,
+          semanticContainer: true,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(
+              color: AppColor.greyBorder,
             ),
-            child: const Center(
-                child: robotoTextWidget(
-                    textval: "Local Convenience",
-                    colorval: AppColor.whiteColor,
-                    sizeval: 14,
-                    fontWeight: FontWeight.bold)),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20)),
           ),
-          Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height / 8,
-            decoration: const BoxDecoration(
-              border: Border(
-                right: BorderSide(
-                  color: Colors.grey,
-                  width: 1,
-                ),
-                left: BorderSide(
-                  color: Colors.grey,
-                  width: 1,
-                ),
-                bottom: BorderSide(
-                  color: Colors.grey,
-                  width: 1,
-                ),
+          child:Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height/13,
+                color: AppColor.themeColor,
+                alignment: Alignment.center,
+                child: robotoTextWidget(textval: 'Local Convenience',
+                    colorval: Colors.white, sizeval: 12, fontWeight: FontWeight.w600),
               ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                imageTextWidget("assets/svg/start.svg", "Start"),
-                imageTextWidget("assets/svg/end.svg", "End"),
-                imageTextWidget("assets/svg/offline.svg", "Offline"),
-              ],
-            ),
+              Container(
+                child:Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    imageTextWidget("assets/svg/start.svg", "Start"),
+                    dividerWidget(),
+                    imageTextWidget("assets/svg/end.svg", "End"),
+                    dividerWidget(),
+                    imageTextWidget("assets/svg/offline.svg", "Offline"),
+                  ],
+                ),
+              )
+            ],
           ),
-        ],
-      ),
-    );
+
+        ));
+  }
+
+  dividerWidget(){
+    return   Container(width: 1,
+      height: MediaQuery.of(context).size.height/8,
+      color: AppColor.grey,);
   }
 
   void RequestMethod(String title) {
@@ -357,60 +300,35 @@ class _HomePageState extends State<HomePage> {
   }
 
   dailyAndWebReport(String title, String svg) {
-    return SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height / 5.6,
-      child: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            height: 40,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+    return  SizedBox(
+        height: MediaQuery.of(context).size.height/4,
+        child: Card(
+          color: AppColor.whiteColor,
+          elevation: 10,
+          semanticContainer: true,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(
+              color: AppColor.greyBorder,
+            ),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20)),
+          ),
+          child:Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height/13,
+                color: AppColor.themeColor,
+                alignment: Alignment.center,
+                child: robotoTextWidget(textval: title,
+                    colorval: Colors.white, sizeval: 12, fontWeight: FontWeight.w600),
               ),
-              color: AppColor.themeColor,
-            ),
-            child: Center(
-                child: robotoTextWidget(
-                    textval: title,
-                    colorval: AppColor.whiteColor,
-                    sizeval: 14,
-                    fontWeight: FontWeight.bold)),
+              Container(
+                child: imageTextWidget(svg, title),
+              )
+            ],
           ),
-          SizedBox(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height / 8,
-            child: InkWell(
-              child: Container(
-                  width: MediaQuery.of(context).size.width / 2.21,
-                  height: MediaQuery.of(context).size.height / 8,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      left: BorderSide(
-                        color: Colors.grey,
-                        width: 1,
-                      ),
-                      right: BorderSide(
-                        color: Colors.grey,
-                        width: 1,
-                      ),
-                      bottom: BorderSide(
-                        color: Colors.grey,
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: imageTextWidget(svg, title)),
-              onTap: () {
-                screenNavigation(title);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+
+        ));
   }
 
   Future<void> getNameValue() async {
@@ -549,19 +467,20 @@ class _HomePageState extends State<HomePage> {
           child: Center(
             child: SvgPicture.asset(
               svg,
-              width: 55,
-              height: 55,
+              width: 50,
+              height: 50,
             ),
           ),
+        ),
+        SizedBox(
+          height: 4,
         ),
         robotoTextWidget(
             textval: msg,
             colorval: AppColor.themeColor,
-            sizeval: 14,
+            sizeval: 12,
             fontWeight: FontWeight.w600)
       ],
     );
   }
-
-
 }
