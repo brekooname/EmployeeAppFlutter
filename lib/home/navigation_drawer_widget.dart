@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import '../gatepass/model/PendingGatePassResponse.dart';
 import '../main.dart';
@@ -134,7 +135,8 @@ class _HomePageState extends State<NavigationDrawerWidget> {
             }
             break;
           case 6:
-            {
+          {
+              Utility().clearSharedPreference();
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const LoginPage()),
                       (route) => false);

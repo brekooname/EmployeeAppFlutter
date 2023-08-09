@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../home/HomePage.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
+import '../webservice/constant.dart';
 
 class OfficialRequest extends StatefulWidget {
 
@@ -107,7 +108,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                 MaterialPageRoute(builder: (context) =>  HomePage()),
               );}
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
@@ -119,9 +120,9 @@ class _OfficialRequestState extends State<OfficialRequest>  {
             children: [
 
               dutyTypeSpinnerWidget(),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               datePickerWidget("OD From",indianFromDate.toString()),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               datePickerWidget("OD To",indianToDate.toString()),
               textFeildWidget( "Visit Place", visitPlace),
               WorkPlaceSpinnerWidget(),
@@ -142,8 +143,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   Widget assginToSpinnerWidget(BuildContext context, List<Activeemployee> activeemployee) {
     return  Container(
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.only(left: 3),
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.only(left: 3),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -156,11 +157,11 @@ class _OfficialRequestState extends State<OfficialRequest>  {
             activeemployee.ename,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child:  Text(activeemployee.ename, style: TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
+              child:  Text(activeemployee.ename, style: const TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
             ),
           ),
         ).toList(),
-        searchInputDecoration: InputDecoration(
+        searchInputDecoration: const InputDecoration(
           hintText: "Assign Charge To",
           hintStyle: TextStyle(color: AppColor.themeColor, fontWeight: FontWeight.normal),
           prefixIcon: Icon(Icons.person, color: AppColor.themeColor,),
@@ -220,13 +221,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
+      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
       child:   Center(
         child: DropdownButton(
           // Initial Value
-          underline: SizedBox(height: 0,),
+          underline: const SizedBox(height: 0,),
           value: dutyTypeSpinner,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_drop_down,
             color: AppColor.themeColor, // <-- SEE HERE
           ),
@@ -320,7 +321,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   textFeildWidget(String hinttxt, TextEditingController visitPlace) {
     return  Container(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -347,7 +348,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   personInCharge() {
     return Container(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -356,15 +357,15 @@ class _OfficialRequestState extends State<OfficialRequest>  {
       child:  TextField(
         controller: visitPlace,
         style: const TextStyle(color: AppColor.themeColor),
-        decoration:  InputDecoration(
-          prefixIcon: const Icon(
+        decoration:  const InputDecoration(
+          prefixIcon: Icon(
             Icons.person,
             color: AppColor.themeColor,
           ),
           border: InputBorder.none,
           hintText: "Charge Given To",
           hintStyle:
-          const TextStyle(color: AppColor.themeColor),
+          TextStyle(color: AppColor.themeColor),
         ),
         keyboardType: TextInputType.text,
 
@@ -381,13 +382,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
+      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
       child:   Center(
         child: DropdownButton(
           // Initial Value
-          underline: SizedBox(height: 0,),
+          underline: const SizedBox(height: 0,),
           value: workPlace,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_drop_down,
             color: AppColor.themeColor, // <-- SEE HERE
           ),
@@ -441,8 +442,9 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   Future<void> createOD() async {
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? sapcode = sharedPreferences.getString(sapCodetxt);
+   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    String? sapcode = sharedPreferences.getString(userID).toString() ;
 
     dynamic response = await HTTP.get(createODAPI(sapcode!,dutyTypeSpinner.toString(),indianFromDate.toString(),indianToDate.toString(),visitPlace.text.toString(),workPlace.toString(),purpose1.text.toString(),purpose2.text.toString(),purpose3.text.toString(),remark.text.toString(),selectedAssginTo.toString()));
     if (response != null && response.statusCode == 200)  {

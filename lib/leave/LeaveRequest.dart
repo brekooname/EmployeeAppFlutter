@@ -16,6 +16,7 @@ import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../webservice/APIDirectory.dart';
+import '../webservice/constant.dart';
 
 // ignore: must_be_immutable
 class LeaveRequestScreen extends StatefulWidget {
@@ -402,9 +403,10 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   }
 
   Future<void> applyLeave() async {
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    String? sapcode = sharedPreferences.getString(sapCodetxt);
+    String? sapcode = sharedPreferences.getString(userID).toString() ;
 
     dynamic response = await HTTP.get(createLeaveAPI(
         sapcode!,

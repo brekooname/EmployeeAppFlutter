@@ -14,6 +14,8 @@ import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../webservice/constant.dart';
+
 
 class GatepassRequestScreen extends StatefulWidget {
   List<Activeemployee> activeemployeeList = [];
@@ -450,9 +452,9 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
   Future<void> gatePassRequestAPI() async {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? sapcode = sharedPreferences.getString(sapCodetxt);
+    String? sapcode = sharedPreferences.getString(userID).toString()  ;
 
-    dynamic response = await HTTP.get(createGatePassAPI(sapcode!,indianFromDate.toString(),_time.toString(),typeSpinner.toString(),returnableSpinner.toString(),indianToDate.toString(),_comeTime.toString(),visitPlace.text.toString(),purpose.text.toString(),selectedAssginTo.toString()));
+    dynamic response = await HTTP.get(createGatePassAPI(sapcode,indianFromDate.toString(),_time.toString(),typeSpinner.toString(),returnableSpinner.toString(),indianToDate.toString(),_comeTime.toString(),visitPlace.text.toString(),purpose.text.toString(),selectedAssginTo.toString()));
     if (response != null && response.statusCode == 200)  {
 
       print("response======>${response.toString()}");

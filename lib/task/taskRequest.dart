@@ -2,7 +2,6 @@ import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/task/model/taskrequest.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
@@ -12,6 +11,7 @@ import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'model/taskresponse.dart';
@@ -214,8 +214,6 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
   }
 
   Future<void> Validation() async {
-    //Validation
-
     if(typeSpinner ==  "Department") {
       Utility().showToast("Please select Department");
     }else if(dateto.compareTo(datefrom) < 0) {
@@ -225,16 +223,10 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
     } else if(selectedAssginTo!.isEmpty){
       Utility().showToast("Please enter person in charge");
     }else {
-      setState(() {
-        print("personInChager1 ${taskDes.text.toString()}");
-      });
-
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      taskData.add(TaskRequest(pernr: sharedPreferences.getString(sapCodetxt).toString(), budat: currentDate!, time: currentTime!, description: taskDes.text.toString(), assignTo: selectedAssginTo.toString(), dateFrom: indianFromDate.toString(), dateTo: indianFromDate.toString(), mrcType: returnableSpinner, department: typeSpinner));
+      taskData.add(TaskRequest(pernr: sharedPreferences.getString(userID).toString() , budat: currentDate!, time: currentTime!, description: taskDes.text.toString(), assignTo: selectedAssginTo.toString(), dateFrom: indianFromDate.toString(), dateTo: indianFromDate.toString(), mrcType: returnableSpinner, department: typeSpinner));
 
       String value =  convert.jsonEncode(taskData).toString();
-
-      print("TaskDetails =====>${value.toString()}");
 
       createTask(value);
     }

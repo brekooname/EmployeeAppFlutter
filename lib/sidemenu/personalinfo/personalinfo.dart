@@ -6,6 +6,7 @@ import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Util/utility.dart';
 import '../../home/model/personalindoresponse.dart';
 import '../../theme/string.dart';
 
@@ -36,21 +37,21 @@ class PersonalInfoState extends State<PersonalInfo> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
+        title: const robotoTextWidget(
             textval: ""
                 "Personal Info",
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) =>  HomePage()),
               );}
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
@@ -75,16 +76,16 @@ class PersonalInfoState extends State<PersonalInfo> {
 
   detailWidget(String title, String value) {
     return Container(
-      margin: EdgeInsets.only(left: 5, right: 5, top: 3, ),
+      margin: const EdgeInsets.only(left: 5, right: 5, top: 3, ),
       height: 52,
       child: Card(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Padding( padding : EdgeInsets.only(left: 10),
+            Padding( padding : const EdgeInsets.only(left: 10),
                child: robotoTextWidget(textval: title, colorval: Colors.black45,
                    sizeval: 15, fontWeight: FontWeight.bold)),
-         SizedBox(width: 10,),
+         const SizedBox(width: 10,),
          Flexible(child: robotoTextWidget(textval: value, colorval: AppColor.themeColor, sizeval: 15, fontWeight: FontWeight.w400))
     ],
         ),
@@ -93,9 +94,10 @@ class PersonalInfoState extends State<PersonalInfo> {
   }
 
   Future<void> getNameValue() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
     setState(() {
-      nameValue = preferences.getString(name);
+      nameValue = sharedPreferences.getString(name) .toString()  ;
     });
   }
 

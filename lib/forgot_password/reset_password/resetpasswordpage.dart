@@ -14,6 +14,7 @@ import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
 import '../../Util/utility.dart';
 import '../../uiwidget/robotoTextWidget.dart';
+import '../../webservice/constant.dart';
 
 class ResetPasswordPage extends StatefulWidget {
 
@@ -168,7 +169,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
               controller: sapCode,
               maxLines: 1,
               decoration: InputDecoration(
-                  hintText: sapCodetxt,
+                  hintText: userID,
                   hintStyle: const TextStyle(color: Colors.grey),
                   border: InputBorder.none),
               keyboardType: TextInputType.number,

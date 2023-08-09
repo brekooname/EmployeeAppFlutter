@@ -14,6 +14,7 @@ import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import '../home/HomePage.dart';
 import '../leave/model/leaveResponse.dart';
 import '../theme/color.dart';
+import '../webservice/constant.dart';
 
 
 class GatePassApproved extends StatefulWidget {
@@ -353,9 +354,9 @@ class _GatePassApprovedState extends State<GatePassApproved> {
       isLoading  = true;
     });
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    dynamic response = await HTTP.get(approveGatePassAPI(prner,leaveNo,sharedPreferences.getString(sapCodetxt).toString() ,s));
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    dynamic response = await HTTP.get(approveGatePassAPI(prner,leaveNo,sharedPreferences.getString(userID) as String ,s));
     if (response != null && response.statusCode == 200)  {
 
       print("response======>${response.toString()}");

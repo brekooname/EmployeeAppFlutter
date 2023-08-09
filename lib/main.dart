@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,16 +8,16 @@ import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'forgot_password/forgot_password_page.dart';
 import 'home/HomePage.dart';
 import 'theme/string.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? isLoggedIn = (prefs.getString(sapCodetxt) == null) ? 'false' : 'true';
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  String? isLoggedIn = (sharedPreferences.getString(userID) == null) ? 'false' : 'true';
   runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
@@ -282,11 +281,8 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-    sharedPreferences.setString(sapCodetxt, sapCodeController.text.toString());
-    sharedPreferences.setString(
-        passwordtxt, passwordController.text.toString());
+    Utility().setSharedPreference(userID, sapCodeController.text.toString());
+    Utility().setSharedPreference(password, passwordController.text.toString());
 
     dynamic response = await HTTP.get(userLogin(
         sapCodeController.text.toString(), passwordController.text.toString()));
@@ -297,8 +293,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (loginResponse[0].pass ==
           passwordController.text.toUpperCase().toString()) {
-        sharedPreferences.setString(name, loginResponse[0].name);
-
+        Utility().setSharedPreference(name, loginResponse[0].name);
         Utility().showToast('Welcome ' + loginResponse[0].name);
         // ignore: use_build_context_synchronously
         Navigator.of(context).pushAndRemoveUntil(

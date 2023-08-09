@@ -15,6 +15,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/string.dart';import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
+import '../../webservice/constant.dart';
+
 class InDirect extends StatefulWidget {
     String Status;
     List<Pendingod> pendindOdList = [];
@@ -340,9 +342,11 @@ class InDirectState extends State<InDirect> {
 
   Future<void> confirmOD(String odno) async {
 
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    dynamic response = await HTTP.get(approveODAPI(odno,sharedPreferences.getString(sapCodetxt).toString(),sharedPreferences.getString(passwordtxt).toString()));
+
+    dynamic response = await HTTP.get(approveODAPI(odno,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()));
     if (response != null && response.statusCode == 200)  {
 
       print("response======>${response.toString()}");
@@ -369,9 +373,11 @@ class InDirectState extends State<InDirect> {
 
   Future<void> rejectOD(String odno) async {
 
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    dynamic response = await HTTP.get(rejectODAPI(odno,sharedPreferences.getString(sapCodetxt).toString(),sharedPreferences.getString(passwordtxt).toString()));
+
+    dynamic response = await HTTP.get(rejectODAPI(odno,sharedPreferences.getString(userID) as String ,sharedPreferences.getString(password) as String ));
     if (response != null && response.statusCode == 200)  {
 
       print("response======>${response.toString()}");

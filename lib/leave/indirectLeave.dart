@@ -15,6 +15,7 @@ import '../../theme/string.dart';
 import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
+import '../webservice/constant.dart';
 import 'model/leaverejectResponse.dart';
 
 class InDirectLeave extends StatefulWidget {
@@ -342,9 +343,10 @@ class InDirectLeaveState extends State<InDirectLeave> {
       isLoading  = true;
     });
 
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    dynamic response = await HTTP.get(approveLeaveAPI(leaveNo,sharedPreferences.getString(sapCodetxt).toString(),sharedPreferences.getString(passwordtxt).toString()));
+    dynamic response = await HTTP.get(approveLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()  ));
     if (response != null && response.statusCode == 200)  {
 
       print("response======>${response.toString()}");
@@ -378,9 +380,10 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
   Future<void> rejectLeave(int leaveNo) async {
 
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    dynamic response = await HTTP.get(rejectLeaveAPI(leaveNo,sharedPreferences.getString(sapCodetxt).toString(),sharedPreferences.getString(passwordtxt).toString()));
+    dynamic response = await HTTP.get(rejectLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString() ,sharedPreferences.getString(password).toString() ));
     if (response != null && response.statusCode == 200)  {
 
       print("response======>${response.toString()}");

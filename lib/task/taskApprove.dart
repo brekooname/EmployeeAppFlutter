@@ -51,7 +51,7 @@ class _TaskApprovedState extends State<TaskApproved> {
         backgroundColor: AppColor.themeColor,
         elevation: 0,
         title: robotoTextWidget(
-            textval: "Pending Task",
+            textval: "Approved Task",
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),

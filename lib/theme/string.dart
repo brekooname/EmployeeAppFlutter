@@ -1,5 +1,4 @@
 var appName = "Shakti Employee App";
-var passwordtxt = "Password";
 var name = "name";
 var checkInternetConnection = "Please check your internet connection and try again!";
 var login = "Login";
@@ -48,14 +47,11 @@ var resendOtp ='RESEND';
 var resendOtpMess= 'Don\u0027t receives the OTP or time out?';
 var editMobile = 'To use different mobile number.';
 var edit = 'EDIT';
-
 var registerDec= 'Please Register by filling below details and \nsign up to continue using our app.';
 var resendMess= 'Your session is expired click on resend of new otp';
-var sapCodetxt = "SapCode";
 var mobileNotxt = "Mobile Number";
-
 var leaveRequest = "Leave Request";
-var officialRequest = "Official Request";
+var officialRequest = "Official Duty Request";
 var gatepass = "Gatepass Request";
 var taskRequest = "Task Request";
 var leaveFrom = "Leave From";
@@ -63,16 +59,8 @@ var leaveTo = "Leave To";
 var noDataFound ="No Data Found";
 var confirmation = "OD Approve alert !\nDo you want Approve OD ?";
 var reject = "OD Reject alert !\nDo you want Reject OD ?";
-
 var leaveConfirmation = "Leave Approve alert !\nDo you want Approve Leave ?";
 var leaveReject = "Leave Reject alert !\nDo you want Reject Leave ?";
-
-var webBaseURL ="https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_web/";
-var canteenUrl= "canteen_expense_report.htm";
-var gatePassUrl = "employee_gatepass.htm";
-var taskUrl = "mrcr_report.htm";
-var emphierarchyUrl = "Employee_Hierarchy.htm";
-
 var aboutdec = "Detail about your Canteen Expense ";
 var gatePass = "Employee GatePass Report";
 var gatePassdec = "Detail of the Gate Pass for the employee.";

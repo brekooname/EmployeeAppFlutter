@@ -4,9 +4,11 @@ import 'package:shakti_employee_app/home/HomePage.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+
 
 import '../../theme/string.dart';
+import '../../webservice/constant.dart';
 
 class SalarySlip extends StatefulWidget {
   const SalarySlip({Key? key}) : super(key: key);
@@ -197,7 +199,8 @@ class _SalarySlipState extends State<SalarySlip> {
   Future<void> Validation() async {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String sapCode =  sharedPreferences.getString(sapCodetxt).toString();
+
+    String sapCode =  sharedPreferences.getString(userID).toString() ;
     if(yearSpinner == "Select Year"){
       Utility().showToast("Please select year");
     } else if(monthSpinner == "Select Month"){
@@ -214,10 +217,10 @@ class _SalarySlipState extends State<SalarySlip> {
     setState(() {
       isLoading = true;
     });
-    launchUrl(
+    /*launchUrl(
       Uri.parse(_url),
       mode: LaunchMode.externalApplication,
-    );
+    );*/
     setState(() {
       isLoading = true;
     });

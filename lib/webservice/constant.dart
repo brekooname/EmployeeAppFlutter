@@ -1,9 +1,9 @@
 
 var userID = "userID";
-var userName = "userName";
-var userEmail = "userEmail";
-var userMobile = "userMobile";
-var userRoleId = "userRoleId";
-var aboutUSUrl = "https://www.shaktipumps.com/company-profile.php";
-var termsConditionUrl = "https://www.shaktipumps.com/terms_of_use.php";
-var privacyPolicyUrl = "https://www.shaktipumps.com/privacy-policy.php";
+var password = "password";
+var currentDate = "currentDate";
+var webBaseURL ="https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_web/";
+var canteenUrl= "canteen_expense_report.htm";
+var gatePassUrl = "employee_gatepass.htm";
+var taskUrl = "mrcr_report.htm";
+var emphierarchyUrl = "Employee_Hierarchy.htm";
