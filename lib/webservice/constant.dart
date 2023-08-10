@@ -1,9 +1,19 @@
-
 var userID = "userID";
 var password = "password";
 var currentDate = "currentDate";
-var webBaseURL ="https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_web/";
-var canteenUrl= "canteen_expense_report.htm";
+var webBaseURL =
+    "https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_web/";
+var canteenUrl = "canteen_expense_report.htm";
 var gatePassUrl = "employee_gatepass.htm";
 var taskUrl = "mrcr_report.htm";
 var emphierarchyUrl = "Employee_Hierarchy.htm";
+var leaveBalanceLists = "leaveBalanceList";
+var activeEmployeeLists = "activeEmployeeList";
+var attendenceLists = "attendenceList";
+var odEmpLists = "odEmpList";
+var leaveEmpLists = "leaveEmpList";
+var pendingTaskLists = "pendingTaskList";
+var pendingLeaveLists = "pendingLeaveList";
+var pendindOdLists = "pendindOdList";
+var personalInfos = "personalInfo";
+var gatePassLists = "gatePassList";

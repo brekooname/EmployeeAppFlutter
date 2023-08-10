@@ -1,12 +1,16 @@
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../gatepass/model/PendingGatePassResponse.dart';
+import '../home/model/personalindoresponse.dart';
 import '../webservice/constant.dart';
 
 class Utility {
@@ -58,4 +62,41 @@ class Utility {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
   }
+  void saveArrayList(List<String> list, int position) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    switch (position) {
+      case 0:
+        preferences.setStringList(leaveBalanceLists, list);
+        break;
+      case 1:
+        preferences.setStringList(activeEmployeeLists, list);
+        break;
+      case 2:
+        preferences.setStringList(attendenceLists, list);
+        break;
+      case 3:
+        preferences.setStringList(odEmpLists, list);
+        break;
+      case 4:
+        preferences.setStringList(leaveEmpLists, list);
+        break;
+      case 5:
+        preferences.setStringList(pendingTaskLists, list);
+        break;
+      case 6:
+        preferences.setStringList(pendingLeaveLists, list);
+        break;
+      case 7:
+        preferences.setStringList(pendindOdLists, list);
+        break;
+      case 8:
+        preferences.setStringList(personalInfos, list);
+        break;
+      case 9:
+        preferences.setStringList(gatePassLists, list);
+        break;
+    }
+  }
+
+
 }

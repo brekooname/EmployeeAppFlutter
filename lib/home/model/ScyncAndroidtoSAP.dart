@@ -307,6 +307,76 @@ class PendingTask {
         reopen: json["reopen"],
       );
 
+
+  factory PendingTask.fromMap(Map<String, dynamic> map) => PendingTask(
+    asgnr1: map["asgnr1"],
+    mrcDate1: map["mrc_date1"],
+    comDateFrom1: map["com_date_from1"],
+    comDateTo1: map["com_date_to1"],
+    mrct1: map["mrct1"],
+    chker1: map["chker1"],
+    mandt: map["mandt"],
+    srno: map["srno"],
+    dno: map["dno"],
+    depName: map["dep_name"],
+    mrct: map["mrct"],
+    agenda: map["agenda"],
+    agenda1: map["agenda1"],
+    discPoint: map["disc_point"],
+    comDateFrom: map["com_date_from"],
+    comWeekFrom: map["com_week_from"],
+    comDateTo: map["com_date_to"],
+    comWeekTo: map["com_week_to"],
+    resPersonId: map["res_person_id"],
+    rpn: map["rpn"],
+    cpid: map["cpid"],
+    cpn: map["cpn"],
+    cdate: map["cdate"],
+    mrcDate: map["mrc_date"],
+    mrcTime: map["mrc_time"],
+    docEnDate: map["doc_en_date"],
+    docEnTime: map["doc_en_time"],
+    uname: map["uname"],
+    ipAdd: map["ip_add"],
+    status: map["status"],
+    comEnDate: map["com_en_date"],
+    comEnTime: map["com_en_time"],
+    comUname: map["com_uname"],
+    comIpadd: map["com_ipadd"],
+    asgnr: map["asgnr"],
+    chker: map["chker"],
+    remark: map["remark"],
+    sta: map["sta"],
+    matnr: map["matnr"],
+    menge: map["menge"],
+    extDate: map["ext_date"],
+    extWeek: map["ext_week"],
+    extCount: map["ext_count"],
+    taskNo: map["task_no"],
+    chgDate: map["chg_date"],
+    chgUname: map["chg_uname"],
+    chgIpadd: map["chg_ipadd"],
+    chgTime: map["chg_time"],
+    cdate1: map["cdate1"],
+    comUname1: map["com_uname1"],
+    ipAdd1: map["ip_add1"],
+    ctime: map["ctime"],
+    helpFrm: map["help_frm"],
+    taskTyp: map["task_typ"],
+    refTaskMaster: map["ref_task_master"],
+    request: map["request"],
+    grp: map["grp"],
+    grp2: map["grp2"],
+    grp3: map["grp3"],
+    pa30TaskNo: map["pa30_task_no"],
+    wbsElement: map["wbs_element"],
+    tenderNo: map["tender_no"],
+    matColor: map["mat_color"],
+    refTask: map["ref_task"],
+    zpriority1: map["zpriority1"],
+    reopen: map["reopen"],
+  );
+
   Map<String, dynamic> toJson() => {
         "asgnr1": asgnr1,
         "mrc_date1": mrcDate1,
@@ -446,6 +516,30 @@ class Pendingleave {
     directIndirect: json["directIndirect"],
   );
 
+  factory Pendingleave.fromMap(Map<String, dynamic> map) => Pendingleave(
+    leavNo: map["leavNo"],
+    horo: map["horo"],
+    pernr: map["pernr"],
+    name: map["name"],
+    dedQuta1: map["dedQuta1"],
+    levFrm: DateTime.parse(map["levFrm"]),
+    levFr: map["levFr"],
+    levTo: DateTime.parse(map["levTo"]),
+    levT: map["levT"],
+    timFrm: map["timFrm"],
+    timTo: map["timTo"],
+    reason: map["reason"],
+    adminChrg1: map["adminChrg1"],
+    nameperl: map["nameperl"],
+    adminChrg2: map["adminChrg2"],
+    nameperl2: map["nameperl2"],
+    nameperl3: map["nameperl3"],
+    nameperl4: map["nameperl4"],
+    person: map["person"],
+    directIndirect: map["directIndirect"],
+
+  );
+
   Map<String, dynamic> toJson() => {
     "leavNo": leavNo,
     "horo": horo,
@@ -514,6 +608,21 @@ class Pendingod {
     directIndirect: json["directIndirect"],
   );
 
+  factory Pendingod.fromMap(Map<String, dynamic> map) => Pendingod(
+    odno: map["odno"],
+    horo: map["horo"],
+    ename: map["ename"],
+    odstdateC: map["odstdateC"],
+    odedateC: map["odedateC"],
+    atnStatus: map["atnStatus"],
+    vplace: map["vplace"],
+    purpose1: map["purpose1"],
+    purpose2: map["purpose2"],
+    purpose3: map["purpose3"],
+    remark: map["remark"],
+    directIndirect: map["directIndirect"],
+  );
+
   Map<String, dynamic> toJson() => {
     "odno": odno,
     "horo": horo,
@@ -550,6 +659,13 @@ class Activeemployee {
         btext: json["btext"],
       );
 
+  factory Activeemployee.fromMap(Map<String, dynamic> map) => Activeemployee(
+    pernr: map["pernr"],
+    ename: map["ename"],
+    btrtl: map["btrtl"],
+    btext: map["btext"],
+  );
+
   Map<String, dynamic> toJson() => {
         "pernr": pernr,
         "ename": ename,
@@ -583,6 +699,15 @@ class Attendanceemp {
         atnStatus: json["atn_status"],
         leaveTyp: json["leave_typ"],
       );
+
+  factory Attendanceemp.fromMap(Map<String, dynamic> map) => Attendanceemp(
+    begdat: map["begdat"],
+    indz: map["indz"],
+    iodz: map["iodz"],
+    totdz: map["totdz"],
+    atnStatus: map["atn_status"],
+    leaveTyp: map["leave_typ"],
+  );
 
   Map<String, dynamic> toJson() => {
         "begdat": begdat,
@@ -700,6 +825,10 @@ class Leavebalance {
         leaveType: json["leaveType"],
         leaveBal: json["leaveBal"]?.toDouble(),
       );
+  factory Leavebalance.fromMap(Map<String, dynamic> map) => Leavebalance(
+    leaveType: map["leaveType"],
+    leaveBal: map["leaveBal"]?.toDouble(),
+  );
 
   Map<String, dynamic> toJson() => {
         "leaveType": leaveType,
@@ -742,6 +871,20 @@ class Leaveemp {
         reason: json["reason"]?? "",
       );
 
+  factory Leaveemp.fromMap(Map<String, dynamic> map) => Leaveemp(
+    leavNo: map["leav_no"]?? "",
+    horo: map["horo"]?? "",
+    levFrm: map["lev_frm"]?? "",
+    levTo: map["lev_to"]?? "",
+    dedQuta1: map["ded_quta1"]?? "",
+    levTyp: map["lev_typ"] ?? "",
+    apphod: map["apphod"]?? "",
+    dele: map["dele"]?? "",
+    reason: map["reason"]?? "",
+
+  );
+
+
   Map<String, dynamic> toJson() => {
         "leav_no": leavNo,
         "horo": horo,
@@ -753,6 +896,11 @@ class Leaveemp {
         "dele": dele,
         "reason": reason,
       };
+
+  @override
+  String toString() {
+    return '{leavNo: $leavNo, horo: $horo, levFrm: $levFrm, levTo: $levTo, dedQuta1: $dedQuta1, levTyp: $levTyp, apphod: $apphod, dele: $dele, reason: $reason}';
+  }
 }
 
 
@@ -804,6 +952,23 @@ class Odemp {
         directIndirect: json["direct_indirect"],
       );
 
+  factory Odemp.fromMap(Map<String, dynamic> map) => Odemp(
+    odno: map["odno"],
+    horo: map["horo"],
+    ename: map["ename"],
+    odstdateC: map["odstdate_c"],
+    odedateC: map["odedate_c"],
+    odaprdtC: map["odaprdt_c"],
+    atnStatus: map["atn_status"],
+    vplace: map["vplace"],
+    purpose1: map["purpose1"],
+    purpose2: map["purpose2"],
+    purpose3: map["purpose3"],
+    remark: map["remark"],
+    directIndirect: map["direct_indirect"],
+
+  );
+
   Map<String, dynamic> toJson() => {
         "odno": odno,
         "horo": horo,
@@ -819,6 +984,11 @@ class Odemp {
         "remark": remark,
         "direct_indirect": directIndirect,
       };
+
+  @override
+  String toString() {
+    return 'Odemp{odno: $odno, horo: $horo, ename: $ename, odstdateC: $odstdateC, odedateC: $odedateC, odaprdtC: $odaprdtC, atnStatus: $atnStatus, vplace: $vplace, purpose1: $purpose1, purpose2: $purpose2, purpose3: $purpose3, remark: $remark, directIndirect: $directIndirect}';
+  }
 }
 
 class Taxcode {
@@ -843,6 +1013,11 @@ class Taxcode {
         "tax_code": taxCode,
         "text": text,
       };
+
+  @override
+  String toString() {
+    return 'Taxcode{mandt: $mandt, taxCode: $taxCode, text: $text}';
+  }
 }
 
 class Tehsil {
@@ -875,6 +1050,11 @@ class Tehsil {
         "tehsil": tehsil,
         "tehsil_text": tehsilText,
       };
+
+  @override
+  String toString() {
+    return 'Tehsil{land1: $land1, regio: $regio, district: $district, tehsil: $tehsil, tehsilText: $tehsilText}';
+  }
 }
 
 enum Land1 { IN, NP }

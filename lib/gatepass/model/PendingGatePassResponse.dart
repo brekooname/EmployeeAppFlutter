@@ -108,6 +108,34 @@ class Datum {
     gateNo: json["gateNo"],
   );
 
+  factory Datum.fromMap(Map<String, dynamic> map) => Datum(
+    gpdat1: map["gpdat1"],
+    gptime1: map["gptime1"],
+    reqtypeTxt: map["reqtypeTxt"],
+    gptypeTxt: map["gptypeTxt"],
+    ename: map["ename"],
+    directindirect: map["directindirect"],
+    mandt: map["mandt"],
+    gpno: map["gpno"],
+    werks: map["werks"],
+    gptype: map["gptype"],
+    pernr: map["pernr"],
+    plans: map["plans"],
+    orgeh: map["orgeh"],
+    gpdat: map["gpdat"],
+    gptime: map["gptime"],
+    eindat: map["eindat"],
+    eintime: map["eintime"],
+    reqtype: map["reqtype"],
+    chargeGiven: map["chargeGiven"],
+    vplace: map["vplace"],
+    purpose1: map["purpose1"],
+    uname: map["uname"],
+    credt:  map["credt"],
+    vfp: map["vfp"],
+    gateNo: map["gateNo"],
+  );
+
   Map<String, dynamic> toJson() => {
     "gpdat1": gpdat1,
     "gptime1": gptime1,

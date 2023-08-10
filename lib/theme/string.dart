@@ -68,3 +68,4 @@ var taskReport = "Task Report";
 var taskReportdec = "Detail of task assgined.";
 var emphierarchy = "Employee Hierarchy";
 var emhierarchydec = "List of Employee In your team.";
+var downloadingDataTxt = "Downloading Data";

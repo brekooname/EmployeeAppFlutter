@@ -1,6 +1,7 @@
 // ignore_for_file: library_prefixes
 
 import 'dart:convert' as convert;
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -38,7 +39,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String packageName="", version="",nameValue="",formattedDate="";
+  String packageName = "", version = "", nameValue = "", formattedDate = "";
   bool isLoading = false;
   late SharedPreferences sharedPreferences;
   List<Leavebalance> leaveBalanceList = [];
@@ -58,8 +59,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _handleLocationPermission();
     getNameValue();
-
-
   }
 
   @override
@@ -85,16 +84,21 @@ class _HomePageState extends State<HomePage> {
                 // row with 2 children
                 child: Row(
                   children: [
-                    Icon(Icons.download_for_offline,color: AppColor.themeColor,),
+                    Icon(
+                      Icons.download_for_offline,
+                      color: AppColor.themeColor,
+                    ),
                     SizedBox(
                       width: 10,
                     ),
-                    robotoTextWidget(textval: 'Downloading Data',
-                        colorval: AppColor.themeColor, sizeval: 16, fontWeight: FontWeight.w600)
+                    robotoTextWidget(
+                        textval: 'Downloading Data',
+                        colorval: AppColor.themeColor,
+                        sizeval: 16,
+                        fontWeight: FontWeight.w600)
                   ],
                 ),
               ),
-
             ],
 
             color: Colors.white,
@@ -103,7 +107,7 @@ class _HomePageState extends State<HomePage> {
             onSelected: (value) {
               // if value 1 show dialog
               if (value == 1) {
-                 downloadingData();
+                downloadingData();
                 // if value 2 show dialog
               }
             },
@@ -168,27 +172,26 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Container(
-                  height: MediaQuery.of(context).size.height / 18,
-                  color: AppColor.themeColor,
-                  alignment: Alignment.center,
-                  child: robotoTextWidget(
-                      textval: title,
-                      colorval: Colors.white,
-                      sizeval: 12,
-                      fontWeight: FontWeight.w600),
-                ),
-          Container(
-                margin: EdgeInsets.only(bottom: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    imageTextWidget("assets/svg/request.svg", "Request",title),
-                    dividerWidget(),
-                    imageTextWidget("assets/svg/approved.svg", "Approve",title)
-                  ],
-                ),
-
+              height: MediaQuery.of(context).size.height / 18,
+              color: AppColor.themeColor,
+              alignment: Alignment.center,
+              child: robotoTextWidget(
+                  textval: title,
+                  colorval: Colors.white,
+                  sizeval: 12,
+                  fontWeight: FontWeight.w600),
+            ),
+            Container(
+              margin: EdgeInsets.only(bottom: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  imageTextWidget("assets/svg/request.svg", "Request", title),
+                  dividerWidget(),
+                  imageTextWidget("assets/svg/approved.svg", "Approve", title)
+                ],
+              ),
             )
           ],
         ),
@@ -197,49 +200,48 @@ class _HomePageState extends State<HomePage> {
   }
 
   localConvenience() {
-    return  Container(
-            margin: EdgeInsets.only(top: 5),
-            child: Card(
-              color: AppColor.whiteColor,
-              elevation: 5,
-              semanticContainer: true,
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              shape: const RoundedRectangleBorder(
-                side: BorderSide(
-                  color: AppColor.greyBorder,
+    return Container(
+        margin: EdgeInsets.only(top: 5),
+        child: Card(
+          color: AppColor.whiteColor,
+          elevation: 5,
+          semanticContainer: true,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(
+              color: AppColor.greyBorder,
+            ),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height / 18,
+                color: AppColor.themeColor,
+                alignment: Alignment.center,
+                child: const robotoTextWidget(
+                    textval: 'Local Convenience',
+                    colorval: Colors.white,
+                    sizeval: 12,
+                    fontWeight: FontWeight.w600),
+              ),
+              Container(
+                margin: EdgeInsets.only(bottom: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    imageTextWidget("assets/svg/start.svg", "Start", ""),
+                    dividerWidget(),
+                    imageTextWidget("assets/svg/end.svg", "End", ""),
+                    dividerWidget(),
+                    imageTextWidget("assets/svg/offline.svg", "Offline", ""),
+                  ],
                 ),
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20)),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height / 18,
-                    color: AppColor.themeColor,
-                    alignment: Alignment.center,
-                    child: const robotoTextWidget(
-                        textval: 'Local Convenience',
-                        colorval: Colors.white,
-                        sizeval: 12,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        imageTextWidget("assets/svg/start.svg", "Start",""),
-                        dividerWidget(),
-                        imageTextWidget("assets/svg/end.svg", "End",""),
-                        dividerWidget(),
-                        imageTextWidget("assets/svg/offline.svg", "Offline",""),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ));
+              )
+            ],
+          ),
+        ));
   }
 
   dividerWidget() {
@@ -253,39 +255,38 @@ class _HomePageState extends State<HomePage> {
 
   dailyAndWebReport(String title, String svg) {
     return Container(
-            margin: EdgeInsets.only(top: 5),
-            child: Card(
-              color: AppColor.whiteColor,
-              elevation: 10,
-              semanticContainer: true,
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              shape: const RoundedRectangleBorder(
-                side: BorderSide(
-                  color: AppColor.greyBorder,
-                ),
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20)),
+        margin: EdgeInsets.only(top: 5),
+        child: Card(
+          color: AppColor.whiteColor,
+          elevation: 10,
+          semanticContainer: true,
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(
+              color: AppColor.greyBorder,
+            ),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height / 18,
+                color: AppColor.themeColor,
+                alignment: Alignment.center,
+                child: robotoTextWidget(
+                    textval: title,
+                    colorval: Colors.white,
+                    sizeval: 12,
+                    fontWeight: FontWeight.w600),
               ),
-              child: Column(
-                children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height / 18,
-                    color: AppColor.themeColor,
-                    alignment: Alignment.center,
-                    child: robotoTextWidget(
-                        textval: title,
-                        colorval: Colors.white,
-                        sizeval: 12,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(bottom: 10),
-                    child: imageTextWidget(svg, title,title),
-                  )
-                ],
-              ),
-            ));
+              Container(
+                margin: EdgeInsets.only(bottom: 10),
+                child: imageTextWidget(svg, title, title),
+              )
+            ],
+          ),
+        ));
   }
 
   void requestMethod(String title) {
@@ -382,19 +383,63 @@ class _HomePageState extends State<HomePage> {
     var now = new DateTime.now();
     var formatter = new DateFormat('yyyy-MM-dd');
     formattedDate = formatter.format(now);
-     sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences = await SharedPreferences.getInstance();
 
     setState(() {
-      nameValue = sharedPreferences.getString(name)as String;
+      nameValue = sharedPreferences.getString(name) as String;
     });
-    if(sharedPreferences.getString(currentDate)!=null) {
+    if (sharedPreferences.getString(currentDate) != null) {
       if (formattedDate !=
           sharedPreferences.getString(currentDate).toString()) {
         downloadingData();
+      } else {
+     //   getSPArrayList();
       }
-    }else{
+    } else {
       downloadingData();
     }
+  }
+
+  void getSPArrayList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+
+
+     /*
+       List<String> mActiveEmployeeList = (prefs.getStringList(activeEmployeeLists) ?? []);
+       leaveBalanceList = mLeaveBalanceList.cast<Leavebalance>();
+       print('leaveBalanceList=========>${leaveBalanceList.length}}');
+
+
+      List<String> mActiveEmployeeList = (prefs.getStringList(activeEmployeeLists) ?? []);
+      activeEmployeeList = mActiveEmployeeList.cast<Activeemployee>();
+
+      List<String> mAttendenceLists = (prefs.getStringList(attendenceLists) ?? []);
+      attendenceList = mAttendenceLists.cast<Attendanceemp>();
+
+      List<String> mOdEmpLists = (prefs.getStringList(odEmpLists) ?? []);
+      odEmpList = mOdEmpLists.cast<Odemp>();
+
+      List<String> mLeaveEmpLists = (prefs.getStringList(leaveEmpLists) ?? []);
+      leaveEmpList = mLeaveEmpLists.cast<Leaveemp>();
+
+      List<String> mPendingTaskLists =
+          (prefs.getStringList(pendingTaskLists) ?? []);
+      pendingTaskList = mPendingTaskLists.cast<PendingTask>();
+
+      List<String> mPendingLeaveLists = (prefs.getStringList(pendingLeaveLists) ?? []);
+      pendingLeaveList = mPendingLeaveLists.cast<Pendingleave>();
+
+      List<String> mPendindOdLists = (prefs.getStringList(pendindOdLists) ?? []);
+      pendindOdList = mPendindOdLists.cast<Pendingod>();
+
+      List<String> mPersonalInfos = (prefs.getStringList(personalInfos) ?? []);
+      personalInfo = mPersonalInfos.cast<Emp>();
+
+      List<String> mGatePassLists = (prefs.getStringList(gatePassLists) ?? []);
+      gatePassList = mGatePassLists.cast<Datum>();*/
+    });
   }
 
   buildLocationDialog() {
@@ -444,44 +489,54 @@ class _HomePageState extends State<HomePage> {
       isLoading = true;
     });
 
-   
     var jsonData = null;
     var jsonData1 = null;
 
-    dynamic response = await HTTP.get(SyncAndroidToSapAPI(
-        sharedPreferences.getString(userID) as String ));
+    dynamic response = await HTTP.get(
+        SyncAndroidToSapAPI(sharedPreferences.getString(userID) as String));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
       SyncAndroidToSapResponse androidToSapResponse =
           SyncAndroidToSapResponse.fromJson(jsonData);
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
 
       setState(() {
         leaveBalanceList = androidToSapResponse.leavebalance;
-
-        leaveBalanceList.add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
-
+        leaveBalanceList
+            .add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
         activeEmployeeList = androidToSapResponse.activeemployee;
-
         attendenceList = androidToSapResponse.attendanceemp;
-
         odEmpList = androidToSapResponse.odemp;
-
         leaveEmpList = androidToSapResponse.leaveemp;
-
         pendingTaskList = androidToSapResponse.pendingtask;
-
         pendingLeaveList = androidToSapResponse.pendingleave;
-
         pendindOdList = androidToSapResponse.pendingod;
 
-
         Utility().setSharedPreference(currentDate, formattedDate);
-
+        List<String> stringsList =
+            leaveBalanceList.map((i) => i.toString()).toList();
+        sharedPreferences.setStringList(leaveBalanceLists, stringsList);
+        Utility().saveArrayList(
+            leaveBalanceList.map((i) => i.toString()).toList(), 0);
+        Utility().saveArrayList(
+            activeEmployeeList.map((i) => i.toString()).toList(), 1);
+        Utility()
+            .saveArrayList(attendenceList.map((i) => i.toString()).toList(), 2);
+        Utility().saveArrayList(odEmpList.map((i) => i.toString()).toList(), 3);
+        Utility()
+            .saveArrayList(leaveEmpList.map((i) => i.toString()).toList(), 4);
+        Utility().saveArrayList(
+            pendingTaskList.map((i) => i.toString()).toList(), 5);
+        Utility().saveArrayList(
+            pendingLeaveList.map((i) => i.toString()).toList(), 6);
+        Utility()
+            .saveArrayList(pendindOdList.map((i) => i.toString()).toList(), 7);
       });
     }
 
-    dynamic response1 = await HTTP.get(
-        personalInfoAPI(sharedPreferences.getString(userID).toString() ));
+    dynamic response1 = await HTTP
+        .get(personalInfoAPI(sharedPreferences.getString(userID).toString()));
     if (response1 != null && response1.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response1.body);
       PersonalInfoResponse _personalInfo =
@@ -490,11 +545,13 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         isLoading = false;
         personalInfo = _personalInfo.emp;
+        Utility()
+            .saveArrayList(personalInfo.map((i) => i.toString()).toList(), 8);
       });
     }
 
-    dynamic response2 = await HTTP.get(
-        pendingGatePass(sharedPreferences.getString(userID) .toString() ));
+    dynamic response2 = await HTTP
+        .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
     if (response2 != null && response2.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response2.body);
       PendingGatePassResponse pendingGatePassResponse =
@@ -503,78 +560,75 @@ class _HomePageState extends State<HomePage> {
       gatePassList = pendingGatePassResponse.data;
       setState(() {
         isLoading = false;
+        Utility()
+            .saveArrayList(gatePassList.map((i) => i.toString()).toList(), 9);
       });
     }
   }
 
   imageTextWidget(String svg, String msg, String title) {
-    return GestureDetector(onTap: (){
-      switch (msg) {
-        case "Request":
-          {
-            requestMethod(title);
-          }
-          break;
-        case "Approve":
-          {
-            approvedMethod(title);
-          }
-          break;
-        case "Start":
-          {
+    return GestureDetector(
+      onTap: () {
+        switch (msg) {
+          case "Request":
+            {
+              requestMethod(title);
+            }
+            break;
+          case "Approve":
+            {
+              approvedMethod(title);
+            }
+            break;
+          case "Start":
+            {}
+            break;
+          case "End":
+            {}
+            break;
+          case "Offline":
+            {}
+            break;
+          case "Daily Report":
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const DailyReport()),
+                  (route) => true);
+            }
+            break;
+          case "Web Report":
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const WebReport()),
+                  (route) => true);
+            }
+            break;
+        }
 
-          }
-          break;
-        case "End":
-          {
-
-          }
-          break;
-        case "Offline":
-          {
-
-          }
-          break;
-        case "Daily Report":
-          {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => const DailyReport()),
-                    (route) => true);
-          }
-          break;
-        case "Web Report":
-          {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => const WebReport()),
-                    (route) => true);
-          }
-          break;
-      }
-
-       /**/
-    },child:Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Center(
-            child: SvgPicture.asset(
-              svg,
-              width: 50,
-              height: 50,
+        /**/
+      },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Center(
+              child: SvgPicture.asset(
+                svg,
+                width: 50,
+                height: 50,
+              ),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 4,
-        ),
-        robotoTextWidget(
-            textval: msg,
-            colorval: AppColor.themeColor,
-            sizeval: 12,
-            fontWeight: FontWeight.w600)
-      ],
-    ) ,);
+          const SizedBox(
+            height: 4,
+          ),
+          robotoTextWidget(
+              textval: msg,
+              colorval: AppColor.themeColor,
+              sizeval: 12,
+              fontWeight: FontWeight.w600)
+        ],
+      ),
+    );
   }
 }

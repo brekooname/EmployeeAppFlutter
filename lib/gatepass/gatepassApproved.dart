@@ -46,7 +46,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                     (route) => false),
           ),
           backgroundColor: AppColor.themeColor,
-          title: robotoTextWidget(textval: "Gate Pass Approve", colorval: AppColor.whiteColor,
+          title: const robotoTextWidget(textval: "Gate Pass Approve", colorval: AppColor.whiteColor,
               sizeval: 18, fontWeight: FontWeight.normal),
 
       ),
@@ -95,35 +95,35 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         detailWidget("GatePass No", widget.gatePassList[index].gpno.toString()),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget("Name",widget.gatePassList[index].ename),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget("GatePass Type",widget.gatePassList[index].gptypeTxt ),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget("Required Type",widget.gatePassList[index].reqtypeTxt),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
                             datedetailWidget( "From", widget.gatePassList[index].gpdat.toString()),
-                            SizedBox(
+                            const SizedBox(
                               width: 4,
                             ),
                             datedetailWidget( "To",widget.gatePassList[index].eindat.toString()),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget( "Visit Place",widget.gatePassList[index].vplace),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
 
@@ -131,7 +131,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
 
                             child: InkWell(
                               onTap: (){
@@ -147,7 +147,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
                             child: InkWell(
                               onTap: (){
                                 selectedIndex = index;
@@ -202,7 +202,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   }
 
   datedetailWidget(String title, String value) {
-    return Container(
+    return SizedBox(
       width:MediaQuery.of(context).size.width/2.2,
       height: 30,
       child: Row(
@@ -213,7 +213,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -228,7 +228,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   }
 
   detailWidget(String title, var value) {
-    return Container(
+    return SizedBox(
       width:MediaQuery.of(context).size.width/1.1,
       height: 26,
       child: Row(
@@ -239,7 +239,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -349,35 +349,25 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   }
 
   Future<void> confirmGatePass(int prner, int leaveNo, String s) async {
-
     setState(() {
       isLoading  = true;
     });
-
-
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(approveGatePassAPI(prner,leaveNo,sharedPreferences.getString(userID) as String ,s));
     if (response != null && response.statusCode == 200)  {
-
-      print("response======>${response.toString()}");
       Iterable l = convert.json.decode(response.body);
       List<GatePassResponse> gatePassResponse = List<GatePassResponse>.from(l.map((model)=> GatePassResponse.fromJson(model)));
-      print("response======>${gatePassResponse[0].msgtyp}");
 
       if(gatePassResponse[0].msgtyp.compareTo("S") == 0){
-
         setState(() {
           isLoading  = false;
         });
         Utility().showToast("Gate Pass Approved Successfully");
-
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (context) =>
                     HomePage()),
                 (route) => true);
-
-
       }else{
         setState(() {
           isLoading  = false;

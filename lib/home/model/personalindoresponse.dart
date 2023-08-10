@@ -98,6 +98,32 @@ class Emp {
     bankTxt: json["bank_txt"],
   );
 
+  factory Emp.fromMap(Map<String, dynamic> map) => Emp(
+    pernr: map["pernr"],
+    bukrs: map["bukrs"],
+    werks: map["werks"],
+    persk: map["persk"],
+    btrtl: map["btrtl"],
+    btrtlTxt: map["btrtl_txt"],
+    perskTxt: map["persk_txt"],
+    telnr: map["telnr"],
+    emailShkt: map["email_shkt"],
+    emailPers: map["email_pers"],
+    hod: map["hod"],
+    hodEname: map["hod_ename"],
+    stras: map["stras"],
+    locat: map["locat"],
+    address: map["address"],
+    gender: map["gender"],
+    birth: map["birth"],
+    birth1: map["birth1"],
+    marital: map["marital"],
+    bankn: map["bankn"],
+    bankl: map["bankl"],
+    bankTxt: map["bank_txt"],
+  );
+
+
   Map<String, dynamic> toJson() => {
     "pernr": pernr,
     "bukrs": bukrs,
