@@ -653,4 +653,246 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+  Future getCurrentLocation() async {
+    if (Platform.isAndroid) {
+      var permission = Permission.locationWhenInUse.status;
+      if (permission != PermissionStatus.granted) {
+        final status = await Permission.location.request();
+        if (status != PermissionStatus.granted) {
+          Utility().showToast("You need location permission for use this App");
+          return;
+        }
+      }
+    }
+
+    if (Platform.isIOS) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission != PermissionStatus.granted) {
+        LocationPermission permission = await Geolocator.requestPermission();
+        if (permission != PermissionStatus.granted) getLocation();
+        return;
+      }
+    }
+    getLocation();
+  }
+
+  getLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    if(mounted) {
+      setState(() {
+        latlong = LatLng(position.latitude, position.longitude);
+        GetAddressFromLatLong(latlong!);
+      });
+    }
+  }
+
+  Future<void> GetAddressFromLatLong(LatLng position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude, position.longitude,
+          localeIdentifier: 'en');
+      Placemark place = placemarks[0];
+      placeName = (place.subLocality != '')
+          ? place.subLocality!
+          : place.subAdministrativeArea!;
+      isoId = place.isoCountryCode!;
+
+      if(mounted) {
+        setState(() {
+          Address = '${place.street}, ${place.subLocality}, ${place.locality}';
+          Address = Utility().formatAddress(Address);
+
+        });
+        setState(() {
+          isLoading = false;
+        });
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => startJourneyPopup(context),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => startJourneyPopup(context),
+      );
+    }
+  }
+
+  startJourneyPopup(BuildContext context) {
+    return AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        content: Container(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: robotoTextWidget(
+                    textval: appName,
+                    colorval: AppColor.themeColor,
+                    sizeval: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+
+              latLongWidget('Latitude:-  ${latlong!.latitude}',),
+              latLongWidget('Longitude:-  ${latlong!.longitude}',),
+              latLongWidget('Address:-$Address',),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Flexible(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColor.whiteColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                      ),
+                      child: robotoTextWidget(
+                        textval: cancel,
+                        colorval: AppColor.darkGrey,
+                        sizeval: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    child: ElevatedButton(
+                      onPressed: () {
+                       setState(() {
+                         journeyStart = True;
+                         Utility().setSharedPreference(journeyStart, True);
+                       });
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColor.themeColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                      ),
+                      child: robotoTextWidget(
+                        textval: confirm,
+                        colorval: AppColor.whiteColor,
+                        sizeval: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ])));
+  }
+
+  latLongWidget(String title) {
+    return Container(
+      margin: EdgeInsets.only(top: 10),
+      child: Column(
+        children: [
+          robotoTextWidget(textval: title,
+              colorval: Colors.black,
+              sizeval: 12,
+              fontWeight: FontWeight.normal),
+          SizedBox(height: 5,),
+          Divider(),
+        ],
+      ),
+    );
+  }
+
+  localConvenceWidget(String svg, String msg, String title) {
+    return GestureDetector(
+      onTap: () {
+        switch (msg) {
+          case "Start":{
+            if(journeyStart == False) {
+              getCurrentLocation();
+              setState(() {
+                isLoading = true;
+              });
+            }
+            }
+            break;
+          case "End":{
+            if(journeyStart == True) {
+              setState(() {
+                journeyStart = False;
+                Utility().setSharedPreference(journeyStart, False);
+              });
+            }
+            }
+            break;
+        }
+      },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Center(
+              child: loadSvg(msg,svg),
+            ),
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          robotoTextWidget(
+              textval: msg,
+              colorval: AppColor.themeColor,
+              sizeval: 12,
+              fontWeight: FontWeight.w600)
+        ],
+      ),
+    );
+  }
+
+  loadSvg( String msg, String svg) {
+    if(journeyStart == True && msg == start){
+      return Opacity(
+        opacity: 0.42,
+        child: SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+        ),
+      );
+    }
+
+    if(journeyStart == False && msg == start){
+      return  SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+      );
+    }
+
+    if(journeyStart == True && msg==end){
+      return  SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+      );
+    }
+
+    if(journeyStart == False && msg == end){
+      return Opacity(
+        opacity: 0.42,
+        child: SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+        ),
+      );
+    }
+  }
+
 }
