@@ -82,10 +82,7 @@ class _DailyReportState extends State<DailyReport> {
               color: AppColor.whiteColor,
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
+              Navigator.of(context).pop();
             }),
         iconTheme: const IconThemeData(color: Colors.white),
       ),

@@ -361,11 +361,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
         });
         Utility().showToast("Leave Approved Successfully");
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
 
 
       }else{
@@ -395,11 +391,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
         Utility().showToast("Leave Rejected Successfully");
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
 
       }else{
         Utility().showToast(leaveResponse[0].message);

@@ -41,8 +41,7 @@ class _LeaveApprovedState extends State<LeaveApproved> {
         appBar:  AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>  HomePage()),
-                      (route) => false),
+              onPressed: () => Navigator.of(context).pop(),
             ),
             backgroundColor: AppColor.themeColor,
             title: robotoTextWidget(textval: "Leave Approve", colorval: AppColor.whiteColor,

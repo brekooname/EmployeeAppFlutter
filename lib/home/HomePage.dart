@@ -1,10 +1,14 @@
 // ignore_for_file: library_prefixes
 
 import 'dart:convert' as convert;
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
@@ -29,14 +33,21 @@ import '../webservice/constant.dart';
 import 'navigation_drawer_widget.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key,required this.journeyStart}) : super(key: key);
 
+  String journeyStart;
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  String packageName = "", version = "", nameValue = "", formattedDate = "";
+
+  LatLng? latlong = null;
+  String packageName = "",
+      version = "",
+      nameValue = "",
+      formattedDate = "",
+      Address = "",placeName = "",isoId="",journeyStart = "";
   bool isLoading = false;
   late SharedPreferences sharedPreferences;
   List<Leavebalance> leaveBalanceList = [];
@@ -49,15 +60,16 @@ class _HomePageState extends State<HomePage> {
   List<Pendingod> pendindOdList = [];
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
+  SyncAndroidToSapResponse? syncAndroidToSapResponse;
+  PersonalInfoResponse? personInfo;
+  PendingGatePassResponse? gatePassResponse;
 
-   SyncAndroidToSapResponse? syncAndroidToSapResponse;
-   PersonalInfoResponse? personInfo;
-   PendingGatePassResponse? gatePassResponse;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    journeyStart = widget.journeyStart;
     _handleLocationPermission();
     getNameValue();
   }
@@ -78,7 +90,8 @@ class _HomePageState extends State<HomePage> {
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           PopupMenuButton<int>(
-            itemBuilder: (context) => [
+            itemBuilder: (context) =>
+            [
               // PopupMenuItem 1
               const PopupMenuItem(
                 value: 1,
@@ -120,7 +133,10 @@ class _HomePageState extends State<HomePage> {
           SingleChildScrollView(
             child: Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
-              width: MediaQuery.of(context).size.width,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               child: Column(
                 children: [
                   detailWidget("Leave"),
@@ -137,8 +153,8 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: isLoading == true
                 ? const CircularProgressIndicator(
-                    color: Colors.indigo,
-                  )
+              color: Colors.indigo,
+            )
                 : const SizedBox(),
           ),
         ],
@@ -173,7 +189,10 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Container(
-              height: MediaQuery.of(context).size.height / 18,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height / 18,
               color: AppColor.themeColor,
               alignment: Alignment.center,
               child: robotoTextWidget(
@@ -218,7 +237,10 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               Container(
-                height: MediaQuery.of(context).size.height / 18,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height / 18,
                 color: AppColor.themeColor,
                 alignment: Alignment.center,
                 child: const robotoTextWidget(
@@ -232,11 +254,11 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    imageTextWidget("assets/svg/start.svg", "Start", ""),
+                    localConvenceWidget("assets/svg/start.svg", start, ""),
                     dividerWidget(),
-                    imageTextWidget("assets/svg/end.svg", "End", ""),
+                    localConvenceWidget("assets/svg/end.svg", end, ""),
                     dividerWidget(),
-                    imageTextWidget("assets/svg/offline.svg", "Offline", ""),
+                    imageTextWidget("assets/svg/offline.svg", Offline, ""),
                   ],
                 ),
               )
@@ -249,7 +271,10 @@ class _HomePageState extends State<HomePage> {
     return Container(
       width: 1,
       margin: EdgeInsets.only(top: 15),
-      height: MediaQuery.of(context).size.height / 8,
+      height: MediaQuery
+          .of(context)
+          .size
+          .height / 8,
       color: AppColor.grey,
     );
   }
@@ -272,7 +297,10 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               Container(
-                height: MediaQuery.of(context).size.height / 18,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height / 18,
                 color: AppColor.themeColor,
                 alignment: Alignment.center,
                 child: robotoTextWidget(
@@ -296,41 +324,45 @@ class _HomePageState extends State<HomePage> {
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) => LeaveRequestScreen(
+                  builder: (context) =>
+                      LeaveRequestScreen(
                         LeaveBalanceList: leaveBalanceList,
                         activeEmpList: activeEmployeeList,
                       )),
-              (route) => true);
+                  (route) => true);
         }
         break;
       case "Official Duty":
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) => OfficialRequest(
+                  builder: (context) =>
+                      OfficialRequest(
                         activeemployeeList: activeEmployeeList,
                       )),
-              (route) => true);
+                  (route) => true);
         }
         break;
       case "Gate Pass":
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) => GatepassRequestScreen(
+                  builder: (context) =>
+                      GatepassRequestScreen(
                         activeemployeeList: activeEmployeeList,
                       )),
-              (route) => true);
+                  (route) => true);
         }
         break;
       case "Task":
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) => TaskRequestScreen(
+                  builder: (context) =>
+                      TaskRequestScreen(
                         activeemployeeList: activeEmployeeList,
                       )),
-              (route) => true);
+                  (route) => true);
         }
         break;
     }
@@ -342,10 +374,11 @@ class _HomePageState extends State<HomePage> {
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) => LeaveApproved(
+                  builder: (context) =>
+                      LeaveApproved(
                         pendingLeaveList: pendingLeaveList,
                       )),
-              (route) => true);
+                  (route) => true);
         }
         break;
       case "Official Duty":
@@ -354,7 +387,7 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(
                   builder: (context) =>
                       OfficialApproved(pendindOdList: pendindOdList)),
-              (route) => true);
+                  (route) => true);
         }
         break;
       case "Gate Pass":
@@ -363,18 +396,19 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(
                   builder: (context) =>
                       GatePassApproved(gatePassList: gatePassList)),
-              (route) => true);
+                  (route) => true);
         }
         break;
       case "Task":
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) => TaskApproved(
+                  builder: (context) =>
+                      TaskApproved(
                         pendingTaskList: pendingTaskList,
                         activeemployeeList: activeEmployeeList,
                       )),
-              (route) => true);
+                  (route) => true);
         }
         break;
     }
@@ -402,27 +436,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getSPArrayList() async {
-
-
-    if(sharedPreferences.getString(syncSapResponse)!=null && sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
-      var jsonData = convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
+    if (sharedPreferences.getString(syncSapResponse) != null &&
+        sharedPreferences
+            .getString(syncSapResponse)
+            .toString()
+            .isNotEmpty) {
+      var jsonData =
+      convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
       syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
     }
 
-    if(sharedPreferences.getString(userInfo)!=null && sharedPreferences.getString(userInfo).toString().isNotEmpty) {
+    if (sharedPreferences.getString(userInfo) != null &&
+        sharedPreferences
+            .getString(userInfo)
+            .toString()
+            .isNotEmpty) {
       var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
       personInfo = PersonalInfoResponse.fromJson(jsonData);
-
     }
 
-    if(sharedPreferences.getString(gatePassDatail)!=null && sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
-      var jsonData = convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+    if (sharedPreferences.getString(gatePassDatail) != null &&
+        sharedPreferences
+            .getString(gatePassDatail)
+            .toString()
+            .isNotEmpty) {
+      var jsonData =
+      convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
-
     }
 
     setListData();
-
   }
 
   buildLocationDialog() {
@@ -479,10 +522,12 @@ class _HomePageState extends State<HomePage> {
         SyncAndroidToSapAPI(sharedPreferences.getString(userID) as String));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-      SyncAndroidToSapResponse androidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
+      SyncAndroidToSapResponse androidToSapResponse =
+      SyncAndroidToSapResponse.fromJson(jsonData);
       setState(() {
         syncAndroidToSapResponse = androidToSapResponse;
-        Utility().setSharedPreference(syncSapResponse, response.body.toString());
+        Utility()
+            .setSharedPreference(syncSapResponse, response.body.toString());
         Utility().setSharedPreference(currentDate, formattedDate);
       });
       setListData();
@@ -492,8 +537,9 @@ class _HomePageState extends State<HomePage> {
         .get(personalInfoAPI(sharedPreferences.getString(userID).toString()));
     if (response1 != null && response1.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response1.body);
-      PersonalInfoResponse _personalInfo = PersonalInfoResponse.fromJson(jsonData1);
-      if(_personalInfo.emp.isNotEmpty) {
+      PersonalInfoResponse _personalInfo =
+      PersonalInfoResponse.fromJson(jsonData1);
+      if (_personalInfo.emp.isNotEmpty) {
         setState(() {
           personInfo = _personalInfo;
           isLoading = false;
@@ -508,14 +554,15 @@ class _HomePageState extends State<HomePage> {
         .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
     if (response2 != null && response2.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response2.body);
-      PendingGatePassResponse pendingGatePassResponse = PendingGatePassResponse.fromJson(jsonData1);
-      if(pendingGatePassResponse.data.isNotEmpty) {
+      PendingGatePassResponse pendingGatePassResponse =
+      PendingGatePassResponse.fromJson(jsonData1);
+      if (pendingGatePassResponse.data.isNotEmpty) {
         setState(() {
           gatePassList = pendingGatePassResponse.data;
           gatePassResponse = pendingGatePassResponse;
           isLoading = false;
-          Utility().setSharedPreference(
-              gatePassDatail, response2.body.toString());
+          Utility()
+              .setSharedPreference(gatePassDatail, response2.body.toString());
         });
         setListData();
       }
@@ -536,12 +583,6 @@ class _HomePageState extends State<HomePage> {
               approvedMethod(title);
             }
             break;
-          case "Start":
-            {}
-            break;
-          case "End":
-            {}
-            break;
           case "Offline":
             {}
             break;
@@ -549,19 +590,17 @@ class _HomePageState extends State<HomePage> {
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const DailyReport()),
-                  (route) => true);
+                      (route) => true);
             }
             break;
           case "Web Report":
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const WebReport()),
-                  (route) => true);
+                      (route) => true);
             }
             break;
         }
-
-        /**/
       },
       child: Column(
         children: [
@@ -590,10 +629,10 @@ class _HomePageState extends State<HomePage> {
 
   void setListData() {
     setState(() {
-      if(syncAndroidToSapResponse!=null) {
+      if (syncAndroidToSapResponse != null) {
         leaveBalanceList = syncAndroidToSapResponse!.leavebalance;
-        leaveBalanceList.add(
-            Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
+        leaveBalanceList
+            .add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
         activeEmployeeList = syncAndroidToSapResponse!.activeemployee;
         attendenceList = syncAndroidToSapResponse!.attendanceemp;
         odEmpList = syncAndroidToSapResponse!.odemp;
@@ -602,13 +641,256 @@ class _HomePageState extends State<HomePage> {
         pendingLeaveList = syncAndroidToSapResponse!.pendingleave;
         pendindOdList = syncAndroidToSapResponse!.pendingod;
       }
-      if(personInfo!=null && personInfo!.emp.isNotEmpty) {
+      if (personInfo != null && personInfo!.emp.isNotEmpty) {
         personalInfo = personInfo!.emp;
       }
-      if(gatePassResponse!=null && gatePassResponse!.data.isNotEmpty) {
+      if (gatePassResponse != null && gatePassResponse!.data.isNotEmpty) {
         gatePassList = gatePassResponse!.data;
       }
     });
-
   }
+
+
+  Future getCurrentLocation() async {
+    if (Platform.isAndroid) {
+      var permission = Permission.locationWhenInUse.status;
+      if (permission != PermissionStatus.granted) {
+        final status = await Permission.location.request();
+        if (status != PermissionStatus.granted) {
+          Utility().showToast("You need location permission for use this App");
+          return;
+        }
+      }
+    }
+
+    if (Platform.isIOS) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission != PermissionStatus.granted) {
+        LocationPermission permission = await Geolocator.requestPermission();
+        if (permission != PermissionStatus.granted) getLocation();
+        return;
+      }
+    }
+    getLocation();
+  }
+
+  getLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    if(mounted) {
+      setState(() {
+        latlong = LatLng(position.latitude, position.longitude);
+        GetAddressFromLatLong(latlong!);
+      });
+    }
+  }
+
+  Future<void> GetAddressFromLatLong(LatLng position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude, position.longitude,
+          localeIdentifier: 'en');
+      Placemark place = placemarks[0];
+      placeName = (place.subLocality != '')
+          ? place.subLocality!
+          : place.subAdministrativeArea!;
+      isoId = place.isoCountryCode!;
+
+      if(mounted) {
+        setState(() {
+          Address = '${place.street}, ${place.subLocality}, ${place.locality}';
+          Address = Utility().formatAddress(Address);
+
+        });
+        setState(() {
+          isLoading = false;
+        });
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => startJourneyPopup(context),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => startJourneyPopup(context),
+      );
+    }
+  }
+
+  startJourneyPopup(BuildContext context) {
+    return AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        content: Container(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: robotoTextWidget(
+                    textval: appName,
+                    colorval: AppColor.themeColor,
+                    sizeval: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+
+              latLongWidget('Latitude:-  ${latlong!.latitude}',),
+              latLongWidget('Longitude:-  ${latlong!.longitude}',),
+              latLongWidget('Address:-$Address',),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Flexible(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColor.whiteColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                      ),
+                      child: robotoTextWidget(
+                        textval: cancel,
+                        colorval: AppColor.darkGrey,
+                        sizeval: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    child: ElevatedButton(
+                      onPressed: () {
+                       setState(() {
+                         journeyStart = True;
+                         Utility().setSharedPreference(journeyStart, True);
+                       });
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColor.themeColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                      ),
+                      child: robotoTextWidget(
+                        textval: confirm,
+                        colorval: AppColor.whiteColor,
+                        sizeval: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ])));
+  }
+
+  latLongWidget(String title) {
+    return Container(
+      margin: EdgeInsets.only(top: 10),
+      child: Column(
+        children: [
+          robotoTextWidget(textval: title,
+              colorval: Colors.black,
+              sizeval: 12,
+              fontWeight: FontWeight.normal),
+          SizedBox(height: 5,),
+          Divider(),
+        ],
+      ),
+    );
+  }
+
+  localConvenceWidget(String svg, String msg, String title) {
+    return GestureDetector(
+      onTap: () {
+        switch (msg) {
+          case "Start":{
+            if(journeyStart == False) {
+              getCurrentLocation();
+              setState(() {
+                isLoading = true;
+              });
+            }
+            }
+            break;
+          case "End":{
+            if(journeyStart == True) {
+              setState(() {
+                journeyStart = False;
+                Utility().setSharedPreference(journeyStart, False);
+              });
+            }
+            }
+            break;
+        }
+      },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Center(
+              child: loadSvg(msg,svg),
+            ),
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          robotoTextWidget(
+              textval: msg,
+              colorval: AppColor.themeColor,
+              sizeval: 12,
+              fontWeight: FontWeight.w600)
+        ],
+      ),
+    );
+  }
+
+  loadSvg( String msg, String svg) {
+    if(journeyStart == True && msg == start){
+      return Opacity(
+        opacity: 0.42,
+        child: SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+        ),
+      );
+    }
+
+    if(journeyStart == False && msg == start){
+      return  SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+      );
+    }
+
+    if(journeyStart == True && msg==end){
+      return  SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+      );
+    }
+
+    if(journeyStart == False && msg == end){
+      return Opacity(
+        opacity: 0.42,
+        child: SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+        ),
+      );
+    }
+  }
+
 }

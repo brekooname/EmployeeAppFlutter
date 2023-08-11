@@ -122,14 +122,12 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
@@ -141,9 +139,9 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
             children: [
               MRCTypeSpinnerWidget(),
               departmentTypeSpinnerWidget(),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               datePickerWidget("From Date",indianFromDate.toString()),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               datePickerWidget("To Date",indianToDate.toString()),
               textFeildWidget("Task Description", taskDes),
               assginToSpinnerWidget(context,widget.activeemployeeList),
@@ -157,7 +155,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
 
   textFeildWidget(String hinttxt, TextEditingController visitPlace) {
     return  Container(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -241,13 +239,13 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
+      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
       child:   Center(
         child: DropdownButton(
           // Initial Value
-          underline: SizedBox(height: 0,),
+          underline: const SizedBox(height: 0,),
           value: returnableSpinner,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_drop_down,
             color: AppColor.themeColor, // <-- SEE HERE
           ),
@@ -278,13 +276,13 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
+      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
       child:   Center(
         child: DropdownButton(
           // Initial Value
-          underline: SizedBox(height: 0,),
+          underline: const SizedBox(height: 0,),
           value: typeSpinner,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_drop_down,
             color: AppColor.themeColor, // <-- SEE HERE
           ),
@@ -334,8 +332,8 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
 
   Widget assginToSpinnerWidget(BuildContext context, List<Activeemployee> activeemployee) {
     return  Container(
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.only(left: 3),
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.only(left: 3),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -348,11 +346,11 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
                 activeemployee.ename,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child:  Text(activeemployee.ename, style: TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
+              child:  Text(activeemployee.ename, style: const TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
             ),
           ),
         ).toList(),
-        searchInputDecoration: InputDecoration(
+        searchInputDecoration: const InputDecoration(
           hintText: "Assign Charge To",
           hintStyle: TextStyle(color: AppColor.themeColor, fontWeight: FontWeight.normal),
           prefixIcon: Icon(Icons.person, color: AppColor.themeColor,),
@@ -420,28 +418,12 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
 
     dynamic response = await HTTP.get(createTaskAPI(value));
     if (response != null && response.statusCode == 200) {
-
-      print("response======>${response.toString()}");
-
       jsonData = convert.jsonDecode(response.body);
       TaskRespons taskRespons = TaskRespons.fromJson(jsonData);
-
-      print("response======>${taskRespons.dataSuccess[2].value.toString()}");
-      print("response======>${taskRespons.dataSuccess[2].syncData.toString()}");
-
       if(taskRespons.dataSuccess[2].syncData == "EMP_TASK" && taskRespons.dataSuccess[2].value == "Y"){
-
         Utility().showToast("Task has been assigned.");
-
-
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage( )),
-                (route) => true);
-
-      }else
-        {
+        Navigator.of(context).pop();
+      }else {
           Utility().showToast("Something went wrong try again.");
         }
 

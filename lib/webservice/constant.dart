@@ -10,4 +10,5 @@ var emphierarchyUrl = "Employee_Hierarchy.htm";
 var syncSapResponse = "syncSapResponse";
 var userInfo = "userInfo";
 var gatePassDatail = "gatePassDetail";
+var journeyStart = "journeyStart";
 

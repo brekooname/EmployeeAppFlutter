@@ -57,7 +57,7 @@ class _SalarySlipState extends State<SalarySlip> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
+        title: const robotoTextWidget(
             textval: ""
                 "Download Salary Slip ",
             colorval: AppColor.whiteColor,
@@ -66,12 +66,10 @@ class _SalarySlipState extends State<SalarySlip> {
         leading: IconButton(
             icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
@@ -99,13 +97,13 @@ class _SalarySlipState extends State<SalarySlip> {
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
+      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
       child:   Center(
         child: DropdownButton(
           // Initial Value
-          underline: SizedBox(height: 0,),
+          underline: const SizedBox(height: 0,),
           value: yearSpinner,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_drop_down,
             color: AppColor.themeColor, // <-- SEE HERE
           ),
@@ -136,13 +134,13 @@ class _SalarySlipState extends State<SalarySlip> {
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
+      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
       child:   Center(
         child: DropdownButton(
           // Initial Value
-          underline: SizedBox(height: 0,),
+          underline: const SizedBox(height: 0,),
           value: monthSpinner,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_drop_down,
             color: AppColor.themeColor, // <-- SEE HERE
           ),
@@ -187,7 +185,7 @@ class _SalarySlipState extends State<SalarySlip> {
                 color: AppColor.whiteColor,
               ),
             )
-                : robotoTextWidget(
+                : const robotoTextWidget(
                 textval: "Download Salary Slip",
                 colorval: Colors.white,
                 sizeval: 14,

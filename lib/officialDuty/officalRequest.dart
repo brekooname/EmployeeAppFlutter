@@ -103,10 +103,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         leading: IconButton(
             icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
         iconTheme: const IconThemeData(color: Colors.white),
 
@@ -458,11 +456,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
         Utility().showToast("OD Created Successfully");
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
 
       }else{
         Utility().showToast(odResponse[0].name);

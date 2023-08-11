@@ -42,8 +42,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
       appBar:  AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>  HomePage()),
-                    (route) => false),
+            onPressed: () => Navigator.of(context).pop(),
           ),
           backgroundColor: AppColor.themeColor,
           title: const robotoTextWidget(textval: "Gate Pass Approve", colorval: AppColor.whiteColor,
@@ -363,11 +362,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
           isLoading  = false;
         });
         Utility().showToast("Gate Pass Approved Successfully");
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
       }else{
         setState(() {
           isLoading  = false;

@@ -358,11 +358,7 @@ class InDirectState extends State<InDirect> {
 
         Utility().showToast("OD Approved Successfully");
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
 
       }else{
         Utility().showToast(odResponse[0].msg);
@@ -389,11 +385,7 @@ class InDirectState extends State<InDirect> {
 
         Utility().showToast("OD Rejected Successfully");
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
 
       }else{
         Utility().showToast(odResponse[0].message);
