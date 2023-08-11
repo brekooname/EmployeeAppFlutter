@@ -672,6 +672,11 @@ class Activeemployee {
         "btrtl": btrtl,
         "btext": btext,
       };
+
+  @override
+  String toString() {
+    return 'Activeemployee{pernr: $pernr, ename: $ename, btrtl: $btrtl, btext: $btext}';
+  }
 }
 
 class Attendanceemp {
@@ -834,6 +839,11 @@ class Leavebalance {
         "leaveType": leaveType,
         "leaveBal": leaveBal,
       };
+
+  @override
+  String toString() {
+    return 'Leavebalance{leaveType: $leaveType, leaveBal: $leaveBal}';
+  }
 }
 
 class Leaveemp {

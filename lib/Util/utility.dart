@@ -62,11 +62,13 @@ class Utility {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
   }
-  void saveArrayList(List<String> list, int position) async {
+  /*void saveArrayList(List<String> list, int position) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     switch (position) {
       case 0:
-        preferences.setStringList(leaveBalanceLists, list);
+        String jsonstring = json.encode(list);
+        print('jsonstring=========>$jsonstring');
+        preferences.setString(leaveBalanceLists, jsonstring);
         break;
       case 1:
         preferences.setStringList(activeEmployeeLists, list);
@@ -96,7 +98,7 @@ class Utility {
         preferences.setStringList(gatePassLists, list);
         break;
     }
-  }
+  }*/
 
 
 }

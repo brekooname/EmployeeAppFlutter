@@ -163,4 +163,9 @@ class Datum {
     "vfp": vfp,
     "gateNo": gateNo,
   };
+
+  @override
+  String toString() {
+    return 'Datum{gpdat1: $gpdat1, gptime1: $gptime1, reqtypeTxt: $reqtypeTxt, gptypeTxt: $gptypeTxt, ename: $ename, directindirect: $directindirect, mandt: $mandt, gpno: $gpno, werks: $werks, gptype: $gptype, pernr: $pernr, plans: $plans, orgeh: $orgeh, gpdat: $gpdat, gptime: $gptime, eindat: $eindat, eintime: $eintime, reqtype: $reqtype, chargeGiven: $chargeGiven, vplace: $vplace, purpose1: $purpose1, uname: $uname, credt: $credt, vfp: $vfp, gateNo: $gateNo}';
+  }
 }

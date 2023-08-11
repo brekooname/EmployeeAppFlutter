@@ -1,8 +1,6 @@
 // ignore_for_file: library_prefixes
 
 import 'dart:convert' as convert;
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
@@ -25,7 +23,6 @@ import 'package:shakti_employee_app/webReport/webreport.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../leave/LeaveApprove.dart';
 import '../theme/string.dart';
 import '../webservice/constant.dart';
@@ -52,6 +49,10 @@ class _HomePageState extends State<HomePage> {
   List<Pendingod> pendindOdList = [];
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
+
+   SyncAndroidToSapResponse? syncAndroidToSapResponse;
+   PersonalInfoResponse? personInfo;
+   PendingGatePassResponse? gatePassResponse;
 
   @override
   void initState() {
@@ -145,7 +146,7 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
           backgroundColor: AppColor.whiteColor,
           child: NavigationDrawerWidget(
-            name: nameValue!,
+            name: nameValue,
             attendenceList: attendenceList,
             leaveEmpList: leaveEmpList,
             odEmpList: odEmpList,
@@ -386,14 +387,14 @@ class _HomePageState extends State<HomePage> {
     sharedPreferences = await SharedPreferences.getInstance();
 
     setState(() {
-      nameValue = sharedPreferences.getString(name) as String;
+      nameValue = sharedPreferences.getString(name)!;
     });
     if (sharedPreferences.getString(currentDate) != null) {
       if (formattedDate !=
           sharedPreferences.getString(currentDate).toString()) {
         downloadingData();
       } else {
-     //   getSPArrayList();
+        getSPArrayList();
       }
     } else {
       downloadingData();
@@ -401,45 +402,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getSPArrayList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
 
 
-     /*
-       List<String> mActiveEmployeeList = (prefs.getStringList(activeEmployeeLists) ?? []);
-       leaveBalanceList = mLeaveBalanceList.cast<Leavebalance>();
-       print('leaveBalanceList=========>${leaveBalanceList.length}}');
+    if(sharedPreferences.getString(syncSapResponse)!=null && sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
+      var jsonData = convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
+      syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
+    }
 
+    if(sharedPreferences.getString(userInfo)!=null && sharedPreferences.getString(userInfo).toString().isNotEmpty) {
+      var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
+      personInfo = PersonalInfoResponse.fromJson(jsonData);
 
-      List<String> mActiveEmployeeList = (prefs.getStringList(activeEmployeeLists) ?? []);
-      activeEmployeeList = mActiveEmployeeList.cast<Activeemployee>();
+    }
 
-      List<String> mAttendenceLists = (prefs.getStringList(attendenceLists) ?? []);
-      attendenceList = mAttendenceLists.cast<Attendanceemp>();
+    if(sharedPreferences.getString(gatePassDatail)!=null && sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
+      var jsonData = convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+      gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
 
-      List<String> mOdEmpLists = (prefs.getStringList(odEmpLists) ?? []);
-      odEmpList = mOdEmpLists.cast<Odemp>();
+    }
 
-      List<String> mLeaveEmpLists = (prefs.getStringList(leaveEmpLists) ?? []);
-      leaveEmpList = mLeaveEmpLists.cast<Leaveemp>();
+    setListData();
 
-      List<String> mPendingTaskLists =
-          (prefs.getStringList(pendingTaskLists) ?? []);
-      pendingTaskList = mPendingTaskLists.cast<PendingTask>();
-
-      List<String> mPendingLeaveLists = (prefs.getStringList(pendingLeaveLists) ?? []);
-      pendingLeaveList = mPendingLeaveLists.cast<Pendingleave>();
-
-      List<String> mPendindOdLists = (prefs.getStringList(pendindOdLists) ?? []);
-      pendindOdList = mPendindOdLists.cast<Pendingod>();
-
-      List<String> mPersonalInfos = (prefs.getStringList(personalInfos) ?? []);
-      personalInfo = mPersonalInfos.cast<Emp>();
-
-      List<String> mGatePassLists = (prefs.getStringList(gatePassLists) ?? []);
-      gatePassList = mGatePassLists.cast<Datum>();*/
-    });
   }
 
   buildLocationDialog() {
@@ -496,73 +479,41 @@ class _HomePageState extends State<HomePage> {
         SyncAndroidToSapAPI(sharedPreferences.getString(userID) as String));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-      SyncAndroidToSapResponse androidToSapResponse =
-          SyncAndroidToSapResponse.fromJson(jsonData);
-      SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
-
+      SyncAndroidToSapResponse androidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
       setState(() {
-        leaveBalanceList = androidToSapResponse.leavebalance;
-        leaveBalanceList
-            .add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
-        activeEmployeeList = androidToSapResponse.activeemployee;
-        attendenceList = androidToSapResponse.attendanceemp;
-        odEmpList = androidToSapResponse.odemp;
-        leaveEmpList = androidToSapResponse.leaveemp;
-        pendingTaskList = androidToSapResponse.pendingtask;
-        pendingLeaveList = androidToSapResponse.pendingleave;
-        pendindOdList = androidToSapResponse.pendingod;
-
+        syncAndroidToSapResponse = androidToSapResponse;
+        Utility().setSharedPreference(syncSapResponse, response.body.toString());
         Utility().setSharedPreference(currentDate, formattedDate);
-        List<String> stringsList =
-            leaveBalanceList.map((i) => i.toString()).toList();
-        sharedPreferences.setStringList(leaveBalanceLists, stringsList);
-        Utility().saveArrayList(
-            leaveBalanceList.map((i) => i.toString()).toList(), 0);
-        Utility().saveArrayList(
-            activeEmployeeList.map((i) => i.toString()).toList(), 1);
-        Utility()
-            .saveArrayList(attendenceList.map((i) => i.toString()).toList(), 2);
-        Utility().saveArrayList(odEmpList.map((i) => i.toString()).toList(), 3);
-        Utility()
-            .saveArrayList(leaveEmpList.map((i) => i.toString()).toList(), 4);
-        Utility().saveArrayList(
-            pendingTaskList.map((i) => i.toString()).toList(), 5);
-        Utility().saveArrayList(
-            pendingLeaveList.map((i) => i.toString()).toList(), 6);
-        Utility()
-            .saveArrayList(pendindOdList.map((i) => i.toString()).toList(), 7);
       });
+      setListData();
     }
 
     dynamic response1 = await HTTP
         .get(personalInfoAPI(sharedPreferences.getString(userID).toString()));
     if (response1 != null && response1.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response1.body);
-      PersonalInfoResponse _personalInfo =
-          PersonalInfoResponse.fromJson(jsonData1);
-
+      PersonalInfoResponse _personalInfo = PersonalInfoResponse.fromJson(jsonData1);
       setState(() {
+        personInfo = _personalInfo;
         isLoading = false;
         personalInfo = _personalInfo.emp;
-        Utility()
-            .saveArrayList(personalInfo.map((i) => i.toString()).toList(), 8);
+        Utility().setSharedPreference(userInfo, response1.body.toString());
       });
+      setListData();
     }
 
     dynamic response2 = await HTTP
         .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
     if (response2 != null && response2.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response2.body);
-      PendingGatePassResponse pendingGatePassResponse =
-          PendingGatePassResponse.fromJson(jsonData1);
-
-      gatePassList = pendingGatePassResponse.data;
+      PendingGatePassResponse pendingGatePassResponse = PendingGatePassResponse.fromJson(jsonData1);
       setState(() {
+        gatePassList = pendingGatePassResponse.data;
+        gatePassResponse = pendingGatePassResponse;
         isLoading = false;
-        Utility()
-            .saveArrayList(gatePassList.map((i) => i.toString()).toList(), 9);
+        Utility().setSharedPreference(gatePassDatail, response2.body.toString());
       });
+      setListData();
     }
   }
 
@@ -630,5 +581,43 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  void setListData() {
+    setState(() {
+      if(syncAndroidToSapResponse!=null) {
+        leaveBalanceList = syncAndroidToSapResponse!.leavebalance;
+        leaveBalanceList.add(
+            Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
+        activeEmployeeList = syncAndroidToSapResponse!.activeemployee;
+        attendenceList = syncAndroidToSapResponse!.attendanceemp;
+        odEmpList = syncAndroidToSapResponse!.odemp;
+        leaveEmpList = syncAndroidToSapResponse!.leaveemp;
+        pendingTaskList = syncAndroidToSapResponse!.pendingtask;
+        pendingLeaveList = syncAndroidToSapResponse!.pendingleave;
+        pendindOdList = syncAndroidToSapResponse!.pendingod;
+
+
+        print('leaveBalanceList=====>${leaveBalanceList.length}');
+        print('activeEmployeeList=====>${activeEmployeeList.length}');
+        print('attendenceList=====>${attendenceList.length}');
+        print('odEmpList=====>${odEmpList.length}');
+        print('leaveEmpList=====>${leaveEmpList.length}');
+        print('pendingTaskList=====>${pendingTaskList.length}');
+        print('pendingLeaveList=====>${pendingLeaveList.length}');
+        print('pendindOdList=====>${pendindOdList.length}');
+      }
+      if(personInfo!=null && personInfo!.emp.isNotEmpty) {
+        personalInfo = personInfo!.emp;
+        print('personalInfo=====>${personalInfo.toString()}');
+
+      }
+      if(gatePassResponse!=null && gatePassResponse!.data.isNotEmpty) {
+        gatePassList = gatePassResponse!.data;
+
+        print('gatePassList=====>${gatePassList.toString()}');
+      }
+    });
+
   }
 }

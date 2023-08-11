@@ -370,15 +370,13 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
         if(text == "Gatepass Date"){
           datefrom = picked;
           indianFromDate =  DateFormat("dd/MM/yyyy").format(picked);
-          print("indianDate===> ${indianFromDate}");
         }else if(text == "Comeback Date"){
           dateto = picked;
           indianToDate =  DateFormat("dd/MM/yyyy").format(picked);
-          print("indianDate===> ${indianToDate}");
+
         }
 
-        print("indianDate1===> ${datefrom}");
-        print("indianDate2===> ${dateto}");
+
       });
     }
   }
@@ -434,10 +432,6 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
               DateTime(2019, 08, 1, comeBackTime!.hour, comeBackTime!.minute),
               [hh, ':', nn, " ", am]).toString();
         }
-
-        print(newTime.format(context));
-        print("From Time:${fromTime}");
-        print("comeBackTime :${comeBackTime}");
 
       });
 

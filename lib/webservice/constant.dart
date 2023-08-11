@@ -7,13 +7,7 @@ var canteenUrl = "canteen_expense_report.htm";
 var gatePassUrl = "employee_gatepass.htm";
 var taskUrl = "mrcr_report.htm";
 var emphierarchyUrl = "Employee_Hierarchy.htm";
-var leaveBalanceLists = "leaveBalanceList";
-var activeEmployeeLists = "activeEmployeeList";
-var attendenceLists = "attendenceList";
-var odEmpLists = "odEmpList";
-var leaveEmpLists = "leaveEmpList";
-var pendingTaskLists = "pendingTaskList";
-var pendingLeaveLists = "pendingLeaveList";
-var pendindOdLists = "pendindOdList";
-var personalInfos = "personalInfo";
-var gatePassLists = "gatePassList";
+var syncSapResponse = "syncSapResponse";
+var userInfo = "userInfo";
+var gatePassDatail = "gatePassDetail";
+

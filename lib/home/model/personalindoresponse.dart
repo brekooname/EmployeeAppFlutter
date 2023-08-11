@@ -148,4 +148,9 @@ class Emp {
     "bankl": bankl,
     "bank_txt": bankTxt,
   };
+
+  @override
+  String toString() {
+    return 'Emp{pernr: $pernr, bukrs: $bukrs, werks: $werks, persk: $persk, btrtl: $btrtl, btrtlTxt: $btrtlTxt, perskTxt: $perskTxt, telnr: $telnr, emailShkt: $emailShkt, emailPers: $emailPers, hod: $hod, hodEname: $hodEname, stras: $stras, locat: $locat, address: $address, gender: $gender, birth: $birth, birth1: $birth1, marital: $marital, bankn: $bankn, bankl: $bankl, bankTxt: $bankTxt}';
+  }
 }

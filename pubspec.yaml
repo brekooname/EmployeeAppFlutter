@@ -55,6 +55,8 @@ dependencies:
   image: ^3.2.2
   searchfield: ^0.8.3
   webview_flutter: ^4.2.2
+  package_info_plus: ^3.0.3
+
 
 dev_dependencies:
   flutter_test:
