@@ -11,4 +11,5 @@ var syncSapResponse = "syncSapResponse";
 var userInfo = "userInfo";
 var gatePassDatail = "gatePassDetail";
 var journeyStart = "journeyStart";
+var googleApiKey = "AIzaSyAohhwZ11LRwoxsS8lJ0VHGkA4L-cwjWmw";
 

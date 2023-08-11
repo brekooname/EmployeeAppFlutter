@@ -27,7 +27,7 @@ import 'package:shakti_employee_app/webReport/webreport.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:shakti_employee_app/home/model/distance_calculate_model.dart'as distancePrefix;
 import '../leave/LeaveApprove.dart';
 import '../theme/string.dart';
 import '../webservice/constant.dart';
@@ -319,6 +319,579 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
+  buildLocationDialog() {
+    showDialog(
+        context: context,
+        builder: (builder) {
+          return AlertDialog(
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Container(),
+            ),
+          );
+        });
+  }
+
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> getNameValue() async {
+    var now = new DateTime.now();
+    var formatter = new DateFormat('yyyy-MM-dd');
+    formattedDate = formatter.format(now);
+    sharedPreferences = await SharedPreferences.getInstance();
+
+    setState(() {
+      nameValue = sharedPreferences.getString(name)!;
+    });
+    if (sharedPreferences.getString(currentDate) != null) {
+      if (formattedDate !=
+          sharedPreferences.getString(currentDate).toString()) {
+        downloadingData();
+      } else {
+        getSPArrayList();
+      }
+    } else {
+      downloadingData();
+    }
+  }
+
+  void getSPArrayList() async {
+    if (sharedPreferences.getString(syncSapResponse) != null &&
+        sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
+      var jsonData =
+      convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
+      syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
+
+      setListData();
+    }
+
+    if (sharedPreferences.getString(userInfo) != null &&
+        sharedPreferences.getString(userInfo).toString().isNotEmpty) {
+      var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
+      personInfo = PersonalInfoResponse.fromJson(jsonData);
+      setpersonData();
+    }
+
+    if (sharedPreferences.getString(gatePassDatail) != null &&
+        sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
+      var jsonData =
+      convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+      gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
+      setgatePassData();
+    }
+  }
+
+  imageTextWidget(String svg, String msg, String title) {
+    return GestureDetector(
+      onTap: () {
+        switch (msg) {
+          case "Request":
+            {
+              requestMethod(title);
+            }
+            break;
+          case "Approve":
+            {
+              approvedMethod(title);
+            }
+            break;
+          case "Offline":
+            {}
+            break;
+          case "Daily Report":
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const DailyReport()),
+                      (route) => true);
+            }
+            break;
+          case "Web Report":
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const WebReport()),
+                      (route) => true);
+            }
+            break;
+        }
+      },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Center(
+              child: SvgPicture.asset(
+                svg,
+                width: 50,
+                height: 50,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          robotoTextWidget(
+              textval: msg,
+              colorval: AppColor.themeColor,
+              sizeval: 12,
+              fontWeight: FontWeight.w600)
+        ],
+      ),
+    );
+  }
+
+  localConvenceWidget(String svg, String msg, String title) {
+    return GestureDetector(
+      onTap: () {
+        switch (msg) {
+          case "Start":{
+            if(journeyStart == False) {
+              getCurrentLocation();
+              setState(() {
+                isLoading = true;
+              });
+            }
+            }
+            break;
+          case "End":{
+            if(journeyStart == True) {
+              getCurrentLocation();
+              setState(() {
+                isLoading = true;
+              });
+            }
+            }
+            break;
+        }
+      },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Center(
+              child: loadSvg(msg,svg),
+            ),
+          ),
+          const SizedBox(
+            height: 4,
+          ),
+          robotoTextWidget(
+              textval: msg,
+              colorval: AppColor.themeColor,
+              sizeval: 12,
+              fontWeight: FontWeight.w600)
+        ],
+      ),
+    );
+  }
+
+  loadSvg( String msg, String svg) {
+    if(journeyStart == True && msg == start){
+      return Opacity(
+        opacity: 0.42,
+        child: SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+        ),
+      );
+    }
+
+    if(journeyStart == False && msg == start){
+      return  SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+      );
+    }
+
+    if(journeyStart == True && msg==end){
+      return  SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+      );
+    }
+
+    if(journeyStart == False && msg == end){
+      return Opacity(
+        opacity: 0.42,
+        child: SvgPicture.asset(
+          svg,
+          width: 50,
+          height: 50,
+        ),
+      );
+    }
+  }
+
+  Future getCurrentLocation() async {
+    if (Platform.isAndroid) {
+      var permission = Permission.locationWhenInUse.status;
+      if (permission != PermissionStatus.granted) {
+        final status = await Permission.location.request();
+        if (status != PermissionStatus.granted) {
+          Utility().showToast("You need location permission for use this App");
+          return;
+        }
+      }
+    }
+
+    if (Platform.isIOS) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission != PermissionStatus.granted) {
+        LocationPermission permission = await Geolocator.requestPermission();
+        if (permission != PermissionStatus.granted) getLocation();
+        return;
+      }
+    }
+    getLocation();
+  }
+
+  getLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    if(mounted) {
+      setState(() {
+        latlong = LatLng(position.latitude, position.longitude);
+        GetAddressFromLatLong(latlong!);
+      });
+    }
+  }
+
+  Future<void> GetAddressFromLatLong(LatLng position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          position.latitude, position.longitude,
+          localeIdentifier: 'en');
+      Placemark place = placemarks[0];
+      placeName = (place.subLocality != '')
+          ? place.subLocality!
+          : place.subAdministrativeArea!;
+      isoId = place.isoCountryCode!;
+
+      if(mounted) {
+        setState(() {
+          Address = '${place.street}, ${place.subLocality}, ${place.locality}';
+          Address = Utility().formatAddress(Address);
+
+        });
+        setState(() {
+          isLoading = false;
+        });
+        showJourneyDialogue();
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      showJourneyDialogue();
+    }
+  }
+
+  void showJourneyDialogue() {
+
+    if(journeyStart == False) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => startJourneyPopup(context),
+      );
+    }else{
+      calculateDistance();
+
+    }
+  }
+
+  startJourneyPopup(BuildContext context) {
+    return AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        content: Container(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min, children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: robotoTextWidget(
+                    textval: appName,
+                    colorval: AppColor.themeColor,
+                    sizeval: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+
+              latLongWidget('$latitude  ${latlong!.latitude}',),
+              latLongWidget('$longitude  ${latlong!.longitude}',),
+              latLongWidget('$address $Address',),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Flexible(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColor.whiteColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                      ),
+                      child: robotoTextWidget(
+                        textval: cancel,
+                        colorval: AppColor.darkGrey,
+                        sizeval: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          journeyStart = True;
+                          Utility().setSharedPreference(journeyStart, True);
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColor.themeColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                      ),
+                      child: robotoTextWidget(
+                        textval: confirm,
+                        colorval: AppColor.whiteColor,
+                        sizeval: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ])));
+  }
+
+  stopJourneyPopup(BuildContext context, distancePrefix.DistanceCalculateModel distanceCalculateModel) {
+    return AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        content: Container(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: robotoTextWidget(
+                    textval: appName,
+                    colorval: AppColor.themeColor,
+                    sizeval: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+
+              latLongWidget('$fromLatitude  ${latlong!.latitude}',),
+              latLongWidget('$fromLongitude  ${latlong!.longitude}',),
+              latLongWidget('$toLatitude  ${latlong!.latitude}',),
+              latLongWidget('$toLongitude  ${latlong!.longitude}',),
+              latLongWidget('$fromAddress ${distanceCalculateModel.originAddresses.toString()}',),
+              latLongWidget('$toAddress ${distanceCalculateModel.destinationAddresses.toString()}',),
+              latLongWidget('$distanceTravelled ${distanceCalculateModel.rows[0].elements[0].distance.text}',),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Flexible(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColor.whiteColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                      ),
+                      child: robotoTextWidget(
+                        textval: cancel,
+                        colorval: AppColor.darkGrey,
+                        sizeval: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    child: ElevatedButton(
+                      onPressed: () {
+                         setState(() {
+                           journeyStart = False;
+                           Utility().setSharedPreference(journeyStart, False);
+                         });
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColor.themeColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // <-- Radius
+                        ),
+                      ),
+                      child: robotoTextWidget(
+                        textval: confirm,
+                        colorval: AppColor.whiteColor,
+                        sizeval: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ])));
+  }
+
+  latLongWidget(String title) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      margin: EdgeInsets.only(top: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          robotoTextWidget(textval: title,
+              colorval: Colors.black,
+              sizeval: 12,
+              fontWeight: FontWeight.normal),
+          SizedBox(height: 5,),
+          Divider(),
+        ],
+      ),
+    );
+  }
+
+  Future<void> downloadingData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var jsonData = null;
+    var jsonData1 = null;
+
+    dynamic response = await HTTP.get(
+        SyncAndroidToSapAPI(sharedPreferences.getString(userID) as String));
+    if (response != null && response.statusCode == 200) {
+      jsonData = convert.jsonDecode(response.body);
+      SyncAndroidToSapResponse androidToSapResponse =
+      SyncAndroidToSapResponse.fromJson(jsonData);
+      setState(() {
+        syncAndroidToSapResponse = androidToSapResponse;
+        Utility()
+            .setSharedPreference(syncSapResponse, response.body.toString());
+        Utility().setSharedPreference(currentDate, formattedDate);
+      });
+      setListData();
+    }
+
+    dynamic response1 = await HTTP
+        .get(personalInfoAPI(sharedPreferences.getString(userID).toString()));
+    if (response1 != null && response1.statusCode == 200) {
+      jsonData1 = convert.jsonDecode(response1.body);
+      PersonalInfoResponse _personalInfo =
+      PersonalInfoResponse.fromJson(jsonData1);
+      if (_personalInfo.emp.isNotEmpty) {
+        setState(() {
+          personInfo = _personalInfo;
+          isLoading = false;
+          personalInfo = _personalInfo.emp;
+          Utility().setSharedPreference(userInfo, response1.body.toString());
+        });
+        setpersonData();
+      }
+    }
+
+    dynamic response2 = await HTTP
+        .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
+    if (response2 != null && response2.statusCode == 200) {
+      jsonData1 = convert.jsonDecode(response2.body);
+      PendingGatePassResponse pendingGatePassResponse =
+      PendingGatePassResponse.fromJson(jsonData1);
+      if (pendingGatePassResponse.data.isNotEmpty) {
+        setState(() {
+          gatePassList = pendingGatePassResponse.data;
+          gatePassResponse = pendingGatePassResponse;
+          isLoading = false;
+          Utility()
+              .setSharedPreference(gatePassDatail, response2.body.toString());
+        });
+        setgatePassData();
+      }
+    }
+  }
+
+  void setListData() {
+    if (syncAndroidToSapResponse != null) {
+      setState(() {
+        leaveBalanceList = syncAndroidToSapResponse!.leavebalance;
+        leaveBalanceList
+            .add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
+        activeEmployeeList = syncAndroidToSapResponse!.activeemployee;
+        attendenceList = syncAndroidToSapResponse!.attendanceemp;
+        odEmpList = syncAndroidToSapResponse!.odemp;
+        leaveEmpList = syncAndroidToSapResponse!.leaveemp;
+        pendingTaskList = syncAndroidToSapResponse!.pendingtask;
+        pendingLeaveList = syncAndroidToSapResponse!.pendingleave;
+        pendindOdList = syncAndroidToSapResponse!.pendingod;
+      });
+    }
+  }
+
+  void setpersonData() {
+    if (personInfo != null && personInfo!.emp.isNotEmpty) {
+      setState(() {
+        personalInfo = personInfo!.emp;
+      });
+    }
+  }
+
+  void setgatePassData() {
+    if (gatePassResponse != null && gatePassResponse!.data.isNotEmpty) {
+      setState(() {
+        gatePassList = gatePassResponse!.data;
+      });
+    }
+  }
+
   void requestMethod(String title) {
     switch (title) {
       case "Leave":
@@ -415,483 +988,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> getNameValue() async {
-    var now = new DateTime.now();
-    var formatter = new DateFormat('yyyy-MM-dd');
-    formattedDate = formatter.format(now);
-    sharedPreferences = await SharedPreferences.getInstance();
 
-    setState(() {
-      nameValue = sharedPreferences.getString(name)!;
-    });
-    if (sharedPreferences.getString(currentDate) != null) {
-      if (formattedDate !=
-          sharedPreferences.getString(currentDate).toString()) {
-        downloadingData();
-      } else {
-        getSPArrayList();
-      }
-    } else {
-      downloadingData();
-    }
-  }
-
-  void getSPArrayList() async {
-    if (sharedPreferences.getString(syncSapResponse) != null &&
-        sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
-      var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
-      syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
-
-      setListData();
-    }
-
-    if (sharedPreferences.getString(userInfo) != null &&
-        sharedPreferences.getString(userInfo).toString().isNotEmpty) {
-      var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
-      personInfo = PersonalInfoResponse.fromJson(jsonData);
-      setpersonData();
-    }
-
-    if (sharedPreferences.getString(gatePassDatail) != null &&
-        sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
-      var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
-      gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
-      setgatePassData();
-    }
-  }
-
-  buildLocationDialog() {
-    showDialog(
-        context: context,
-        builder: (builder) {
-          return AlertDialog(
-            content: SizedBox(
-              width: double.maxFinite,
-              child: Container(),
-            ),
-          );
-        });
-  }
-
-  Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location services are disabled. Please enable the services')));
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')));
-        return false;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
-      return false;
-    }
-    return true;
-  }
-
-  Future<void> downloadingData() async {
-    setState(() {
-      isLoading = true;
-    });
-
+  Future<void> calculateDistance() async {
     var jsonData = null;
-    var jsonData1 = null;
-
     dynamic response = await HTTP.get(
-        SyncAndroidToSapAPI(sharedPreferences.getString(userID) as String));
+        getDistanceAPI());
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-      SyncAndroidToSapResponse androidToSapResponse =
-          SyncAndroidToSapResponse.fromJson(jsonData);
-      setState(() {
-        syncAndroidToSapResponse = androidToSapResponse;
-        Utility()
-            .setSharedPreference(syncSapResponse, response.body.toString());
-        Utility().setSharedPreference(currentDate, formattedDate);
-      });
-      setListData();
-    }
-
-    dynamic response1 = await HTTP
-        .get(personalInfoAPI(sharedPreferences.getString(userID).toString()));
-    if (response1 != null && response1.statusCode == 200) {
-      jsonData1 = convert.jsonDecode(response1.body);
-      PersonalInfoResponse _personalInfo =
-          PersonalInfoResponse.fromJson(jsonData1);
-      if (_personalInfo.emp.isNotEmpty) {
-        setState(() {
-          personInfo = _personalInfo;
-          isLoading = false;
-          personalInfo = _personalInfo.emp;
-          Utility().setSharedPreference(userInfo, response1.body.toString());
-        });
-        setpersonData();
-      }
-    }
-
-    dynamic response2 = await HTTP
-        .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
-    if (response2 != null && response2.statusCode == 200) {
-      jsonData1 = convert.jsonDecode(response2.body);
-      PendingGatePassResponse pendingGatePassResponse =
-          PendingGatePassResponse.fromJson(jsonData1);
-      if (pendingGatePassResponse.data.isNotEmpty) {
-        setState(() {
-          gatePassList = pendingGatePassResponse.data;
-          gatePassResponse = pendingGatePassResponse;
-          isLoading = false;
-          Utility()
-              .setSharedPreference(gatePassDatail, response2.body.toString());
-        });
-        setgatePassData();
-      }
-    }
-  }
-
-  imageTextWidget(String svg, String msg, String title) {
-    return GestureDetector(
-      onTap: () {
-        switch (msg) {
-          case "Request":
-            {
-              requestMethod(title);
-            }
-            break;
-          case "Approve":
-            {
-              approvedMethod(title);
-            }
-            break;
-          case "Offline":
-            {}
-            break;
-          case "Daily Report":
-            {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const DailyReport()),
-                      (route) => true);
-            }
-            break;
-          case "Web Report":
-            {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const WebReport()),
-                      (route) => true);
-            }
-            break;
-        }
-      },
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Center(
-              child: SvgPicture.asset(
-                svg,
-                width: 50,
-                height: 50,
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-          robotoTextWidget(
-              textval: msg,
-              colorval: AppColor.themeColor,
-              sizeval: 12,
-              fontWeight: FontWeight.w600)
-        ],
-      ),
-    );
-  }
-
-  void setListData() {
-    if (syncAndroidToSapResponse != null) {
-      setState(() {
-        leaveBalanceList = syncAndroidToSapResponse!.leavebalance;
-        leaveBalanceList
-            .add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
-        activeEmployeeList = syncAndroidToSapResponse!.activeemployee;
-        attendenceList = syncAndroidToSapResponse!.attendanceemp;
-        odEmpList = syncAndroidToSapResponse!.odemp;
-        leaveEmpList = syncAndroidToSapResponse!.leaveemp;
-        pendingTaskList = syncAndroidToSapResponse!.pendingtask;
-        pendingLeaveList = syncAndroidToSapResponse!.pendingleave;
-        pendindOdList = syncAndroidToSapResponse!.pendingod;
-      });
-    }
-  }
-
-  void setpersonData() {
-    if (personInfo != null && personInfo!.emp.isNotEmpty) {
-      setState(() {
-        personalInfo = personInfo!.emp;
-      });
-    }
-  }
-
-  void setgatePassData() {
-    if (gatePassResponse != null && gatePassResponse!.data.isNotEmpty) {
-      setState(() {
-        gatePassList = gatePassResponse!.data;
-      });
-    }
-  }
-  Future getCurrentLocation() async {
-    if (Platform.isAndroid) {
-      var permission = Permission.locationWhenInUse.status;
-      if (permission != PermissionStatus.granted) {
-        final status = await Permission.location.request();
-        if (status != PermissionStatus.granted) {
-          Utility().showToast("You need location permission for use this App");
-          return;
-        }
-      }
-    }
-
-    if (Platform.isIOS) {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission != PermissionStatus.granted) {
-        LocationPermission permission = await Geolocator.requestPermission();
-        if (permission != PermissionStatus.granted) getLocation();
-        return;
-      }
-    }
-    getLocation();
-  }
-
-  getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    if(mounted) {
-      setState(() {
-        latlong = LatLng(position.latitude, position.longitude);
-        GetAddressFromLatLong(latlong!);
-      });
-    }
-  }
-
-  Future<void> GetAddressFromLatLong(LatLng position) async {
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-          position.latitude, position.longitude,
-          localeIdentifier: 'en');
-      Placemark place = placemarks[0];
-      placeName = (place.subLocality != '')
-          ? place.subLocality!
-          : place.subAdministrativeArea!;
-      isoId = place.isoCountryCode!;
-
-      if(mounted) {
-        setState(() {
-          Address = '${place.street}, ${place.subLocality}, ${place.locality}';
-          Address = Utility().formatAddress(Address);
-
-        });
-        setState(() {
-          isLoading = false;
-        });
+      distancePrefix.DistanceCalculateModel distanceCalculateModel =
+      distancePrefix.DistanceCalculateModel.fromJson(jsonData);
+      if(distanceCalculateModel.rows.isNotEmpty
+          && distanceCalculateModel.rows[0].elements.isNotEmpty
+      && distanceCalculateModel.rows[0].elements[0].distance.text.isNotEmpty) {
         showDialog(
           context: context,
-          builder: (BuildContext context) => startJourneyPopup(context),
+          builder: (BuildContext context) =>
+              stopJourneyPopup(context, distanceCalculateModel),
         );
       }
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => startJourneyPopup(context),
-      );
-    }
-  }
-
-  startJourneyPopup(BuildContext context) {
-    return AlertDialog(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
-        content: Container(
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: robotoTextWidget(
-                    textval: appName,
-                    colorval: AppColor.themeColor,
-                    sizeval: 16,
-                    fontWeight: FontWeight.bold),
-              ),
-
-              latLongWidget('Latitude:-  ${latlong!.latitude}',),
-              latLongWidget('Longitude:-  ${latlong!.longitude}',),
-              latLongWidget('Address:-$Address',),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Flexible(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: AppColor.whiteColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // <-- Radius
-                        ),
-                      ),
-                      child: robotoTextWidget(
-                        textval: cancel,
-                        colorval: AppColor.darkGrey,
-                        sizeval: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: ElevatedButton(
-                      onPressed: () {
-                       setState(() {
-                         journeyStart = True;
-                         Utility().setSharedPreference(journeyStart, True);
-                       });
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: AppColor.themeColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // <-- Radius
-                        ),
-                      ),
-                      child: robotoTextWidget(
-                        textval: confirm,
-                        colorval: AppColor.whiteColor,
-                        sizeval: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ])));
-  }
-
-  latLongWidget(String title) {
-    return Container(
-      margin: EdgeInsets.only(top: 10),
-      child: Column(
-        children: [
-          robotoTextWidget(textval: title,
-              colorval: Colors.black,
-              sizeval: 12,
-              fontWeight: FontWeight.normal),
-          SizedBox(height: 5,),
-          Divider(),
-        ],
-      ),
-    );
-  }
-
-  localConvenceWidget(String svg, String msg, String title) {
-    return GestureDetector(
-      onTap: () {
-        switch (msg) {
-          case "Start":{
-            if(journeyStart == False) {
-              getCurrentLocation();
-              setState(() {
-                isLoading = true;
-              });
-            }
-            }
-            break;
-          case "End":{
-            if(journeyStart == True) {
-              setState(() {
-                journeyStart = False;
-                Utility().setSharedPreference(journeyStart, False);
-              });
-            }
-            }
-            break;
-        }
-      },
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Center(
-              child: loadSvg(msg,svg),
-            ),
-          ),
-          const SizedBox(
-            height: 4,
-          ),
-          robotoTextWidget(
-              textval: msg,
-              colorval: AppColor.themeColor,
-              sizeval: 12,
-              fontWeight: FontWeight.w600)
-        ],
-      ),
-    );
-  }
-
-  loadSvg( String msg, String svg) {
-    if(journeyStart == True && msg == start){
-      return Opacity(
-        opacity: 0.42,
-        child: SvgPicture.asset(
-          svg,
-          width: 50,
-          height: 50,
-        ),
-      );
-    }
-
-    if(journeyStart == False && msg == start){
-      return  SvgPicture.asset(
-          svg,
-          width: 50,
-          height: 50,
-      );
-    }
-
-    if(journeyStart == True && msg==end){
-      return  SvgPicture.asset(
-          svg,
-          width: 50,
-          height: 50,
-      );
-    }
-
-    if(journeyStart == False && msg == end){
-      return Opacity(
-        opacity: 0.42,
-        child: SvgPicture.asset(
-          svg,
-          width: 50,
-          height: 50,
-        ),
-      );
     }
   }
 

@@ -75,3 +75,14 @@ var Offline = "Offline";
 var True = "true";
 var False = "false";
 var Login = "LOGIN";
+var latitude = "Latitude:- ";
+var longitude = "Longitude:- ";
+var address = "Address:- ";
+var fromLatitude = "From Latitude:- ";
+var fromLongitude = "From Longitude:- ";
+var toLatitude = "To Latitude:- ";
+var toLongitude = "To Longitude:- ";
+var fromAddress = "From Address:- ";
+var toAddress = "To Address:- ";
+var distanceTravelled = "Distance Travelled:- ";
+
