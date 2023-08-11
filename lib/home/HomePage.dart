@@ -493,13 +493,15 @@ class _HomePageState extends State<HomePage> {
     if (response1 != null && response1.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response1.body);
       PersonalInfoResponse _personalInfo = PersonalInfoResponse.fromJson(jsonData1);
-      setState(() {
-        personInfo = _personalInfo;
-        isLoading = false;
-        personalInfo = _personalInfo.emp;
-        Utility().setSharedPreference(userInfo, response1.body.toString());
-      });
-      setListData();
+      if(_personalInfo.emp.isNotEmpty) {
+        setState(() {
+          personInfo = _personalInfo;
+          isLoading = false;
+          personalInfo = _personalInfo.emp;
+          Utility().setSharedPreference(userInfo, response1.body.toString());
+        });
+        setListData();
+      }
     }
 
     dynamic response2 = await HTTP
@@ -507,13 +509,16 @@ class _HomePageState extends State<HomePage> {
     if (response2 != null && response2.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response2.body);
       PendingGatePassResponse pendingGatePassResponse = PendingGatePassResponse.fromJson(jsonData1);
-      setState(() {
-        gatePassList = pendingGatePassResponse.data;
-        gatePassResponse = pendingGatePassResponse;
-        isLoading = false;
-        Utility().setSharedPreference(gatePassDatail, response2.body.toString());
-      });
-      setListData();
+      if(pendingGatePassResponse.data.isNotEmpty) {
+        setState(() {
+          gatePassList = pendingGatePassResponse.data;
+          gatePassResponse = pendingGatePassResponse;
+          isLoading = false;
+          Utility().setSharedPreference(
+              gatePassDatail, response2.body.toString());
+        });
+        setListData();
+      }
     }
   }
 
@@ -596,26 +601,12 @@ class _HomePageState extends State<HomePage> {
         pendingTaskList = syncAndroidToSapResponse!.pendingtask;
         pendingLeaveList = syncAndroidToSapResponse!.pendingleave;
         pendindOdList = syncAndroidToSapResponse!.pendingod;
-
-
-        print('leaveBalanceList=====>${leaveBalanceList.length}');
-        print('activeEmployeeList=====>${activeEmployeeList.length}');
-        print('attendenceList=====>${attendenceList.length}');
-        print('odEmpList=====>${odEmpList.length}');
-        print('leaveEmpList=====>${leaveEmpList.length}');
-        print('pendingTaskList=====>${pendingTaskList.length}');
-        print('pendingLeaveList=====>${pendingLeaveList.length}');
-        print('pendindOdList=====>${pendindOdList.length}');
       }
       if(personInfo!=null && personInfo!.emp.isNotEmpty) {
         personalInfo = personInfo!.emp;
-        print('personalInfo=====>${personalInfo.toString()}');
-
       }
       if(gatePassResponse!=null && gatePassResponse!.data.isNotEmpty) {
         gatePassList = gatePassResponse!.data;
-
-        print('gatePassList=====>${gatePassList.toString()}');
       }
     });
 
