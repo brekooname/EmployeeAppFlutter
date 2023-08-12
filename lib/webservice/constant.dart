@@ -10,6 +10,6 @@ var emphierarchyUrl = "Employee_Hierarchy.htm";
 var syncSapResponse = "syncSapResponse";
 var userInfo = "userInfo";
 var gatePassDatail = "gatePassDetail";
-var journeyStart = "journeyStart";
+var localConveyanceJourneyStart = "localConveyanceJourneyStart";
 var googleApiKey = "AIzaSyAohhwZ11LRwoxsS8lJ0VHGkA4L-cwjWmw";
 

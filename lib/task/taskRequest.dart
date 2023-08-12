@@ -5,7 +5,7 @@ import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';

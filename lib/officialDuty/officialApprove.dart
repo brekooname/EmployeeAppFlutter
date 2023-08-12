@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 
 import 'package:shakti_employee_app/officialDuty/indirect/indirect.dart';
 import 'package:shakti_employee_app/theme/color.dart';

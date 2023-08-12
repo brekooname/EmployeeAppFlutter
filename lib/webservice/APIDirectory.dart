@@ -20,8 +20,8 @@ sendOTPAPI(String mobile, int otp){
 SyncAndroidToSapAPI(String pernr){
   return Uri.parse('${productionUrl}sync_android_to_sap.htm?pernr=${pernr}');
 }
-getDistanceAPI(){
-  return Uri.parse('${googleDistanceMatrixAPI}json?origins=40.6655101,-73.89188969999998&destinations=40.659569,-73.933783&key=$googleApiKey');
+getDistanceAPI(String origin,String destination){
+  return Uri.parse('${googleDistanceMatrixAPI}json?origins=$origin&destinations=$destination&key=$googleApiKey');
 }
 //https://maps.googleapis.com/maps/api/distancematrix/json?destinations=40.659569,-73.933783
 // &origins=40.6655101,-73.89188969999998&key=AIzaSyAohhwZ11LRwoxsS8lJ0VHGkA4L-cwjWmw
@@ -75,4 +75,8 @@ rejectLeaveAPI(int drno, String sapcode, String pass){
 
 vendorNameAPI(String value){
   return Uri.parse('${productionUrl}vendor_details_all.htm?name=${value}');
+}
+
+syncLocalConveyanceAPI(String value){
+  return Uri.parse('${productionUrl}sync_offline_data.htm?travel_distance=${value}');
 }

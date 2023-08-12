@@ -11,14 +11,15 @@ import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'forgot_password/forgot_password_page.dart';
-import 'home/HomePage.dart';
+import 'home/home_page.dart';
 import 'theme/string.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn = (sharedPreferences.getString(userID) == null) ? False : True;
-  String? journeyStarts = (sharedPreferences.getString(journeyStart) == null) ? False : sharedPreferences.getString(journeyStart);
+  print('journeyStart1111=====>${sharedPreferences.getString(localConveyanceJourneyStart)}');
+  String? journeyStarts = (sharedPreferences.getString(localConveyanceJourneyStart) == null) ? False : sharedPreferences.getString(localConveyanceJourneyStart);
   runApp(MyApp(isLoggedIn: isLoggedIn,journStar: journeyStarts,));
 }
 
@@ -294,7 +295,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (loginResponse[0].name.isNotEmpty) {
         Utility().setSharedPreference(name, loginResponse[0].name);
-        Utility().setSharedPreference(journeyStart,'false');
+        Utility().setSharedPreference(localConveyanceJourneyStart,'false');
         Utility().showToast('Welcome ' + loginResponse[0].name);
         // ignore: use_build_context_synchronously
         Navigator.of(context).pushAndRemoveUntil(

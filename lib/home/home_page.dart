@@ -2,6 +2,7 @@
 
 import 'dart:convert' as convert;
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geocoding/geocoding.dart';
@@ -15,6 +16,8 @@ import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
 import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
 import 'package:shakti_employee_app/gatepass/model/PendingGatePassResponse.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
+import 'package:shakti_employee_app/home/model/distance_calculate_model.dart'
+    as distancePrefix;
 import 'package:shakti_employee_app/home/model/personalindoresponse.dart';
 import 'package:shakti_employee_app/leave/LeaveRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officalRequest.dart';
@@ -27,28 +30,34 @@ import 'package:shakti_employee_app/webReport/webreport.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shakti_employee_app/home/model/distance_calculate_model.dart'as distancePrefix;
+
+import '../database/database_helper.dart';
 import '../leave/LeaveApprove.dart';
 import '../theme/string.dart';
 import '../webservice/constant.dart';
+import 'model/local_convence_model.dart';
 import 'navigation_drawer_widget.dart';
+import 'offline_local_convenyance.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key,required this.journeyStart}) : super(key: key);
+  HomePage({Key? key, required this.journeyStart}) : super(key: key);
 
   String journeyStart;
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-
   LatLng? latlong = null;
   String packageName = "",
       version = "",
       nameValue = "",
       formattedDate = "",
-      Address = "",placeName = "",isoId="",journeyStart = "";
+      Address = "",
+      placeName = "",
+      isoId = "",
+      journeyStart = "";
   bool isLoading = false;
   late SharedPreferences sharedPreferences;
   List<Leavebalance> leaveBalanceList = [];
@@ -61,10 +70,10 @@ class _HomePageState extends State<HomePage> {
   List<Pendingod> pendindOdList = [];
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
+  List<LocalConveyanceModel> localConveyanceList = [];
   SyncAndroidToSapResponse? syncAndroidToSapResponse;
   PersonalInfoResponse? personInfo;
   PendingGatePassResponse? gatePassResponse;
-
 
   @override
   void initState() {
@@ -91,8 +100,7 @@ class _HomePageState extends State<HomePage> {
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           PopupMenuButton<int>(
-            itemBuilder: (context) =>
-            [
+            itemBuilder: (context) => [
               // PopupMenuItem 1
               const PopupMenuItem(
                 value: 1,
@@ -134,10 +142,7 @@ class _HomePageState extends State<HomePage> {
           SingleChildScrollView(
             child: Container(
               margin: const EdgeInsets.only(left: 10, right: 10),
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
+              width: MediaQuery.of(context).size.width,
               child: Column(
                 children: [
                   detailWidget("Leave"),
@@ -154,8 +159,8 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: isLoading == true
                 ? const CircularProgressIndicator(
-              color: Colors.indigo,
-            )
+                    color: Colors.indigo,
+                  )
                 : const SizedBox(),
           ),
         ],
@@ -190,10 +195,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Container(
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height / 18,
+              height: MediaQuery.of(context).size.height / 18,
               color: AppColor.themeColor,
               alignment: Alignment.center,
               child: robotoTextWidget(
@@ -238,10 +240,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               Container(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height / 18,
+                height: MediaQuery.of(context).size.height / 18,
                 color: AppColor.themeColor,
                 alignment: Alignment.center,
                 child: const robotoTextWidget(
@@ -272,10 +271,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       width: 1,
       margin: EdgeInsets.only(top: 15),
-      height: MediaQuery
-          .of(context)
-          .size
-          .height / 8,
+      height: MediaQuery.of(context).size.height / 8,
       color: AppColor.grey,
     );
   }
@@ -298,10 +294,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               Container(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height / 18,
+                height: MediaQuery.of(context).size.height / 18,
                 color: AppColor.themeColor,
                 alignment: Alignment.center,
                 child: robotoTextWidget(
@@ -362,8 +355,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> getNameValue() async {
-    var now = new DateTime.now();
-    var formatter = new DateFormat('yyyy-MM-dd');
+    var now = DateTime.now();
+    var formatter = DateFormat('yyyy-MM-dd');
     formattedDate = formatter.format(now);
     sharedPreferences = await SharedPreferences.getInstance();
 
@@ -386,7 +379,7 @@ class _HomePageState extends State<HomePage> {
     if (sharedPreferences.getString(syncSapResponse) != null &&
         sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
       var jsonData =
-      convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
+          convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
       syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
 
       setListData();
@@ -402,7 +395,7 @@ class _HomePageState extends State<HomePage> {
     if (sharedPreferences.getString(gatePassDatail) != null &&
         sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
       var jsonData =
-      convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+          convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
       setgatePassData();
     }
@@ -423,20 +416,24 @@ class _HomePageState extends State<HomePage> {
             }
             break;
           case "Offline":
-            {}
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const OfflineLocalConveyance()),
+                      (route) => true);
+            }
             break;
           case "Daily Report":
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const DailyReport()),
-                      (route) => true);
+                  (route) => true);
             }
             break;
           case "Web Report":
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const WebReport()),
-                      (route) => true);
+                  (route) => true);
             }
             break;
         }
@@ -470,22 +467,24 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         switch (msg) {
-          case "Start":{
-            if(journeyStart == False) {
-              getCurrentLocation();
-              setState(() {
-                isLoading = true;
-              });
-            }
+          case "Start":
+            {
+              if (journeyStart == False) {
+                getCurrentLocation();
+                setState(() {
+                  isLoading = true;
+                });
+              }
             }
             break;
-          case "End":{
-            if(journeyStart == True) {
-              getCurrentLocation();
-              setState(() {
-                isLoading = true;
-              });
-            }
+          case "End":
+            {
+              if (journeyStart == True) {
+                getCurrentLocation();
+                setState(() {
+                  isLoading = true;
+                });
+              }
             }
             break;
         }
@@ -495,7 +494,7 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: Center(
-              child: loadSvg(msg,svg),
+              child: loadSvg(msg, svg),
             ),
           ),
           const SizedBox(
@@ -511,8 +510,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  loadSvg( String msg, String svg) {
-    if(journeyStart == True && msg == start){
+  loadSvg(String msg, String svg) {
+    if (journeyStart == True && msg == start) {
       return Opacity(
         opacity: 0.42,
         child: SvgPicture.asset(
@@ -523,23 +522,23 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    if(journeyStart == False && msg == start){
-      return  SvgPicture.asset(
-          svg,
-          width: 50,
-          height: 50,
+    if (journeyStart == False && msg == start) {
+      return SvgPicture.asset(
+        svg,
+        width: 50,
+        height: 50,
       );
     }
 
-    if(journeyStart == True && msg==end){
-      return  SvgPicture.asset(
-          svg,
-          width: 50,
-          height: 50,
+    if (journeyStart == True && msg == end) {
+      return SvgPicture.asset(
+        svg,
+        width: 50,
+        height: 50,
       );
     }
 
-    if(journeyStart == False && msg == end){
+    if (journeyStart == False && msg == end) {
       return Opacity(
         opacity: 0.42,
         child: SvgPicture.asset(
@@ -577,7 +576,7 @@ class _HomePageState extends State<HomePage> {
   getLocation() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    if(mounted) {
+    if (mounted) {
       setState(() {
         latlong = LatLng(position.latitude, position.longitude);
         GetAddressFromLatLong(latlong!);
@@ -596,11 +595,10 @@ class _HomePageState extends State<HomePage> {
           : place.subAdministrativeArea!;
       isoId = place.isoCountryCode!;
 
-      if(mounted) {
+      if (mounted) {
         setState(() {
           Address = '${place.street}, ${place.subLocality}, ${place.locality}';
           Address = Utility().formatAddress(Address);
-
         });
         setState(() {
           isLoading = false;
@@ -616,16 +614,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   void showJourneyDialogue() {
-
-    if(journeyStart == False) {
+    if (journeyStart == False) {
       showDialog(
         context: context,
         builder: (BuildContext context) => startJourneyPopup(context),
       );
-    }else{
-      calculateDistance();
-
+    } else {
+      getLocalConveyanceData();
     }
+  }
+
+  Future<List<Map<String, dynamic>>?> getLocalConveyanceData() async {
+    List<Map<String, dynamic>> listMap =
+        await DatabaseHelper.instance.queryAllLocalConveyance();
+    setState(() {
+      listMap.forEach(
+          (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
+      if (localConveyanceList.isNotEmpty) {
+        calculateDistance(localConveyanceList[localConveyanceList.length - 1]);
+      }
+    });
+    return null;
   }
 
   startJourneyPopup(BuildContext context) {
@@ -636,7 +645,8 @@ class _HomePageState extends State<HomePage> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min, children: [
+                mainAxisSize: MainAxisSize.min,
+                children: [
               Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: robotoTextWidget(
@@ -645,10 +655,15 @@ class _HomePageState extends State<HomePage> {
                     sizeval: 16,
                     fontWeight: FontWeight.bold),
               ),
-
-              latLongWidget('$latitude  ${latlong!.latitude}',),
-              latLongWidget('$longitude  ${latlong!.longitude}',),
-              latLongWidget('$address $Address',),
+              latLongWidget(
+                '$latitude  ${latlong!.latitude}',
+              ),
+              latLongWidget(
+                '$longitude  ${latlong!.longitude}',
+              ),
+              latLongWidget(
+                '$address $Address',
+              ),
               const SizedBox(
                 height: 10,
               ),
@@ -677,9 +692,33 @@ class _HomePageState extends State<HomePage> {
                   Flexible(
                     child: ElevatedButton(
                       onPressed: () {
+                        String currentDate =
+                            DateFormat('yyyyMMdd').format(DateTime.now());
+                        String currentTime =
+                            DateFormat('HHmmss').format(DateTime.now());
+
+                        LocalConveyanceModel localConveyance =
+                            LocalConveyanceModel(
+                                empId: int.parse(sharedPreferences
+                                    .getString(userID)
+                                    .toString()),
+                                fromLatitude: latlong!.latitude.toString(),
+                                fromLongitude: latlong!.longitude.toString(),
+                                toLatitude: '',
+                                toLongitude: '',
+                                fromAddress: Address,
+                                toAddress: '',
+                                createDate: currentDate,
+                                createTime: currentTime,
+                                endDate: '',
+                                endTime: '');
+
                         setState(() {
                           journeyStart = True;
-                          Utility().setSharedPreference(journeyStart, True);
+                          Utility().setSharedPreference(
+                              localConveyanceJourneyStart, True);
+                          DatabaseHelper.instance.insertLocalConveyance(
+                              localConveyance.toMapWithoutId());
                         });
                         Navigator.of(context).pop();
                       },
@@ -702,7 +741,12 @@ class _HomePageState extends State<HomePage> {
             ])));
   }
 
-  stopJourneyPopup(BuildContext context, distancePrefix.DistanceCalculateModel distanceCalculateModel) {
+  stopJourneyPopup(
+      BuildContext context,
+      distancePrefix.DistanceCalculateModel distanceCalculateModel,
+      LocalConveyanceModel localConveyanceList,
+      String toLatitude,
+      String toLongitude) {
     return AlertDialog(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -720,14 +764,27 @@ class _HomePageState extends State<HomePage> {
                     sizeval: 16,
                     fontWeight: FontWeight.bold),
               ),
-
-              latLongWidget('$fromLatitude  ${latlong!.latitude}',),
-              latLongWidget('$fromLongitude  ${latlong!.longitude}',),
-              latLongWidget('$toLatitude  ${latlong!.latitude}',),
-              latLongWidget('$toLongitude  ${latlong!.longitude}',),
-              latLongWidget('$fromAddress ${distanceCalculateModel.originAddresses.toString()}',),
-              latLongWidget('$toAddress ${distanceCalculateModel.destinationAddresses.toString()}',),
-              latLongWidget('$distanceTravelled ${distanceCalculateModel.rows[0].elements[0].distance.text}',),
+              latLongWidget(
+                '$fromLatitude  ${localConveyanceList.fromLatitude}',
+              ),
+              latLongWidget(
+                '$fromLongitude  ${localConveyanceList.fromLongitude}',
+              ),
+              latLongWidget(
+                '$toLatitude  ${toLatitude}',
+              ),
+              latLongWidget(
+                '$toLongitude  ${toLongitude}',
+              ),
+              latLongWidget(
+                '$fromAddress ${distanceCalculateModel.originAddresses[0]}',
+              ),
+              latLongWidget(
+                '$toAddress ${distanceCalculateModel.destinationAddresses[0]}',
+              ),
+              latLongWidget(
+                '$distanceTravelled ${distanceCalculateModel.rows[0].elements[0].distance.text}',
+              ),
               const SizedBox(
                 height: 10,
               ),
@@ -756,11 +813,38 @@ class _HomePageState extends State<HomePage> {
                   Flexible(
                     child: ElevatedButton(
                       onPressed: () {
-                         setState(() {
-                           journeyStart = False;
-                           Utility().setSharedPreference(journeyStart, False);
-                         });
-                        Navigator.of(context).pop();
+                        String currentDate =
+                            DateFormat('yyyyMMdd').format(DateTime.now());
+                        String currentTime =
+                            DateFormat('HHmmss').format(DateTime.now());
+
+                        LocalConveyanceModel localConveyance =
+                            LocalConveyanceModel(
+                                empId: int.parse(sharedPreferences
+                                    .getString(userID)
+                                    .toString()),
+                                fromLatitude: localConveyanceList.fromLatitude,
+                                fromLongitude:
+                                    localConveyanceList.fromLongitude,
+                                toLatitude: toLatitude,
+                                toLongitude: toLongitude,
+                                fromAddress:
+                                    distanceCalculateModel.originAddresses[0],
+                                toAddress: distanceCalculateModel
+                                    .destinationAddresses[0],
+                                createDate: localConveyanceList.createDate,
+                                createTime: localConveyanceList.createTime,
+                                endDate: currentDate,
+                                endTime: currentTime);
+
+                        setState(() {
+                          journeyStart = False;
+                          Utility().setSharedPreference(
+                              localConveyanceJourneyStart, False);
+                          DatabaseHelper.instance.updateLocalConveyance(
+                              localConveyance.toMapWithoutId());
+                          Navigator.of(context).pop();
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         primary: AppColor.themeColor,
@@ -789,11 +873,14 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          robotoTextWidget(textval: title,
+          robotoTextWidget(
+              textval: title,
               colorval: Colors.black,
               sizeval: 12,
               fontWeight: FontWeight.normal),
-          SizedBox(height: 5,),
+          SizedBox(
+            height: 5,
+          ),
           Divider(),
         ],
       ),
@@ -813,7 +900,7 @@ class _HomePageState extends State<HomePage> {
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
       SyncAndroidToSapResponse androidToSapResponse =
-      SyncAndroidToSapResponse.fromJson(jsonData);
+          SyncAndroidToSapResponse.fromJson(jsonData);
       setState(() {
         syncAndroidToSapResponse = androidToSapResponse;
         Utility()
@@ -828,7 +915,7 @@ class _HomePageState extends State<HomePage> {
     if (response1 != null && response1.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response1.body);
       PersonalInfoResponse _personalInfo =
-      PersonalInfoResponse.fromJson(jsonData1);
+          PersonalInfoResponse.fromJson(jsonData1);
       if (_personalInfo.emp.isNotEmpty) {
         setState(() {
           personInfo = _personalInfo;
@@ -845,7 +932,7 @@ class _HomePageState extends State<HomePage> {
     if (response2 != null && response2.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response2.body);
       PendingGatePassResponse pendingGatePassResponse =
-      PendingGatePassResponse.fromJson(jsonData1);
+          PendingGatePassResponse.fromJson(jsonData1);
       if (pendingGatePassResponse.data.isNotEmpty) {
         setState(() {
           gatePassList = pendingGatePassResponse.data;
@@ -898,45 +985,41 @@ class _HomePageState extends State<HomePage> {
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) =>
-                      LeaveRequestScreen(
+                  builder: (context) => LeaveRequestScreen(
                         LeaveBalanceList: leaveBalanceList,
                         activeEmpList: activeEmployeeList,
                       )),
-                  (route) => true);
+              (route) => true);
         }
         break;
       case "Official Duty":
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) =>
-                      OfficialRequest(
+                  builder: (context) => OfficialRequest(
                         activeemployeeList: activeEmployeeList,
                       )),
-                  (route) => true);
+              (route) => true);
         }
         break;
       case "Gate Pass":
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) =>
-                      GatepassRequestScreen(
+                  builder: (context) => GatepassRequestScreen(
                         activeemployeeList: activeEmployeeList,
                       )),
-                  (route) => true);
+              (route) => true);
         }
         break;
       case "Task":
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) =>
-                      TaskRequestScreen(
+                  builder: (context) => TaskRequestScreen(
                         activeemployeeList: activeEmployeeList,
                       )),
-                  (route) => true);
+              (route) => true);
         }
         break;
     }
@@ -948,11 +1031,10 @@ class _HomePageState extends State<HomePage> {
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) =>
-                      LeaveApproved(
+                  builder: (context) => LeaveApproved(
                         pendingLeaveList: pendingLeaveList,
                       )),
-                  (route) => true);
+              (route) => true);
         }
         break;
       case "Official Duty":
@@ -961,7 +1043,7 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(
                   builder: (context) =>
                       OfficialApproved(pendindOdList: pendindOdList)),
-                  (route) => true);
+              (route) => true);
         }
         break;
       case "Gate Pass":
@@ -970,43 +1052,48 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(
                   builder: (context) =>
                       GatePassApproved(gatePassList: gatePassList)),
-                  (route) => true);
+              (route) => true);
         }
         break;
       case "Task":
         {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) =>
-                      TaskApproved(
+                  builder: (context) => TaskApproved(
                         pendingTaskList: pendingTaskList,
                         activeemployeeList: activeEmployeeList,
                       )),
-                  (route) => true);
+              (route) => true);
         }
         break;
     }
   }
 
-
-  Future<void> calculateDistance() async {
+  Future<void> calculateDistance(
+      LocalConveyanceModel localConveyanceList) async {
     var jsonData = null;
-    dynamic response = await HTTP.get(
-        getDistanceAPI());
+    String toLatitude = latlong!.latitude.toString();
+    String toLongitude = latlong!.longitude.toString();
+    dynamic response = await HTTP.get(getDistanceAPI(
+        '${localConveyanceList.fromLatitude},${localConveyanceList.fromLongitude}',
+        '${toLatitude},${toLongitude}'));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
       distancePrefix.DistanceCalculateModel distanceCalculateModel =
-      distancePrefix.DistanceCalculateModel.fromJson(jsonData);
-      if(distanceCalculateModel.rows.isNotEmpty
-          && distanceCalculateModel.rows[0].elements.isNotEmpty
-      && distanceCalculateModel.rows[0].elements[0].distance.text.isNotEmpty) {
+          distancePrefix.DistanceCalculateModel.fromJson(jsonData);
+      if (distanceCalculateModel.rows.isNotEmpty &&
+          distanceCalculateModel.rows[0].elements.isNotEmpty &&
+          distanceCalculateModel.rows[0].elements[0].distance.text.isNotEmpty) {
         showDialog(
           context: context,
-          builder: (BuildContext context) =>
-              stopJourneyPopup(context, distanceCalculateModel),
+          builder: (BuildContext context) => stopJourneyPopup(
+              context,
+              distanceCalculateModel,
+              localConveyanceList,
+              toLatitude,
+              toLongitude),
         );
       }
     }
   }
-
 }

@@ -9,7 +9,7 @@ import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../home/HomePage.dart';
+import '../home/home_page.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/constant.dart';
