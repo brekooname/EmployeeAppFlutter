@@ -100,16 +100,20 @@ class _TaskApprovedState extends State<TaskApproved> {
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
           child: Container(
-              height: 280,
+              height: 270,
               padding: const EdgeInsets.all(5),
               color: AppColor.whiteColor,
               child: Stack(children: <Widget>[
                 Column(
+
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     displayWidget("Document No - ", widget.pendingTaskList[index].dno),
+                    SizedBox(height: 10,),
                     displayWidget("MRC Type - ",  widget.pendingTaskList[index].mrct1),
+                    SizedBox(height: 10,),
                     displayWidget("Assigner - ",  widget.pendingTaskList[index].asgnr1),
+                    SizedBox(height: 10,),
                     taskDescWidget("Description - ",  widget.pendingTaskList[index].agenda),
                     Row(
                       children: [
@@ -272,13 +276,13 @@ class _TaskApprovedState extends State<TaskApproved> {
       children: [
         robotoTextWidget(
           textval: title,
-          colorval: Colors.black54,
+          colorval: AppColor.themeColor,
           sizeval: 14.0,
           fontWeight: FontWeight.bold,
         ),
         robotoTextWidget(
           textval: value,
-          colorval: AppColor.themeColor,
+          colorval: Colors.black,
           sizeval: 14.0,
           fontWeight: FontWeight.w400,
         )
@@ -293,19 +297,21 @@ class _TaskApprovedState extends State<TaskApproved> {
       children: [
         robotoTextWidget(
           textval: title,
-          colorval: Colors.black54,
+          colorval: AppColor.themeColor,
           sizeval: 14.0,
           fontWeight: FontWeight.bold,
         ),
 
         Container(
           width: 240,
-          height: 45,
-          child:  robotoTextWidget(
-            textval: value,
-            colorval: AppColor.themeColor,
-            sizeval: 14.0,
-            fontWeight: FontWeight.w400,
+          height: 30,
+          child:  Flexible(
+            child: robotoTextWidget(
+              textval: value,
+              colorval:  Colors.black,
+              sizeval: 14.0,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ),
       ],
@@ -326,8 +332,7 @@ class _TaskApprovedState extends State<TaskApproved> {
         },
         child: Container(
           height: 50,
-          margin: const EdgeInsets.symmetric(
-              horizontal: 50),
+
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),
@@ -387,7 +392,11 @@ class _TaskApprovedState extends State<TaskApproved> {
     return  Container(
       margin: EdgeInsets.all(10),
       padding: EdgeInsets.only(left: 3),
-
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColor.themeColor),
+        borderRadius:
+        const BorderRadius.all(Radius.circular(10)),
+      ),
       child: SearchField< List<Activeemployee>>(
         suggestions: activeemployee
             .map(
@@ -401,9 +410,9 @@ class _TaskApprovedState extends State<TaskApproved> {
         ).toList(),
         searchInputDecoration: InputDecoration(
           hintText: "Assign Charge To",
-          hintStyle: TextStyle(color: AppColor.themeColor, fontWeight: FontWeight.normal),
-          prefixIcon: Icon(Icons.person, color: AppColor.themeColor,),
-
+          hintStyle: TextStyle(color: AppColor.themeColor, fontSize: 13, fontWeight: FontWeight.normal),
+          prefixIcon: Icon(Icons.person, color: AppColor.themeColor, size: 20,),
+          border: InputBorder.none,
         ),
         onSubmit: (String value) {
           setState(() {
@@ -415,6 +424,7 @@ class _TaskApprovedState extends State<TaskApproved> {
 
     );
   }
+
 
 }
 

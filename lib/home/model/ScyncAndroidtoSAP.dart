@@ -562,6 +562,11 @@ class Pendingleave {
     "person": person,
     "directIndirect": directIndirect,
   };
+
+  @override
+  String toString() {
+    return 'Pendingleave{leavNo: $leavNo, horo: $horo, pernr: $pernr, name: $name, dedQuta1: $dedQuta1, levFrm: $levFrm, levFr: $levFr, levTo: $levTo, levT: $levT, timFrm: $timFrm, timTo: $timTo, reason: $reason, adminChrg1: $adminChrg1, nameperl: $nameperl, adminChrg2: $adminChrg2, nameperl2: $nameperl2, nameperl3: $nameperl3, nameperl4: $nameperl4, person: $person, directIndirect: $directIndirect}';
+  }
 }
 
 class Pendingod {
