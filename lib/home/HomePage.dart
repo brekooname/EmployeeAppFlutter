@@ -1,6 +1,7 @@
 // ignore_for_file: library_prefixes
 
 import 'dart:convert' as convert;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
@@ -23,6 +24,7 @@ import 'package:shakti_employee_app/webReport/webreport.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../leave/LeaveApprove.dart';
 import '../theme/string.dart';
 import '../webservice/constant.dart';
@@ -50,9 +52,9 @@ class _HomePageState extends State<HomePage> {
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
 
-   SyncAndroidToSapResponse? syncAndroidToSapResponse;
-   PersonalInfoResponse? personInfo;
-   PendingGatePassResponse? gatePassResponse;
+  SyncAndroidToSapResponse? syncAndroidToSapResponse;
+  PersonalInfoResponse? personInfo;
+  PendingGatePassResponse? gatePassResponse;
 
   @override
   void initState() {
@@ -403,28 +405,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   void getSPArrayList() async {
-
-
-    if(sharedPreferences.getString(syncSapResponse)!=null && sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
-      var jsonData = convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
+    if (sharedPreferences.getString(syncSapResponse) != null &&
+        sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
+      var jsonData =
+          convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
       syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
+
       setListData();
     }
 
-    if(sharedPreferences.getString(userInfo)!=null && sharedPreferences.getString(userInfo).toString().isNotEmpty) {
+    if (sharedPreferences.getString(userInfo) != null &&
+        sharedPreferences.getString(userInfo).toString().isNotEmpty) {
       var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
       personInfo = PersonalInfoResponse.fromJson(jsonData);
-          setpersonData();
+      setpersonData();
     }
 
-    if(sharedPreferences.getString(gatePassDatail)!=null && sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
-      var jsonData = convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+    if (sharedPreferences.getString(gatePassDatail) != null &&
+        sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
+      var jsonData =
+          convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
       setgatePassData();
     }
-
-
-
   }
 
   buildLocationDialog() {
@@ -481,11 +484,12 @@ class _HomePageState extends State<HomePage> {
         SyncAndroidToSapAPI(sharedPreferences.getString(userID) as String));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-
-      SyncAndroidToSapResponse androidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
+      SyncAndroidToSapResponse androidToSapResponse =
+          SyncAndroidToSapResponse.fromJson(jsonData);
       setState(() {
         syncAndroidToSapResponse = androidToSapResponse;
-        Utility().setSharedPreference(syncSapResponse, response.body.toString());
+        Utility()
+            .setSharedPreference(syncSapResponse, response.body.toString());
         Utility().setSharedPreference(currentDate, formattedDate);
       });
       setListData();
@@ -495,8 +499,9 @@ class _HomePageState extends State<HomePage> {
         .get(personalInfoAPI(sharedPreferences.getString(userID).toString()));
     if (response1 != null && response1.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response1.body);
-      PersonalInfoResponse _personalInfo = PersonalInfoResponse.fromJson(jsonData1);
-      if(_personalInfo.emp.isNotEmpty) {
+      PersonalInfoResponse _personalInfo =
+          PersonalInfoResponse.fromJson(jsonData1);
+      if (_personalInfo.emp.isNotEmpty) {
         setState(() {
           personInfo = _personalInfo;
           isLoading = false;
@@ -511,14 +516,15 @@ class _HomePageState extends State<HomePage> {
         .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
     if (response2 != null && response2.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response2.body);
-      PendingGatePassResponse pendingGatePassResponse = PendingGatePassResponse.fromJson(jsonData1);
-      if(pendingGatePassResponse.data.isNotEmpty) {
+      PendingGatePassResponse pendingGatePassResponse =
+          PendingGatePassResponse.fromJson(jsonData1);
+      if (pendingGatePassResponse.data.isNotEmpty) {
         setState(() {
           gatePassList = pendingGatePassResponse.data;
           gatePassResponse = pendingGatePassResponse;
           isLoading = false;
-          Utility().setSharedPreference(
-              gatePassDatail, response2.body.toString());
+          Utility()
+              .setSharedPreference(gatePassDatail, response2.body.toString());
         });
         setgatePassData();
       }
@@ -598,11 +604,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setListData() {
-    setState(() {
-      if(syncAndroidToSapResponse!=null) {
+    if (syncAndroidToSapResponse != null) {
+      setState(() {
         leaveBalanceList = syncAndroidToSapResponse!.leavebalance;
-        leaveBalanceList.add(
-            Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
+        leaveBalanceList
+            .add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
         activeEmployeeList = syncAndroidToSapResponse!.activeemployee;
         attendenceList = syncAndroidToSapResponse!.attendanceemp;
         odEmpList = syncAndroidToSapResponse!.odemp;
@@ -610,114 +616,24 @@ class _HomePageState extends State<HomePage> {
         pendingTaskList = syncAndroidToSapResponse!.pendingtask;
         pendingLeaveList = syncAndroidToSapResponse!.pendingleave;
         pendindOdList = syncAndroidToSapResponse!.pendingod;
-
-      }
-
-    });
-
+      });
+    }
   }
 
   void setpersonData() {
-    if(personInfo!=null && personInfo!.emp.isNotEmpty) {
-      personalInfo = personInfo!.emp;
+    if (personInfo != null && personInfo!.emp.isNotEmpty) {
+      setState(() {
+        personalInfo = personInfo!.emp;
+      });
     }
   }
 
   void setgatePassData() {
-    if(gatePassResponse!=null && gatePassResponse!.data.isNotEmpty) {
-      gatePassList = gatePassResponse!.data;
+    if (gatePassResponse != null && gatePassResponse!.data.isNotEmpty) {
+      setState(() {
+        gatePassList = gatePassResponse!.data;
+      });
     }
-  }
-
-  badgeWidget(String msg, String title) {
-
-    if (title == "Leave") {
-      return Visibility(
-        visible: pendingLeaveList.length == 0? false : true ,
-        child: Positioned(
-          left: 30.0,
-          bottom: 30.0,
-          child:  Container(
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                  color: AppColor.themeColor,
-            ),
-            width: msg == "Request"? 0:20,
-            height: msg == "Request"? 0:20,
-            child:  Center(
-              child: robotoTextWidget( textval: pendingLeaveList.length.toString(),
-                  colorval:  Colors.white,
-                  sizeval: 12, fontWeight: FontWeight.normal),
-            ),
-          ),
-        ),
-      );
-    }
-    if (title == "Official Duty") {
-      return Visibility(
-        visible: pendindOdList.length == 0? false:true ,
-        child: Positioned(
-          left: 30.0,
-          bottom: 30.0,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColor.themeColor,),
-            width: msg == "Request"? 0:20,
-            height: msg == "Request"? 0:20,
-            child: Center(
-              child: robotoTextWidget(textval: pendindOdList.length.toString(),
-                  colorval:  Colors.white,
-                  sizeval: 12, fontWeight: FontWeight.normal),
-            ),
-          ),
-        ),
-      );
-    }
-    if (title == "Gate Pass") {
-      return Visibility(
-        visible: gatePassList.length == 0? false:true ,
-        child: Positioned(
-          left: 30.0,
-          bottom: 30.0,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color:  AppColor.themeColor,),
-            width: msg == "Request"? 0:20,
-            height: msg == "Request"? 0:20,
-            child: Center(
-              child: robotoTextWidget(textval: gatePassList.length.toString(),
-                  colorval:  Colors.white,
-                  sizeval: 12, fontWeight: FontWeight.normal),
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (title == "Task") {
-      return Visibility(
-        visible: pendingTaskList.length == 0? false:true ,
-        child: Positioned(
-          left: 30.0,
-          bottom: 30.0,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color:  AppColor.themeColor,),
-            width: msg == "Request"? 0:20,
-            height: msg == "Request"? 0:20,
-            child: Center(
-              child: robotoTextWidget(textval: pendingTaskList.length.toString(),
-                  colorval:  Colors.white,
-                  sizeval: 12, fontWeight: FontWeight.normal),
-            ),
-          ),
-        ),
-      );
-    }
-    return Container();
   }
 
 }
