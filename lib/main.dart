@@ -18,7 +18,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn = (sharedPreferences.getString(userID) == null) ? False : True;
-  print('journeyStart1111=====>${sharedPreferences.getString(localConveyanceJourneyStart)}');
   String? journeyStarts = (sharedPreferences.getString(localConveyanceJourneyStart) == null) ? False : sharedPreferences.getString(localConveyanceJourneyStart);
   runApp(MyApp(isLoggedIn: isLoggedIn,journStar: journeyStarts,));
 }

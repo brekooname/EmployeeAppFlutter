@@ -12,4 +12,5 @@ var userInfo = "userInfo";
 var gatePassDatail = "gatePassDetail";
 var localConveyanceJourneyStart = "localConveyanceJourneyStart";
 var googleApiKey = "AIzaSyAohhwZ11LRwoxsS8lJ0VHGkA4L-cwjWmw";
+var databaseName ="EmployeeDatabase.db";
 

@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../gatepass/model/PendingGatePassResponse.dart';
 import '../home/model/personalindoresponse.dart';
@@ -84,6 +85,9 @@ class Utility {
 
     return formated;
   }
+
+  Future<void> deleteDatabase(String path) =>
+      databaseFactory.deleteDatabase(path);
   /*void saveArrayList(List<String> list, int position) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     switch (position) {

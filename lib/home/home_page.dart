@@ -36,6 +36,7 @@ import '../leave/LeaveApprove.dart';
 import '../theme/string.dart';
 import '../webservice/constant.dart';
 import 'model/local_convence_model.dart';
+import 'model/travelmodel.dart';
 import 'navigation_drawer_widget.dart';
 import 'offline_local_convenyance.dart';
 
@@ -57,7 +58,8 @@ class _HomePageState extends State<HomePage> {
       Address = "",
       placeName = "",
       isoId = "",
-      journeyStart = "";
+      journeyStart = "",
+      allLatLng = "",UserID ="";
   bool isLoading = false;
   late SharedPreferences sharedPreferences;
   List<Leavebalance> leaveBalanceList = [];
@@ -70,10 +72,12 @@ class _HomePageState extends State<HomePage> {
   List<Pendingod> pendindOdList = [];
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
+  List<TravelModel> travelList = [];
   List<LocalConveyanceModel> localConveyanceList = [];
   SyncAndroidToSapResponse? syncAndroidToSapResponse;
   PersonalInfoResponse? personInfo;
   PendingGatePassResponse? gatePassResponse;
+  TextEditingController travelModeController = TextEditingController();
 
   @override
   void initState() {
@@ -362,6 +366,7 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       nameValue = sharedPreferences.getString(name)!;
+      UserID = sharedPreferences.getString(userID)!;
     });
     if (sharedPreferences.getString(currentDate) != null) {
       if (formattedDate !=
@@ -418,8 +423,9 @@ class _HomePageState extends State<HomePage> {
           case "Offline":
             {
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const OfflineLocalConveyance()),
-                      (route) => true);
+                  MaterialPageRoute(
+                      builder: (context) => const OfflineLocalConveyance()),
+                  (route) => true);
             }
             break;
           case "Daily Report":
@@ -590,15 +596,11 @@ class _HomePageState extends State<HomePage> {
           position.latitude, position.longitude,
           localeIdentifier: 'en');
       Placemark place = placemarks[0];
-      placeName = (place.subLocality != '')
-          ? place.subLocality!
-          : place.subAdministrativeArea!;
-      isoId = place.isoCountryCode!;
 
       if (mounted) {
         setState(() {
-          Address = '${place.street}, ${place.subLocality}, ${place.locality}';
-          Address = Utility().formatAddress(Address);
+          Address = '${place.street},  ${place.subAdministrativeArea},  ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}';
+         // Address = Utility().formatAddress(Address);
         });
         setState(() {
           isLoading = false;
@@ -631,7 +633,15 @@ class _HomePageState extends State<HomePage> {
       listMap.forEach(
           (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
       if (localConveyanceList.isNotEmpty) {
-        calculateDistance(localConveyanceList[localConveyanceList.length - 1]);
+        print('UserID====>${localConveyanceList[localConveyanceList.length - 1].userId}');
+        Utility().checkInternetConnection().then((connectionResult) {
+          if (connectionResult) {
+            calculateDistance(
+                localConveyanceList[localConveyanceList.length - 1]);
+          } else {
+            savedOfflineLocalConvance(localConveyanceList[localConveyanceList.length - 1]);
+          }
+        });
       }
     });
     return null;
@@ -696,12 +706,12 @@ class _HomePageState extends State<HomePage> {
                             DateFormat('yyyyMMdd').format(DateTime.now());
                         String currentTime =
                             DateFormat('HHmmss').format(DateTime.now());
-
                         LocalConveyanceModel localConveyance =
                             LocalConveyanceModel(
                                 empId: int.parse(sharedPreferences
                                     .getString(userID)
                                     .toString()),
+                                userId: UserID,
                                 fromLatitude: latlong!.latitude.toString(),
                                 fromLongitude: latlong!.longitude.toString(),
                                 toLatitude: '',
@@ -711,7 +721,7 @@ class _HomePageState extends State<HomePage> {
                                 createDate: currentDate,
                                 createTime: currentTime,
                                 endDate: '',
-                                endTime: '');
+                                endTime: '', );
 
                         setState(() {
                           journeyStart = True;
@@ -745,124 +755,138 @@ class _HomePageState extends State<HomePage> {
       BuildContext context,
       distancePrefix.DistanceCalculateModel distanceCalculateModel,
       LocalConveyanceModel localConveyanceList,
-      String toLatitude,
-      String toLongitude) {
+      String toLatitud,
+      String toLongitud) {
     return AlertDialog(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
-        content: Container(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: robotoTextWidget(
-                    textval: appName,
-                    colorval: AppColor.themeColor,
-                    sizeval: 16,
-                    fontWeight: FontWeight.bold),
-              ),
-              latLongWidget(
-                '$fromLatitude  ${localConveyanceList.fromLatitude}',
-              ),
-              latLongWidget(
-                '$fromLongitude  ${localConveyanceList.fromLongitude}',
-              ),
-              latLongWidget(
-                '$toLatitude  ${toLatitude}',
-              ),
-              latLongWidget(
-                '$toLongitude  ${toLongitude}',
-              ),
-              latLongWidget(
-                '$fromAddress ${distanceCalculateModel.originAddresses[0]}',
-              ),
-              latLongWidget(
-                '$toAddress ${distanceCalculateModel.destinationAddresses[0]}',
-              ),
-              latLongWidget(
-                '$distanceTravelled ${distanceCalculateModel.rows[0].elements[0].distance.text}',
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Flexible(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: AppColor.whiteColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // <-- Radius
-                        ),
+        content: SingleChildScrollView(
+            child: Container(
+                height: MediaQuery.of(context).size.height / 1.7  ,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: robotoTextWidget(
+                            textval: appName,
+                            colorval: AppColor.themeColor,
+                            sizeval: 16,
+                            fontWeight: FontWeight.bold),
                       ),
-                      child: robotoTextWidget(
-                        textval: cancel,
-                        colorval: AppColor.darkGrey,
-                        sizeval: 14,
-                        fontWeight: FontWeight.w600,
+                      latLongWidget(
+                        '$fromLatitude  ${localConveyanceList.fromLatitude}',
                       ),
-                    ),
-                  ),
-                  Flexible(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        String currentDate =
-                            DateFormat('yyyyMMdd').format(DateTime.now());
-                        String currentTime =
-                            DateFormat('HHmmss').format(DateTime.now());
+                      latLongWidget(
+                        '$fromLongitude  ${localConveyanceList.fromLongitude}',
+                      ),
+                      latLongWidget(
+                        '$toLatitude  ${toLatitud}',
+                      ),
+                      latLongWidget(
+                        '$toLongitude  ${toLongitud}',
+                      ),
+                      latLongWidget(
+                        '$fromAddress ${distanceCalculateModel.originAddresses[0]}',
+                      ),
+                      latLongWidget(
+                        '$toAddress ${distanceCalculateModel.destinationAddresses[0]}',
+                      ),
+                      latLongWidget(
+                        '$distanceTravelled ${distanceCalculateModel.rows[0].elements[0].distance.text}',
+                      ),
+                      travelModeWidget(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Flexible(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: AppColor.whiteColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(12), // <-- Radius
+                                ),
+                              ),
+                              child: robotoTextWidget(
+                                textval: cancel,
+                                colorval: AppColor.darkGrey,
+                                sizeval: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Utility().checkInternetConnection().then((connectionResult) {
+                                  if (connectionResult) {
+                                    setState(() {
+                                      isLoading = true;
+                                      syncTravelDataAPI(localConveyanceList,distanceCalculateModel);
+                                    });
+                                  } else {
+                                    Utility().showInSnackBar(value: checkInternetConnection, context: context);
+                                  }
+                                });
 
-                        LocalConveyanceModel localConveyance =
-                            LocalConveyanceModel(
-                                empId: int.parse(sharedPreferences
-                                    .getString(userID)
-                                    .toString()),
-                                fromLatitude: localConveyanceList.fromLatitude,
-                                fromLongitude:
-                                    localConveyanceList.fromLongitude,
-                                toLatitude: toLatitude,
-                                toLongitude: toLongitude,
-                                fromAddress:
-                                    distanceCalculateModel.originAddresses[0],
-                                toAddress: distanceCalculateModel
-                                    .destinationAddresses[0],
-                                createDate: localConveyanceList.createDate,
-                                createTime: localConveyanceList.createTime,
-                                endDate: currentDate,
-                                endTime: currentTime);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: AppColor.themeColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(12), // <-- Radius
+                                ),
+                              ),
+                              child: robotoTextWidget(
+                                textval: confirm,
+                                colorval: AppColor.whiteColor,
+                                sizeval: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    ]))));
+  }
 
-                        setState(() {
-                          journeyStart = False;
-                          Utility().setSharedPreference(
-                              localConveyanceJourneyStart, False);
-                          DatabaseHelper.instance.updateLocalConveyance(
-                              localConveyance.toMapWithoutId());
-                          Navigator.of(context).pop();
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: AppColor.themeColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // <-- Radius
-                        ),
-                      ),
-                      child: robotoTextWidget(
-                        textval: confirm,
-                        colorval: AppColor.whiteColor,
-                        sizeval: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ])));
+  travelModeWidget() {
+    return Container(
+      height: 40,
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColor.themeColor),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
+      child: TextField(
+        controller: travelModeController,
+        style: const TextStyle(
+            color: AppColor.themeColor,
+            fontFamily: 'Roboto',
+            fontSize: 12,
+            fontWeight: FontWeight.w600),
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: enterTravelMode,
+          hintStyle: const TextStyle(
+              color: Colors.grey,
+              fontSize: 12,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w400),
+        ),
+        keyboardType: TextInputType.text,
+      ),
+    );
   }
 
   latLongWidget(String title) {
@@ -896,7 +920,7 @@ class _HomePageState extends State<HomePage> {
     var jsonData1 = null;
 
     dynamic response = await HTTP.get(
-        SyncAndroidToSapAPI(sharedPreferences.getString(userID) as String));
+        SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
       SyncAndroidToSapResponse androidToSapResponse =
@@ -1095,5 +1119,82 @@ class _HomePageState extends State<HomePage> {
         );
       }
     }
+  }
+
+  Future<void> syncTravelDataAPI(
+    LocalConveyanceModel LocalConveyance,
+    distancePrefix.DistanceCalculateModel distanceCalculateModel,
+  ) async {
+    String currentDate =
+    DateFormat('yyyyMMdd').format(DateTime.now());
+    String currentTime =
+    DateFormat('HHmmss').format(DateTime.now());
+    allLatLng = '${LocalConveyance.fromLatitude},'
+        '${LocalConveyance.fromLongitude},'
+        '${LocalConveyance.toLatitude},'
+        '${LocalConveyance.toLongitude}';
+    travelList.add(TravelModel(
+        pernr: LocalConveyance.userId.toString(),
+        begda: LocalConveyance.createDate,
+        endda: currentDate,
+        startTime: LocalConveyance.createTime,
+        endTime: currentTime,
+        startLat: LocalConveyance.fromLatitude,
+        endLat:  latlong!.latitude.toString(),
+        startLong: LocalConveyance.fromLongitude,
+        endLong:  latlong!.longitude.toString(),
+        latLong111: allLatLng,
+        startLocation: distanceCalculateModel.originAddresses[0],
+        endLocation: distanceCalculateModel.destinationAddresses[0],
+        distance: distanceCalculateModel.rows[0].elements[0].distance.text,
+        travelMode: travelModeController.text.toString(),
+        latLong: allLatLng));
+    String value = convert.jsonEncode(travelList).toString();
+    var jsonData = null;
+    dynamic response = await HTTP.get(syncLocalConveyanceAPI(value));
+    if (response != null && response.statusCode == 200) {
+      jsonData = convert.jsonDecode(response.body);
+
+      print('jsonData=====>$jsonData');
+      setState(() {
+        journeyStart = False;
+        Utility().setSharedPreference(localConveyanceJourneyStart, False);
+        DatabaseHelper.instance
+            .deleteLocalConveyance(LocalConveyance.toMapWithoutId());
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+        Utility().showInSnackBar(value: somethingWentWrong, context: context);
+      });
+    }
+  }
+
+  void savedOfflineLocalConvance(LocalConveyanceModel localConveyanceList) {
+    String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
+    String currentTime = DateFormat('HHmmss').format(DateTime.now());
+
+    LocalConveyanceModel localConveyance = LocalConveyanceModel(
+        empId: int.parse(sharedPreferences.getString(userID).toString()),
+        userId: UserID,
+        fromLatitude: localConveyanceList.fromLatitude,
+        fromLongitude: localConveyanceList.fromLongitude,
+        toLatitude: latlong!.latitude.toString(),
+        toLongitude: latlong!.longitude.toString(),
+        fromAddress: localConveyanceList.fromAddress,
+        toAddress: '',
+        createDate: localConveyanceList.createDate,
+        createTime: localConveyanceList.createTime,
+        endDate: currentDate,
+        endTime: currentTime);
+
+    setState(() {
+        journeyStart = False;
+        Utility().setSharedPreference(localConveyanceJourneyStart, False);
+        Utility().showInSnackBar(value: dataSavedOffline, context: context);
+      DatabaseHelper.instance
+          .updateLocalConveyance(localConveyance.toMapWithoutId());
+    });
   }
 }

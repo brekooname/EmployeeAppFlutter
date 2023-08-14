@@ -1,6 +1,6 @@
 class LocalConveyanceModel {
   int empId;
-  String fromLatitude,
+  String userId,fromLatitude,
       fromLongitude,
       toLatitude,
       toLongitude,
@@ -13,6 +13,7 @@ class LocalConveyanceModel {
 
   LocalConveyanceModel(
       {required this.empId,
+        required this.userId,
       required this.fromLatitude,
       required this.fromLongitude,
       required this.toLatitude,
@@ -27,6 +28,7 @@ class LocalConveyanceModel {
   //to be used when inserting a row in the table
   Map<String, dynamic> toMapWithoutId() {
     final map = new Map<String, dynamic>();
+    map["user_id"] = userId;
     map["from_latitude"] = fromLatitude;
     map["from_longitude"] = fromLongitude;
     map["to_latitude"] = toLatitude;
@@ -44,6 +46,7 @@ class LocalConveyanceModel {
   Map<String, dynamic> toMap() {
     final map = new Map<String, dynamic>();
     map["emp_id"] = empId;
+    map["user_id"] = userId;
     map["from_latitude"] = fromLatitude;
     map["from_longitude"] = fromLongitude;
     map["to_latitude"] = toLatitude;
@@ -61,6 +64,7 @@ class LocalConveyanceModel {
   factory LocalConveyanceModel.fromMap(Map<String, dynamic> data) =>
       LocalConveyanceModel(
         empId: data['emp_id'] ?? 0,
+        userId: data['user_id'] ?? "",
         fromLatitude: data['from_latitude'] ?? "",
         fromLongitude: data['from_longitude'] ?? "",
         toLatitude: data['to_latitude'] ?? "",

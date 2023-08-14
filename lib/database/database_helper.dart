@@ -4,12 +4,14 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../webservice/constant.dart';
+
 class DatabaseHelper {
-  static final _databaseName = "EmployeeDatabase.db";
+  static final _databaseName = databaseName;
   static final _databaseVersion = 1;
 
   static final table = 'local_conveyance';
-
+  static final columnId = 'column_id';
   static final userId = 'user_id';
   static final fromLatitude = 'from_latitude';
   static final fromLongitude = 'from_longitude';
@@ -44,7 +46,8 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE $table (
-            $userId INTEGER PRIMARY KEY,
+            $columnId INTEGER PRIMARY KEY,
+            $userId TEXT NOT NULL,
             $fromLatitude TEXT NOT NULL,
             $fromLongitude TEXT NOT NULL,
             $toLatitude TEXT NOT NULL,
@@ -87,8 +90,11 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> deleteLocalConveyance(int id) async {
+  Future<int> deleteLocalConveyance(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    return await db.delete(table, where: '$userId = ?', whereArgs: [id]);
+    String CreateDate = row[createDate];
+    String CreateTime = row[createTime];
+    return await db.delete(table,   where: "${createDate} = ? AND ${createTime} = ?",
+    whereArgs: [CreateDate, CreateTime],);
   }
 }

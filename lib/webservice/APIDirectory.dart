@@ -78,5 +78,5 @@ vendorNameAPI(String value){
 }
 
 syncLocalConveyanceAPI(String value){
-  return Uri.parse('${productionUrl}sync_offline_data.htm?travel_distance=${value}');
+  return Uri.parse('${productionUrl}start_end_location.htm?travel_distance=${value}');
 }
