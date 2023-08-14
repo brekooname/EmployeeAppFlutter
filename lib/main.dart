@@ -305,7 +305,7 @@ class _LoginPageState extends State<LoginPage> {
           isLoading = false;
         });
       } else {
-        Utility().showToast("Wrong User Id /Password, Try Again");
+        Utility().showToast(errorMssg);
         setState(() {
           isLoading = false;
         });
@@ -317,4 +317,5 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
   }
+
 }

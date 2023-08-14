@@ -514,6 +514,8 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
       else{
         Utility().showToast(odResponse[0].text);
       }
-  }
+  }else{
+      Utility().showToast(somethingWentWrong);
+    }
   }
 }

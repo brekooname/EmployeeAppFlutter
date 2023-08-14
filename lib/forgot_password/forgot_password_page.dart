@@ -329,6 +329,8 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
         Utility()
             .showInSnackBar(value: otpResponse.description, context: context);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 }

@@ -3,12 +3,11 @@ import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
-
-import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
-
+import '../Util/utility.dart';
+import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import 'model/vendornamelistresponse.dart' as VenderList;
 import 'model/vendornamelistresponse.dart';
@@ -21,7 +20,7 @@ class DailyReport extends StatefulWidget {
 }
 
 class _DailyReportState extends State<DailyReport> {
-  String? _selectedType;
+  String? _selectedType, selectVisit, selectStatus;
 
   String TypeSpinner = 'Select Visit At ';
 
@@ -71,7 +70,6 @@ class _DailyReportState extends State<DailyReport> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -96,22 +94,25 @@ class _DailyReportState extends State<DailyReport> {
         child: Column(
           children: [
             radtiobuttonWidget(),
-            textVendorFeildWidget(
-              "Vendor Name",
-            ),
+            textVendorFeildWidget( "Vendor Name",),
             textFeildWidget("Vendor Code", vendoreCode),
             textFeildWidget("Vendor Address", vendoreAddress),
             textFeildWidget("Vendor Contact N0", vendoreContac),
-            dateTextFeildWidget("Current Date",
-                DateFormat("dd-MM-yyyy").format(DateTime.now())),
+            dateTextFeildWidget("Current Date", DateFormat("dd-MM-yyyy").format(DateTime.now())),
             TypeSpinnerWidget(),
             textFeildWidget("Responsible person", person1),
             textFeildWidget("Responsible person 2", person2),
             textFeildWidget("Responsible person 3", person3),
             longTextFeildWidget("Agenda", agenda),
             longTextFeildWidget("Discussion", discussion),
-            statusSpinnerWidget(),
-            datePickerWidget(selectedFromDate!, fromDateController, "0"),
+
+            Row(
+              children: [
+                statusSpinnerWidget(),
+                datePickerWidget(selectedFromDate!, fromDateController, "0"),
+              ],
+            )
+
           ],
         ),
       ),
@@ -132,7 +133,7 @@ class _DailyReportState extends State<DailyReport> {
             )),
         Container(
           padding: const EdgeInsets.only(left: 15),
-          margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
+          margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.themeColor),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -204,7 +205,7 @@ class _DailyReportState extends State<DailyReport> {
                       color: AppColor.themeColor,
                       fontSize: 15,
                       fontWeight: FontWeight.bold),
-                )),
+                ),),
               ],
             ),
           ),
@@ -215,50 +216,37 @@ class _DailyReportState extends State<DailyReport> {
 
   TypeSpinnerWidget() {
     return Container(
-      padding: const EdgeInsets.only(
-        left: 10,
-        right: 10,
-      ),
-      width: double.infinity,
-      height: 45,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-      child: Center(
-        child: DropdownButton(
-          // Initial Value
-          underline: const SizedBox(
-            height: 0,
-          ),
-          value: TypeSpinner,
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            color: AppColor.themeColor, // <-- SEE HERE
-          ),
-          // Array list of items
-          items: TypeList.map((String items) {
-            return DropdownMenuItem(
-              value: items,
-              child: Center(
-                  child: robotoTextWidget(
-                      textval: items,
-                      colorval: AppColor.themeColor,
-                      sizeval: 13,
-                      fontWeight: FontWeight.w400)),
-            );
-          }).toList(),
-          // After selecting the desired option,it will
-          // change button value to selected value
-          onChanged: (String? newValue) {
+      margin: EdgeInsets.all(  10),
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: 'Select visit type',
+              fillColor: Colors.white),
+          value: selectVisit,
+          validator: (value) =>
+          value == null || value.isEmpty ? 'Please Select visit type' : "",
+          items: TypeList.map((leaveType) => DropdownMenuItem(
+              value: leaveType,
+              child: robotoTextWidget(
+                  textval: leaveType,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold))).toList(),
+          onChanged: (Object? value) {
             setState(() {
-              TypeSpinner = newValue!;
+              selectVisit = value.toString();
             });
           },
-        ),
-      ),
-    );
+        ));
   }
 
   dateTextFeildWidget(String s, String date) {
@@ -272,7 +260,7 @@ class _DailyReportState extends State<DailyReport> {
                 color: Colors.black45, fontWeight: FontWeight.bold),
           )),
       Container(
-        margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
+        margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
         padding: const EdgeInsets.only(left: 15),
         decoration: BoxDecoration(
           border: Border.all(color: AppColor.themeColor),
@@ -307,7 +295,7 @@ class _DailyReportState extends State<DailyReport> {
             )),
         Container(
           padding: const EdgeInsets.only(left: 15),
-          margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
+          margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10,top: 10),
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.themeColor),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -333,50 +321,37 @@ class _DailyReportState extends State<DailyReport> {
 
   statusSpinnerWidget() {
     return Container(
-      padding: const EdgeInsets.only(
-        left: 10,
-        right: 10,
-      ),
-      width: double.infinity,
-      height: 45,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-      ),
-      margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-      child: Center(
-        child: DropdownButton(
-          // Initial Value
-          underline: const SizedBox(
-            height: 0,
-          ),
-          value: statusType,
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            color: AppColor.themeColor, // <-- SEE HERE
-          ),
-          // Array list of items
-          items: statusList.map((String items) {
-            return DropdownMenuItem(
-              value: items,
-              child: Center(
-                  child: robotoTextWidget(
-                      textval: items,
-                      colorval: AppColor.themeColor,
-                      sizeval: 13,
-                      fontWeight: FontWeight.w400)),
-            );
-          }).toList(),
-          // After selecting the desired option,it will
-          // change button value to selected value
-          onChanged: (String? newValue) {
+        margin: EdgeInsets.all(10),
+        height: 45,
+        width: MediaQuery.of(context).size.width/2.2,
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: 'Select status type',
+              fillColor: Colors.white),
+          value: selectStatus,
+          validator: (value) =>
+          value == null || value.isEmpty ? 'Please Select status type' : "",
+          items: statusList.map((leaveType) => DropdownMenuItem(
+              value: leaveType,
+              child: robotoTextWidget(
+                  textval: leaveType,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold))).toList(),
+          onChanged: (Object? value) {
             setState(() {
-              statusType = newValue!;
+              selectStatus = value.toString();
             });
           },
-        ),
-      ),
-    );
+        ));
   }
 
   datePickerWidget(
@@ -386,7 +361,7 @@ class _DailyReportState extends State<DailyReport> {
         _selectDate(context, value);
       },
       child: Container(
-        height: 50,
+        height: 45,
         width: MediaQuery.of(context).size.width / 2.2,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -466,6 +441,8 @@ class _DailyReportState extends State<DailyReport> {
         setState(() {
           vendorNameList = vendorNameResponse.response;
         });
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 
@@ -482,7 +459,7 @@ class _DailyReportState extends State<DailyReport> {
                   color: Colors.black45, fontWeight: FontWeight.bold),
             )),
         Container(
-          margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
+          margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
           padding: const EdgeInsets.only(left: 15),
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.themeColor),

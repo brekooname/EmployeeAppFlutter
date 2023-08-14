@@ -368,12 +368,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
         Navigator.of(context).pop();
 
 
-      }else{
-        setState(() {
-          isLoading  = false;
-        });
-
-      }else{
+      } else{
 
         Utility().showToast(leaveResponse[0].msg);
         setState(() {
@@ -408,6 +403,8 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
         Utility().showToast(leaveResponse.message);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 
