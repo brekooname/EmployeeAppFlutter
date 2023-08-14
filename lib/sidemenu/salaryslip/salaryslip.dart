@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,10 +66,8 @@ class _SalarySlipState extends State<SalarySlip> {
         leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
         iconTheme: const IconThemeData(color: Colors.white),
 

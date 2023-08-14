@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/officialDuty/model/odApproveResponse.dart';
 import 'package:shakti_employee_app/officialDuty/model/odRejectResponse.dart';
@@ -346,11 +346,8 @@ class InDirectState extends State<InDirect> {
       List<OdApproveResponse> odResponse = List<OdApproveResponse>.from(l.map((model)=> OdApproveResponse.fromJson(model)));
       if(odResponse[0].type.compareTo("S") == 0){
         Utility().showToast("OD Approved Successfully");
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+
+        Navigator.of(context).pop();
 
       }else{
         Utility().showToast(odResponse[0].msg);
@@ -367,11 +364,8 @@ class InDirectState extends State<InDirect> {
       List<OdRejectResponse> odResponse = List<OdRejectResponse>.from(l.map((model)=> OdRejectResponse.fromJson(model)));
       if(odResponse[0].status.compareTo("true") == 0){
         Utility().showToast("OD Rejected Successfully");
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+
+        Navigator.of(context).pop();
 
       }else{
         Utility().showToast(odResponse[0].message);

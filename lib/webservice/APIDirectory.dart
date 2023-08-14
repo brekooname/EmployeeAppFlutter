@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'constant.dart';
+
 const productionUrl = 'https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/';
+const googleDistanceMatrixAPI = 'https://maps.googleapis.com/maps/api/distancematrix/';
 
 userLogin(String sapCode, String password ) {
   return Uri.parse('${productionUrl}login.htm?pernr=${sapCode}&pass=${password}');
@@ -17,7 +20,11 @@ sendOTPAPI(String mobile, int otp){
 SyncAndroidToSapAPI(String pernr){
   return Uri.parse('${productionUrl}sync_android_to_sap.htm?pernr=${pernr}');
 }
-
+getDistanceAPI(String origin,String destination){
+  return Uri.parse('${googleDistanceMatrixAPI}json?origins=$origin&destinations=$destination&key=$googleApiKey');
+}
+//https://maps.googleapis.com/maps/api/distancematrix/json?destinations=40.659569,-73.933783
+// &origins=40.6655101,-73.89188969999998&key=AIzaSyAohhwZ11LRwoxsS8lJ0VHGkA4L-cwjWmw
 createLeaveAPI(String sapCode, String leavetype, String leaveDuration, String from, String To, String reason, String pInC1,String pInC2,String pInC3,String pInC4){
   return Uri.parse('${productionUrl}leave_create.htm?app_pernr=${sapCode}&app_leave_type=${leavetype}&app_leave_duration=${leaveDuration}&app_leave_from=${from}&app_leave_to=${To}&app_leave_reason=${reason}&app_per_chrg1=${pInC1}&app_per_chrg2=${pInC2}&app_per_chrg3=${pInC3}&app_per_chrg4=${pInC4}');
 }
@@ -68,4 +75,8 @@ rejectLeaveAPI(int drno, String sapcode, String pass){
 
 vendorNameAPI(String value){
   return Uri.parse('${productionUrl}vendor_details_all.htm?name=${value}');
+}
+
+syncLocalConveyanceAPI(String value){
+  return Uri.parse('${productionUrl}start_end_location.htm?travel_distance=${value}');
 }

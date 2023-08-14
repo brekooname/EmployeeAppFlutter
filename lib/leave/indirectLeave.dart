@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/model/leaveResponse.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -365,11 +365,10 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
         Utility().showToast("Leave Approved Successfully");
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
+
+
+      }else{
         setState(() {
           isLoading  = false;
         });
@@ -399,14 +398,9 @@ class InDirectLeaveState extends State<InDirectLeave> {
       LeaveRejectResponse leaveResponse = LeaveRejectResponse.fromJson(jsonData);
       if(leaveResponse.status.compareTo("true") == 0){
         Utility().showToast("Leave Rejected Successfully");
-        setState(() {
-          isLoading  = false;
-        });
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+
+        Navigator.of(context).pop();
+
       }else{
         setState(() {
           isLoading  = false;

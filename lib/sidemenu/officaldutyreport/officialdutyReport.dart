@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
@@ -32,6 +32,7 @@ class _OficialDutyReportState extends State<OficialDutyReport> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
+        elevation: 0,
         title: const robotoTextWidget(
             textval: "Official Duty Table",
             colorval: AppColor.whiteColor,
@@ -40,10 +41,8 @@ class _OficialDutyReportState extends State<OficialDutyReport> {
         leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
         iconTheme: const IconThemeData(color: Colors.white),
 

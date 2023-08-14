@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
@@ -38,22 +38,17 @@ class _LeaveReportState extends State<LeaveReport> {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: AppColor.whiteColor,
-            ),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
-            }),
+              Navigator.of(context).pop();}
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
+
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        decoration: const BoxDecoration(
+        decoration:  const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/shaktiLogo.png'),
             fit: BoxFit.contain,

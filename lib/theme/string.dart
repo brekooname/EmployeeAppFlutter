@@ -69,3 +69,25 @@ var taskReportdec = "Detail of task assgined.";
 var emphierarchy = "Employee Hierarchy";
 var emhierarchydec = "List of Employee In your team.";
 var downloadingDataTxt = "Downloading Data";
+var start = "Start";
+var end = "End";
+var Offline = "Offline";
+var True = "true";
+var False = "false";
+var Login = "LOGIN";
+var latitude = "Latitude:- ";
+var longitude = "Longitude:- ";
+var address = "Address:- ";
+var fromLatitude = "From Latitude:- ";
+var fromLongitude = "From Longitude:- ";
+var toLatitude = "To Latitude:- ";
+var toLongitude = "To Longitude:- ";
+var fromAddress = "From Address:- ";
+var toAddress = "To Address:- ";
+var distanceTravelled = "Distance Travelled:- ";
+var offlineLocalConveyance = "Offline Local Conveyance";
+var somethingWentWrong ="Something Went Wrong, Please try again";
+var enterTravelMode = "Please enter travel mode";
+var dataSavedOffline = "Your data saved in offline mode";
+
+

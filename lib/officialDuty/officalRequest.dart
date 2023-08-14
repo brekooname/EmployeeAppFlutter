@@ -9,7 +9,7 @@ import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../home/HomePage.dart';
+import '../home/home_page.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/constant.dart';
@@ -109,10 +109,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
         iconTheme: const IconThemeData(color: Colors.white),
 
@@ -429,11 +427,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
       if(odResponse.name.compareTo("SAPLSPO1") == 0){
         Utility().showToast("OD Created Successfully");
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+
+        Navigator.of(context).pop();
 
       }else{
         Utility().showToast(odResponse.name);

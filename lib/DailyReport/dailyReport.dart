@@ -3,7 +3,8 @@ import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
@@ -87,10 +88,7 @@ class _DailyReportState extends State<DailyReport> {
               color: AppColor.whiteColor,
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
+              Navigator.of(context).pop();
             }),
         iconTheme: const IconThemeData(color: Colors.white),
       ),

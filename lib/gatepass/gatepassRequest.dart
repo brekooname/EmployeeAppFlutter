@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/model/gatePassResponse.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
@@ -508,11 +508,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
 
         Utility().showToast(odResponse[0].text);
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
 
       }
       else{

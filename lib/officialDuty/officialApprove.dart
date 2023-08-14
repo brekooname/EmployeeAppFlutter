@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 
 import 'package:shakti_employee_app/officialDuty/indirect/indirect.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -39,8 +39,7 @@ class _OfficialApprovedState extends State<OfficialApproved> {
         appBar:  AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>  HomePage()),
-                      (route) => false),
+              onPressed: () => Navigator.of(context).pop(),
             ),
             backgroundColor: AppColor.themeColor,
             title: const robotoTextWidget(textval: "Official Duty Approve", colorval: AppColor.whiteColor,

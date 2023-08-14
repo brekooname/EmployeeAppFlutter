@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/model/leaveRequestModel.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -84,10 +84,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               color: AppColor.whiteColor,
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
+              Navigator.of(context).pop();
             }),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -430,10 +427,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               l.map((model) => LeaveRequestModelResponse.fromJson(model)));
       if (leave[0].name.compareTo("Leave request created") == 0) {
         Utility().showToast(leave[0].name);
-
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => HomePage()),
-            (route) => false);
+        Navigator.of(context).pop();
       } else {
         Utility().showToast(leave[0].name);
       }
