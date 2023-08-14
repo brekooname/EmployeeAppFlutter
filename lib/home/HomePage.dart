@@ -296,6 +296,7 @@ class _HomePageState extends State<HomePage> {
     switch (title) {
       case "Leave":
         {
+
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (context) => LeaveRequestScreen(
@@ -569,18 +570,24 @@ class _HomePageState extends State<HomePage> {
             break;
         }
 
-        /**/
       },
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Center(
-              child: SvgPicture.asset(
-                svg,
-                width: 50,
-                height: 50,
-              ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Stack(
+              children: <Widget>[
+                Center(
+                  child: SvgPicture.asset(
+                    svg,
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+                badgeWidget(msg,title),
+
+              ],
+
             ),
           ),
           const SizedBox(
@@ -628,4 +635,97 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
+
+  badgeWidget(String msg, String title) {
+
+    if (title == "Leave") {
+      return Visibility(
+        visible: pendingLeaveList.length == 0? false : true ,
+        child: Positioned(
+          left: 30.0,
+          bottom: 30.0,
+          child:  Container(
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                  color: AppColor.themeColor,
+            ),
+            width: msg == "Request"? 0:20,
+            height: msg == "Request"? 0:20,
+            child:  Center(
+              child: robotoTextWidget( textval: pendingLeaveList.length.toString(),
+                  colorval:  Colors.white,
+                  sizeval: 12, fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+      );
+    }
+    if (title == "Official Duty") {
+      return Visibility(
+        visible: pendindOdList.length == 0? false:true ,
+        child: Positioned(
+          left: 30.0,
+          bottom: 30.0,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColor.themeColor,),
+            width: msg == "Request"? 0:20,
+            height: msg == "Request"? 0:20,
+            child: Center(
+              child: robotoTextWidget(textval: pendindOdList.length.toString(),
+                  colorval:  Colors.white,
+                  sizeval: 12, fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+      );
+    }
+    if (title == "Gate Pass") {
+      return Visibility(
+        visible: gatePassList.length == 0? false:true ,
+        child: Positioned(
+          left: 30.0,
+          bottom: 30.0,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color:  AppColor.themeColor,),
+            width: msg == "Request"? 0:20,
+            height: msg == "Request"? 0:20,
+            child: Center(
+              child: robotoTextWidget(textval: gatePassList.length.toString(),
+                  colorval:  Colors.white,
+                  sizeval: 12, fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (title == "Task") {
+      return Visibility(
+        visible: pendingTaskList.length == 0? false:true ,
+        child: Positioned(
+          left: 30.0,
+          bottom: 30.0,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color:  AppColor.themeColor,),
+            width: msg == "Request"? 0:20,
+            height: msg == "Request"? 0:20,
+            child: Center(
+              child: robotoTextWidget(textval: pendingTaskList.length.toString(),
+                  colorval:  Colors.white,
+                  sizeval: 12, fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+      );
+    }
+    return Container();
+  }
+
 }

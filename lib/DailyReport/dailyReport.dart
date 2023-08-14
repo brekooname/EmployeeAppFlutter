@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
-
 import 'package:shakti_employee_app/home/HomePage.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
-
 import '../uiwidget/robotoTextWidget.dart';
 import 'model/vendornamelistresponse.dart' as VenderList;
 import 'model/vendornamelistresponse.dart';
@@ -47,18 +45,23 @@ class _DailyReportState extends State<DailyReport> {
   TextEditingController person1 = TextEditingController();
   TextEditingController person2 = TextEditingController();
   TextEditingController person3 = TextEditingController();
-
+  TextEditingController fromDateController = TextEditingController();
   TextEditingController agenda = TextEditingController();
   TextEditingController discussion = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
   DateTime datefrom = DateTime.now();
-  String? indianFromDate, selectedLeaveType;
+  String? indianFromDate,selectedFromDate;
+  String   dateTimeFormat ="dd/MM/yyyy";
+  DateTime? pickedDate;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
+    fromDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
     indianFromDate =  DateFormat("dd/MM/yyyy").format(DateTime.now());
   }
 
@@ -108,7 +111,8 @@ class _DailyReportState extends State<DailyReport> {
             longTextFeildWidget("Agenda", agenda),
             longTextFeildWidget("Discussion", discussion),
             statusSpinnerWidget(),
-            datePickerWidget("Target Date", indianFromDate.toString()),
+            datePickerWidget(
+                selectedFromDate!, fromDateController, "0"),
           ],
         ),
       ),
@@ -140,7 +144,7 @@ class _DailyReportState extends State<DailyReport> {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: "Please Enter " + hinttxt,
-              hintStyle: const TextStyle(color: AppColor.themeColor),
+              hintStyle: const TextStyle(color: AppColor.themeColor, fontSize: 13, fontWeight: FontWeight.normal),
             ),
             keyboardType: TextInputType.text,
           ),
@@ -239,7 +243,7 @@ class _DailyReportState extends State<DailyReport> {
                   child: robotoTextWidget(
                       textval: items,
                       colorval: AppColor.themeColor,
-                      sizeval: 18,
+                      sizeval: 13,
                       fontWeight: FontWeight.w400)),
             );
           }).toList(),
@@ -277,7 +281,7 @@ class _DailyReportState extends State<DailyReport> {
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: date,
-            hintStyle: const TextStyle(color: AppColor.themeColor),
+            hintStyle: const TextStyle(color: AppColor.themeColor,fontSize: 12, fontWeight: FontWeight.normal),
           ),
           keyboardType: TextInputType.text,
         ),
@@ -310,7 +314,7 @@ class _DailyReportState extends State<DailyReport> {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: "Please Enter " + s,
-              hintStyle: const TextStyle(color: AppColor.themeColor),
+              hintStyle: const TextStyle(color: AppColor.themeColor, fontWeight: FontWeight.normal,fontSize: 13),
             ),
             keyboardType: TextInputType.text,
           ),
@@ -351,7 +355,7 @@ class _DailyReportState extends State<DailyReport> {
                   child: robotoTextWidget(
                       textval: items,
                       colorval: AppColor.themeColor,
-                      sizeval: 18,
+                      sizeval: 13,
                       fontWeight: FontWeight.w400)),
             );
           }).toList(),
@@ -367,82 +371,80 @@ class _DailyReportState extends State<DailyReport> {
     );
   }
 
-  datePickerWidget(String text, String date) {
-    return SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height / 20,
-      child: Center(
+  datePickerWidget(
+      String fromTO, TextEditingController DateController, String value) {
+    return GestureDetector(
+      onTap: () {
+        _selectDate(context, value);
+      },
+      child: Container(
+        height: 50,
+        width: MediaQuery.of(context).size.width / 2.2,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColor.themeColor,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.whiteColor,
-              ),
-              onPressed: () => _selectDate(context, text),
-              child: robotoTextWidget(
-                  textval: text,
-                  colorval: AppColor.themeColor,
-                  sizeval: 15,
-                  fontWeight: FontWeight.w400),
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.calendar_month,
+              color: AppColor.themeColor,
             ),
             const SizedBox(
-              height: 15.0,
+              width: 5,
             ),
-            robotoTextWidget(
-                textval: date.toString(),
-                colorval: AppColor.themeColor,
-                sizeval: 20,
-                fontWeight: FontWeight.normal)
+            Expanded(
+                child: TextField(
+                  controller: DateController,
+                  maxLines: 1,
+                  showCursor: false,
+                  enabled: false,
+                  textAlign: TextAlign.center,
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
+                      hintText: fromTO,
+                      hintStyle: const TextStyle(color: AppColor.themeColor),
+                      border: InputBorder.none),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
+                  keyboardType: TextInputType.datetime,
+                  textInputAction: TextInputAction.done,
+                ))
           ],
         ),
       ),
     );
   }
 
-  Future<void> _selectDate(BuildContext context, String text) async {
-    print("indianDate===> $text}");
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectDate(BuildContext context, String value) async {
+    pickedDate = await showDatePicker(
         context: context,
-        builder: (BuildContext context, Widget? child) {
-          return Theme(
-            data: ThemeData(
-              splashColor: Colors.black,
-              textTheme: const TextTheme(
-                titleSmall: TextStyle(color: Colors.black),
-                bodySmall: TextStyle(color: Colors.black),
-              ),
-              dialogBackgroundColor: Colors.white,
-              colorScheme: const ColorScheme.light(
-                      primary: Color(0xff1565C0),
-                      primaryContainer: Colors.black,
-                      secondaryContainer: Colors.black,
-                      onSecondary: Colors.black,
-                      onPrimary: Colors.white,
-                      surface: Colors.black,
-                      onSurface: Colors.black,
-                      secondary: Colors.black)
-                  .copyWith(
-                      primaryContainer: Colors.grey, secondary: Colors.black),
-            ),
-            child: child ?? const Text(""),
-          );
-        },
-        initialDate: selectedDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2050));
-    if (picked != null && picked != selectedDate) {
+        initialDate: DateTime.now(),
+        firstDate: value == "0"
+            ? DateTime.now()
+            : selectedFromDate != DateFormat(dateTimeFormat).format(DateTime.now())
+            ? DateTime(2023)
+            : DateTime.now(),
+        //DateTime.now() - not to allow to choose before today.
+        lastDate:  DateTime(2050));
+    if (pickedDate != null) {
+      print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+      String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
+      print(
+          formattedDate); //formatted date output using intl package =>  2021-03-16
       setState(() {
-        if (text == "Target Date") {
-          datefrom = picked;
-          indianFromDate = DateFormat("dd/MM/yyyy").format(picked);
-          // print("text===>${text}");
+        if (value == "0") {
+          selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
+          fromDateController.text = formattedDate;
         }
-
-        print("indianDate1===> ${datefrom}");
       });
     }
   }
+
 
   Future<void> vendorNameListAPI(String value) async {
     var jsonData = null;
@@ -491,6 +493,7 @@ class _DailyReportState extends State<DailyReport> {
                         vendornamelist.name1,
                         style: const TextStyle(
                             fontWeight: FontWeight.normal,
+                            fontSize: 13,
                             color: AppColor.themeColor),
                       ),
                     ),
@@ -500,6 +503,7 @@ class _DailyReportState extends State<DailyReport> {
             searchInputDecoration: InputDecoration(
               hintText:  "Search by "+hinttxt,
               hintStyle: const TextStyle(
+                fontSize: 13,
                   color: AppColor.themeColor, ),
               border: InputBorder.none,
             ),

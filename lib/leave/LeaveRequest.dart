@@ -240,7 +240,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                       hintText: fromTO,
-                      hintStyle: const TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(color: AppColor.themeColor),
                       border: InputBorder.none),
                   style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
                   keyboardType: TextInputType.datetime,
@@ -330,8 +330,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                     ),
                   ),
                 )
-                .toList()
-            ,
+                .toList(),
         searchStyle: const TextStyle(
             fontSize: 12,
             color: AppColor.themeColor,
@@ -359,7 +358,6 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               } else if (perInCharge == "3") {
                 perInCharge4 = value;
               }
-
           });
         },
       ),
@@ -373,7 +371,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         },
         child: Container(
           height: 50,
-          margin: const EdgeInsets.symmetric(horizontal: 50),
+
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),
@@ -397,6 +395,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
 
   void Validation() {
     selectedLeaveType ??= "";
+
+    print("Person===>${perInCharge1}");
+    print("Person===>${perInCharge2}");
+    print("Person===>${perInCharge3}");
+    print("Person===>${perInCharge4}");
     if (selectedLeaveType!.isEmpty) {
       Utility().showToast("Please Select Leave Type");
     }  else if (fromDateController.text.toString().isEmpty) {
