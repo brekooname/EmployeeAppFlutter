@@ -1,14 +1,19 @@
 import 'dart:convert' as convert;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:shakti_employee_app/DailyReport/image_view_widget.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+
 import '../Util/utility.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
+import 'model/image_model.dart';
 import 'model/vendornamelistresponse.dart' as VenderList;
 import 'model/vendornamelistresponse.dart';
 
@@ -21,16 +26,13 @@ class DailyReport extends StatefulWidget {
 
 class _DailyReportState extends State<DailyReport> {
   String? _selectedType, selectVisit, selectStatus;
-
-  String TypeSpinner = 'Select Visit At ';
+  String TypeSpinner = 'Select Visit At ', statusType = "Select Status";
 
   var TypeList = [
     'Select Visit At ',
     'Supplier Premises',
     'Shakti H.O',
   ];
-
-  String statusType = "Select Status";
 
   var statusList = [
     'Select Status',
@@ -50,12 +52,28 @@ class _DailyReportState extends State<DailyReport> {
   TextEditingController fromDateController = TextEditingController();
   TextEditingController agenda = TextEditingController();
   TextEditingController discussion = TextEditingController();
-
   DateTime selectedDate = DateTime.now();
   DateTime datefrom = DateTime.now();
   String? indianFromDate, selectedFromDate;
   String dateTimeFormat = "dd/MM/yyyy";
   DateTime? pickedDate;
+  List<ImageModel> imageList = [];
+  var imageFile;
+  int? selectedIndex,selectedPassIndex;
+  bool isChecked = false;
+
+  getAllImageData() async {
+    imageList.add(
+        ImageModel(imageName: 'Photo1', imagePath: '', imageSelected: false));
+    imageList.add(
+        ImageModel(imageName: 'Photo2', imagePath: '', imageSelected: false));
+    imageList.add(
+        ImageModel(imageName: 'Photo3', imagePath: '', imageSelected: false));
+    imageList.add(
+        ImageModel(imageName: 'Photo4', imagePath: '', imageSelected: false));
+    imageList.add(
+        ImageModel(imageName: 'Photo5', imagePath: '', imageSelected: false));
+  }
 
   @override
   void initState() {
@@ -65,6 +83,7 @@ class _DailyReportState extends State<DailyReport> {
     selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
     fromDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
     indianFromDate = DateFormat("dd/MM/yyyy").format(DateTime.now());
+    getAllImageData();
   }
 
   @override
@@ -91,29 +110,32 @@ class _DailyReportState extends State<DailyReport> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            radtiobuttonWidget(),
-            textVendorFeildWidget( "Vendor Name",),
-            textFeildWidget("Vendor Code", vendoreCode),
-            textFeildWidget("Vendor Address", vendoreAddress),
-            textFeildWidget("Vendor Contact N0", vendoreContac),
-            dateTextFeildWidget("Current Date", DateFormat("dd-MM-yyyy").format(DateTime.now())),
-            TypeSpinnerWidget(),
-            textFeildWidget("Responsible person", person1),
-            textFeildWidget("Responsible person 2", person2),
-            textFeildWidget("Responsible person 3", person3),
-            longTextFeildWidget("Agenda", agenda),
-            longTextFeildWidget("Discussion", discussion),
-
-            Row(
-              children: [
-                statusSpinnerWidget(),
-                datePickerWidget(selectedFromDate!, fromDateController, "0"),
-              ],
-            )
-
-          ],
+        physics: const ScrollPhysics(),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              radtiobuttonWidget(),
+              textVendorFeildWidget(
+                "Vendor Name",
+              ),
+              textFeildWidget("Vendor Code", vendoreCode),
+              textFeildWidget("Vendor Address", vendoreAddress),
+              textFeildWidget("Vendor Contact N0", vendoreContac),
+              dateTextFeildWidget("Current Date",
+                  DateFormat("dd-MM-yyyy").format(DateTime.now())),
+              TypeSpinnerWidget(),
+              textFeildWidget("Responsible person", person1),
+              textFeildWidget("Responsible person 2", person2),
+              textFeildWidget("Responsible person 3", person3),
+              longTextFeildWidget("Agenda", agenda),
+              longTextFeildWidget("Discussion", discussion),
+              datePickerWidget(selectedFromDate!, fromDateController, "0"),
+              statusSpinnerWidget(),
+              imageList.isNotEmpty ? imageListWidget() : Container(),
+              imageList.isNotEmpty ? gatePassListWidget() : Container(),
+            ],
+          ),
         ),
       ),
     );
@@ -126,14 +148,15 @@ class _DailyReportState extends State<DailyReport> {
         Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 15),
-            child: Text(
-              hinttxt,
-              style: const TextStyle(
-                  color: Colors.black45, fontWeight: FontWeight.bold),
-            )),
+            child: robotoTextWidget(
+                textval: hinttxt,
+                colorval: Colors.black45,
+                sizeval: 12,
+                fontWeight: FontWeight.bold)),
         Container(
           padding: const EdgeInsets.only(left: 15),
-          margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
+          margin:
+              const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.themeColor),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -199,13 +222,14 @@ class _DailyReportState extends State<DailyReport> {
                   },
                 ),
                 const Flexible(
-                    child: Text(
-                  'Prospective Vendor',
-                  style: TextStyle(
-                      color: AppColor.themeColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold),
-                ),),
+                  child: Text(
+                    'Prospective Vendor',
+                    style: TextStyle(
+                        color: AppColor.themeColor,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
               ],
             ),
           ),
@@ -216,7 +240,7 @@ class _DailyReportState extends State<DailyReport> {
 
   TypeSpinnerWidget() {
     return Container(
-      margin: EdgeInsets.all(  10),
+        margin: const EdgeInsets.all(10),
         height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -233,7 +257,7 @@ class _DailyReportState extends State<DailyReport> {
               fillColor: Colors.white),
           value: selectVisit,
           validator: (value) =>
-          value == null || value.isEmpty ? 'Please Select visit type' : "",
+              value == null || value.isEmpty ? 'Please Select visit type' : "",
           items: TypeList.map((leaveType) => DropdownMenuItem(
               value: leaveType,
               child: robotoTextWidget(
@@ -249,16 +273,16 @@ class _DailyReportState extends State<DailyReport> {
         ));
   }
 
-  dateTextFeildWidget(String s, String date) {
+  dateTextFeildWidget(String title, String date) {
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Container(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.only(left: 15),
-          child: Text(
-            s,
-            style: const TextStyle(
-                color: Colors.black45, fontWeight: FontWeight.bold),
-          )),
+          child: robotoTextWidget(
+              textval: title,
+              colorval: Colors.black45,
+              sizeval: 12,
+              fontWeight: FontWeight.bold)),
       Container(
         margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
         padding: const EdgeInsets.only(left: 15),
@@ -282,20 +306,21 @@ class _DailyReportState extends State<DailyReport> {
     ]);
   }
 
-  longTextFeildWidget(String s, TextEditingController longtext) {
+  longTextFeildWidget(String title, TextEditingController longtext) {
     return Column(
       children: [
         Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 15),
-            child: Text(
-              s,
-              style: const TextStyle(
-                  color: Colors.black45, fontWeight: FontWeight.bold),
-            )),
+            child: robotoTextWidget(
+                textval: title,
+                colorval: Colors.black45,
+                sizeval: 12,
+                fontWeight: FontWeight.bold)),
         Container(
           padding: const EdgeInsets.only(left: 15),
-          margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10,top: 10),
+          margin:
+              const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.themeColor),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -306,7 +331,7 @@ class _DailyReportState extends State<DailyReport> {
             style: const TextStyle(color: AppColor.themeColor),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Please Enter " + s,
+              hintText: "Please Enter " + title,
               hintStyle: const TextStyle(
                   color: AppColor.themeColor,
                   fontWeight: FontWeight.normal,
@@ -319,41 +344,6 @@ class _DailyReportState extends State<DailyReport> {
     );
   }
 
-  statusSpinnerWidget() {
-    return Container(
-        margin: EdgeInsets.all(10),
-        height: 45,
-        width: MediaQuery.of(context).size.width/2.2,
-        child: DropdownButtonFormField(
-          isExpanded: true,
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.themeColor),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10.0),
-                ),
-              ),
-              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select status type',
-              fillColor: Colors.white),
-          value: selectStatus,
-          validator: (value) =>
-          value == null || value.isEmpty ? 'Please Select status type' : "",
-          items: statusList.map((leaveType) => DropdownMenuItem(
-              value: leaveType,
-              child: robotoTextWidget(
-                  textval: leaveType,
-                  colorval: AppColor.themeColor,
-                  sizeval: 12,
-                  fontWeight: FontWeight.bold))).toList(),
-          onChanged: (Object? value) {
-            setState(() {
-              selectStatus = value.toString();
-            });
-          },
-        ));
-  }
-
   datePickerWidget(
       String fromTO, TextEditingController DateController, String value) {
     return GestureDetector(
@@ -361,47 +351,124 @@ class _DailyReportState extends State<DailyReport> {
         _selectDate(context, value);
       },
       child: Container(
-        height: 45,
-        width: MediaQuery.of(context).size.width / 2.2,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColor.themeColor,
-          ),
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        margin: const EdgeInsets.only(left: 10, right: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(
-              Icons.calendar_month,
-              color: AppColor.themeColor,
+            Container(
+              margin: const EdgeInsets.only(left: 5),
+              child: const robotoTextWidget(
+                  textval: 'Target Date',
+                  colorval: Colors.black45,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold),
             ),
             const SizedBox(
-              width: 5,
+              height: 10,
             ),
-            Expanded(
-                child: TextField(
-              controller: DateController,
-              maxLines: 1,
-              showCursor: false,
-              enabled: false,
-              textAlign: TextAlign.center,
-              textAlignVertical: TextAlignVertical.center,
-              decoration: InputDecoration(
-                  hintText: fromTO,
-                  hintStyle: const TextStyle(color: AppColor.themeColor),
-                  border: InputBorder.none),
-              style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.bold),
-              keyboardType: TextInputType.datetime,
-              textInputAction: TextInputAction.done,
-            ))
+            Container(
+              height: 45,
+              width: MediaQuery.of(context).size.width,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: AppColor.themeColor,
+                ),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.calendar_month,
+                    color: AppColor.themeColor,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                      child: TextField(
+                    controller: DateController,
+                    maxLines: 1,
+                    showCursor: false,
+                    enabled: false,
+                    textAlign: TextAlign.start,
+                    textAlignVertical: TextAlignVertical.center,
+                    decoration: InputDecoration(
+                        hintText: fromTO,
+                        hintStyle: const TextStyle(color: AppColor.themeColor),
+                        border: InputBorder.none),
+                    style: const TextStyle(
+                        color: AppColor.themeColor,
+                        fontSize: 12,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.bold),
+                    keyboardType: TextInputType.datetime,
+                    textInputAction: TextInputAction.done,
+                  ))
+                ],
+              ),
+            )
           ],
         ),
+      ),
+    );
+  }
+
+  statusSpinnerWidget() {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(left: 5),
+            child: const robotoTextWidget(
+                textval: 'Status',
+                colorval: Colors.black45,
+                sizeval: 12,
+                fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Container(
+              height: 60,
+              width: MediaQuery.of(context).size.width,
+              child: DropdownButtonFormField(
+                isExpanded: true,
+                decoration: InputDecoration(
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColor.themeColor),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10.0),
+                      ),
+                    ),
+                    hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+                    hintText: 'Select status type',
+                    fillColor: Colors.white),
+                value: selectStatus,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Please Select status type'
+                    : "",
+                items: statusList
+                    .map((leaveType) => DropdownMenuItem(
+                        value: leaveType,
+                        child: robotoTextWidget(
+                            textval: leaveType,
+                            colorval: AppColor.themeColor,
+                            sizeval: 12,
+                            fontWeight: FontWeight.bold)))
+                    .toList(),
+                onChanged: (Object? value) {
+                  setState(() {
+                    selectStatus = value.toString();
+                  });
+                },
+              ))
+        ],
       ),
     );
   }
@@ -441,7 +508,7 @@ class _DailyReportState extends State<DailyReport> {
         setState(() {
           vendorNameList = vendorNameResponse.response;
         });
-    }else{
+    } else {
       Utility().showToast(somethingWentWrong);
     }
   }
@@ -459,7 +526,8 @@ class _DailyReportState extends State<DailyReport> {
                   color: Colors.black45, fontWeight: FontWeight.bold),
             )),
         Container(
-          margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
+          margin:
+              const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
           padding: const EdgeInsets.only(left: 15),
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.themeColor),
@@ -507,5 +575,200 @@ class _DailyReportState extends State<DailyReport> {
         )
       ],
     );
+  }
+
+  imageListWidget() {
+    return Container(
+        margin: const EdgeInsets.all(10),
+        child:Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+          robotoTextWidget(textval: 'Click meeting with vendor images', colorval: Colors.black45,
+              sizeval: 12, fontWeight: FontWeight.bold),
+          SizedBox(height: 10,),
+          ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: imageList.length,
+              itemBuilder: (context, position) {
+                return listItem(imageList[position], position);
+              })
+        ],));
+  }
+
+  gatePassListWidget() {
+    return Container(
+        margin: const EdgeInsets.all(10),
+        child: ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: imageList.length,
+            itemBuilder: (context, position) {
+              return gatePasslistItem(imageList[position], position);
+            }));
+  }
+
+  listItem(ImageModel imageList, int position) {
+    return GestureDetector(
+      onTap: () {
+        selectedIndex = position;
+        if (imageList.imageSelected == true) {
+          selectImage(context, "1");
+        } else {
+          selectImage(context, "0");
+        }
+      },
+      child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          elevation: 10,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  robotoTextWidget(
+                      textval: imageList.imageName,
+                      colorval: AppColor.blackColor,
+                      sizeval: 12,
+                      fontWeight: FontWeight.bold),
+                  SvgPicture.asset(
+                    imageList.imageSelected == true
+                        ? 'assets/svg/tick_icon.svg'
+                        : 'assets/svg/close_icon.svg',
+                    width: 20,
+                    height: 20,
+                  )
+                ]),
+          )),
+    );
+  }
+
+  gatePasslistItem(ImageModel imageList, int position) {
+    return Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        elevation: 10,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                robotoTextWidget(
+                    textval: imageList.imageName,
+                    colorval: AppColor.blackColor,
+                    sizeval: 12,
+                    fontWeight: FontWeight.bold),
+                   Checkbox(value: selectedPassIndex==position?isChecked:false, onChanged: (bool?value){
+                     setState(() {
+                       selectedPassIndex = position;
+                       isChecked = true;
+                     });
+                   },activeColor: Colors.blue, // Change the color of the checkbox when it is checked
+                       checkColor: Colors.white,) // Change the color of the checkmark inside the checkbox)
+              ]),
+        ));
+
+  }
+
+  void selectImage(BuildContext context, String value) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return value == "0"
+              ? Wrap(
+                  children: <Widget>[
+                    ListTile(
+                      title: const robotoTextWidget(
+                          textval: 'Camera',
+                          colorval: AppColor.themeColor,
+                          sizeval: 12,
+                          fontWeight: FontWeight.w600),
+                      onTap: () => {
+                        imageSelector(context, "camera"),
+                        Navigator.pop(context)
+                      },
+                    ),
+                    ListTile(
+                      title: const robotoTextWidget(
+                          textval: 'Cancel',
+                          colorval: AppColor.blackColor,
+                          sizeval: 12,
+                          fontWeight: FontWeight.w600),
+                      onTap: () => {Navigator.pop(context)},
+                    ),
+                  ],
+                )
+              : Wrap(
+                  children: <Widget>[
+                    ListTile(
+                      title: const robotoTextWidget(
+                          textval: 'Display',
+                          colorval: AppColor.themeColor,
+                          sizeval: 12,
+                          fontWeight: FontWeight.w600),
+                      onTap: () => {
+                        Navigator.pop(context),
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => ImageView(
+                                    imagepath:
+                                        imageList[selectedIndex!].imagePath)),
+                            (route) => true)
+                      },
+                    ),
+                    ListTile(
+                      title: const robotoTextWidget(
+                          textval: 'Change',
+                          colorval: AppColor.themeColor,
+                          sizeval: 12,
+                          fontWeight: FontWeight.w600),
+                      onTap: () =>
+                          {Navigator.pop(context), selectImage(context, "0")},
+                    ),
+                    ListTile(
+                      title: const robotoTextWidget(
+                          textval: 'Cancel',
+                          colorval: AppColor.blackColor,
+                          sizeval: 12,
+                          fontWeight: FontWeight.w600),
+                      onTap: () => {Navigator.pop(context)},
+                    ),
+                  ],
+                );
+        });
+  }
+
+  Future imageSelector(BuildContext context, String pickerType) async {
+    switch (pickerType) {
+      case "gallery":
+
+        /// GALLERY IMAGE PICKER
+        imageFile = await ImagePicker.platform.getImageFromSource(
+          source: ImageSource.gallery,
+        );
+        break;
+
+      case "camera": // CAMERA CAPTURE CODE
+        imageFile = await ImagePicker.platform
+            .getImageFromSource(source: ImageSource.camera);
+        break;
+    }
+
+    if (imageFile != null) {
+      setState(() {
+        debugPrint("SELECTED IMAGE PICK   $imageFile");
+        List<ImageModel> imageModel = [];
+        imageModel.add(ImageModel(
+            imageName: imageList[selectedIndex!].imageName,
+            imagePath: imageFile.path,
+            imageSelected: true));
+        imageList.setAll(selectedIndex!, imageModel);
+      });
+    } else {
+      print("You have not taken image");
+    }
   }
 }

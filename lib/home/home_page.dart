@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
 
   detailWidget(String title) {
     return Container(
-      margin: EdgeInsets.only(top: 5),
+      margin: const EdgeInsets.only(top: 5),
       child: Card(
         color: AppColor.whiteColor,
         elevation: 10,
@@ -209,7 +209,7 @@ class _HomePageState extends State<HomePage> {
                   fontWeight: FontWeight.w600),
             ),
             Container(
-              margin: EdgeInsets.only(bottom: 5),
+              margin: const EdgeInsets.only(bottom: 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -228,7 +228,7 @@ class _HomePageState extends State<HomePage> {
 
   localConvenience() {
     return Container(
-        margin: EdgeInsets.only(top: 5),
+        margin: const EdgeInsets.only(top: 5),
         child: Card(
           color: AppColor.whiteColor,
           elevation: 5,
@@ -254,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -274,7 +274,7 @@ class _HomePageState extends State<HomePage> {
   dividerWidget() {
     return Container(
       width: 1,
-      margin: EdgeInsets.only(top: 15),
+      margin: const EdgeInsets.only(top: 15),
       height: MediaQuery.of(context).size.height / 8,
       color: AppColor.grey,
     );
@@ -282,7 +282,7 @@ class _HomePageState extends State<HomePage> {
 
   dailyAndWebReport(String title, String svg) {
     return Container(
-        margin: EdgeInsets.only(top: 5),
+        margin: const EdgeInsets.only(top: 5),
         child: Card(
           color: AppColor.whiteColor,
           elevation: 10,
@@ -308,7 +308,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 10),
                 child: imageTextWidget(svg, title, title),
               )
             ],
@@ -863,7 +863,7 @@ class _HomePageState extends State<HomePage> {
   travelModeWidget() {
     return Container(
       height: 40,
-      padding: EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -892,7 +892,7 @@ class _HomePageState extends State<HomePage> {
   latLongWidget(String title) {
     return Container(
       alignment: Alignment.centerLeft,
-      margin: EdgeInsets.only(top: 10),
+      margin: const EdgeInsets.only(top: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -902,10 +902,10 @@ class _HomePageState extends State<HomePage> {
               colorval: Colors.black,
               sizeval: 12,
               fontWeight: FontWeight.normal),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
-          Divider(),
+          const Divider(),
         ],
       ),
     );
