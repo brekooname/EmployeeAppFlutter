@@ -367,6 +367,8 @@ class InDirectState extends State<InDirect> {
       }else{
         Utility().showToast(odResponse[0].msg);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
 
   }

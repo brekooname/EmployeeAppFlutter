@@ -418,6 +418,8 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
         Utility().showToast(leaveResponse.message);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 

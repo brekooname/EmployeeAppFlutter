@@ -384,7 +384,8 @@ class _TaskApprovedState extends State<TaskApproved> {
      {
        Utility().showToast("Something went wrong try again.");
      }
-
+   }else{
+     Utility().showToast(somethingWentWrong);
    }
  }
 

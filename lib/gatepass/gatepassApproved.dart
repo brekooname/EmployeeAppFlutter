@@ -374,6 +374,8 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         });
         Utility().showToast(gatePassResponse[0].text);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
 
   }

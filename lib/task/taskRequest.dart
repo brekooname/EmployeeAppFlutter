@@ -466,6 +466,8 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
           Utility().showToast("Something went wrong try again.");
         }
 
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 

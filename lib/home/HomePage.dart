@@ -464,9 +464,8 @@ class _HomePageState extends State<HomePage> {
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
+      ScaffoldMessenger.of(context).showSnackBar(  SnackBar(
+          content: Text(locationPermission)));
       return false;
     }
     return true;
@@ -510,6 +509,8 @@ class _HomePageState extends State<HomePage> {
         });
         setpersonData();
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
 
     dynamic response2 = await HTTP
@@ -528,6 +529,8 @@ class _HomePageState extends State<HomePage> {
         });
         setgatePassData();
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 

@@ -445,6 +445,8 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       } else {
         Utility().showToast(leave[0].name);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 }

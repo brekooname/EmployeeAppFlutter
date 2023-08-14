@@ -69,3 +69,6 @@ var taskReportdec = "Detail of task assgined.";
 var emphierarchy = "Employee Hierarchy";
 var emhierarchydec = "List of Employee In your team.";
 var downloadingDataTxt = "Downloading Data";
+var errorMssg = "Wrong User Id /Password, Try Again";
+var somethingWentWrong = "Some thing went wrong";
+var locationPermission = "Location permissions are permanently denied, we cannot request permissions.";

@@ -459,6 +459,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
       }else{
         Utility().showToast(odResponse.name);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 

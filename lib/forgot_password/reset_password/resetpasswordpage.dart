@@ -281,10 +281,10 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
         Utility().showToast(updatepassword[0].msg);
       }
       else {
-
-
         Utility().showToast(updatepassword[0].msg);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 
