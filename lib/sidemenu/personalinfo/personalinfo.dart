@@ -57,7 +57,6 @@ class PersonalInfoState extends State<PersonalInfo> {
       body: Container(
         child: Column(
           children: [
-
             detailWidget("SapCode", nameValue!),
             detailWidget("Name", widget.personalInfo[0].pernr),
             detailWidget("Department", widget.personalInfo[0].btrtlTxt),
@@ -67,7 +66,6 @@ class PersonalInfoState extends State<PersonalInfo> {
             detailWidget("E-mail",  widget.personalInfo[0].emailShkt),
             detailWidget("Address",  widget.personalInfo[0].address),
             detailWidget("DOB",  widget.personalInfo[0].birth),
-
           ],
         ),
       ),

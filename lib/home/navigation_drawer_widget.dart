@@ -137,7 +137,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
           case 4:
             {
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => SalarySlip()),
+                  MaterialPageRoute(builder: (context) => const SalarySlip()),
                   (route) => true);
             }
             break;

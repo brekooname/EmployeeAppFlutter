@@ -35,7 +35,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
+        title: const robotoTextWidget(
             textval: "Attendance Table",
             colorval: AppColor.whiteColor,
             sizeval: 15,
@@ -48,13 +48,13 @@ class _AttendanceReportState extends State<AttendanceReport> {
                 MaterialPageRoute(builder: (context) =>  HomePage()),
               );}
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        decoration:  BoxDecoration(
+        decoration:  const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/shaktiLogo.png'),
             fit: BoxFit.contain,

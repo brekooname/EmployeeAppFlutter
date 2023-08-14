@@ -80,7 +80,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
           child: Container(
               width: 400,
               color: AppColor.whiteColor,
-              padding: const EdgeInsets.all(5),
+              padding:  const EdgeInsets.all(5),
               child: Stack(children: <Widget>[
                 Row(
                   children: [
@@ -88,31 +88,31 @@ class InDirectLeaveState extends State<InDirectLeave> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         detailWidget("Leave No", widget.pendindLeaveList[index].leavNo.toString()),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget("Name",widget.pendindLeaveList[index].name),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget("Leave Type",widget.pendindLeaveList[index].horo + widget.pendindLeaveList[index].dedQuta1),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
                             datedetailWidget( "Leave From", widget.pendindLeaveList[index].levFr),
-                            SizedBox(
+                            const SizedBox(
                               width: 4,
                             ),
                             datedetailWidget( "Leave To",widget.pendindLeaveList[index].levT),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget( "Visit Place",widget.pendindLeaveList[index].reason),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
 
@@ -120,7 +120,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
 
                             child: InkWell(
                               onTap: (){
@@ -136,7 +136,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
                             child: InkWell(
                               onTap: (){
                                 selectedIndex = index;
@@ -273,7 +273,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -329,7 +329,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -395,17 +395,13 @@ class InDirectLeaveState extends State<InDirectLeave> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(rejectLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString() ,sharedPreferences.getString(password).toString() ));
     if (response != null && response.statusCode == 200)  {
-      print("response======>${response.toString()}");
       var jsonData = convert.jsonDecode(response.body);
       LeaveRejectResponse leaveResponse = LeaveRejectResponse.fromJson(jsonData);
-      print("response======>${leaveResponse.status}");
-
       if(leaveResponse.status.compareTo("true") == 0){
         Utility().showToast("Leave Rejected Successfully");
         setState(() {
           isLoading  = false;
         });
-
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (context) =>

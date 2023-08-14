@@ -159,7 +159,7 @@ class _HomePageState extends State<HomePage> {
 
   detailWidget(String title) {
     return Container(
-      margin: EdgeInsets.only(top: 5),
+      margin: const EdgeInsets.only(top: 5),
       child: Card(
         color: AppColor.whiteColor,
         elevation: 10,
@@ -185,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                   fontWeight: FontWeight.w600),
             ),
             Container(
-              margin: EdgeInsets.only(bottom: 5),
+              margin: const EdgeInsets.only(bottom: 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -204,7 +204,7 @@ class _HomePageState extends State<HomePage> {
 
   localConvenience() {
     return Container(
-        margin: EdgeInsets.only(top: 5),
+        margin: const EdgeInsets.only(top: 5),
         child: Card(
           color: AppColor.whiteColor,
           elevation: 5,
@@ -230,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -250,7 +250,7 @@ class _HomePageState extends State<HomePage> {
   dividerWidget() {
     return Container(
       width: 1,
-      margin: EdgeInsets.only(top: 15),
+      margin: const EdgeInsets.only(top: 15),
       height: MediaQuery.of(context).size.height / 8,
       color: AppColor.grey,
     );
@@ -258,7 +258,7 @@ class _HomePageState extends State<HomePage> {
 
   dailyAndWebReport(String title, String svg) {
     return Container(
-        margin: EdgeInsets.only(top: 5),
+        margin: const EdgeInsets.only(top: 5),
         child: Card(
           color: AppColor.whiteColor,
           elevation: 10,
@@ -284,7 +284,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 10),
                 child: imageTextWidget(svg, title, title),
               )
             ],
@@ -641,12 +641,12 @@ class _HomePageState extends State<HomePage> {
 
     if (title == "Leave") {
       return Visibility(
-        visible: pendingLeaveList.length == 0? false : true ,
+        visible: pendingLeaveList.isEmpty? false : true ,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child:  Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                   color: AppColor.themeColor,
             ),
@@ -663,12 +663,12 @@ class _HomePageState extends State<HomePage> {
     }
     if (title == "Official Duty") {
       return Visibility(
-        visible: pendindOdList.length == 0? false:true ,
+        visible: pendindOdList.isEmpty? false:true ,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: AppColor.themeColor,),
             width: msg == "Request"? 0:20,
@@ -684,12 +684,12 @@ class _HomePageState extends State<HomePage> {
     }
     if (title == "Gate Pass") {
       return Visibility(
-        visible: gatePassList.length == 0? false:true ,
+        visible: gatePassList.isEmpty? false:true ,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color:  AppColor.themeColor,),
             width: msg == "Request"? 0:20,
@@ -706,12 +706,12 @@ class _HomePageState extends State<HomePage> {
 
     if (title == "Task") {
       return Visibility(
-        visible: pendingTaskList.length == 0? false:true ,
+        visible: pendingTaskList.isEmpty? false:true ,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color:  AppColor.themeColor,),
             width: msg == "Request"? 0:20,

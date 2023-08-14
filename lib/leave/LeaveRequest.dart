@@ -264,11 +264,8 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         //DateTime.now() - not to allow to choose before today.
         lastDate:  DateTime(2050));
     if (pickedDate != null) {
-      print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
       String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
-      print(
-          formattedDate); //formatted date output using intl package =>  2021-03-16
-      setState(() {
+       setState(() {
         if (value == "0") {
           selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
           fromDateController.text = formattedDate;
@@ -395,11 +392,6 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
 
   void Validation() {
     selectedLeaveType ??= "";
-
-    print("Person===>${perInCharge1}");
-    print("Person===>${perInCharge2}");
-    print("Person===>${perInCharge3}");
-    print("Person===>${perInCharge4}");
     if (selectedLeaveType!.isEmpty) {
       Utility().showToast("Please Select Leave Type");
     }  else if (fromDateController.text.toString().isEmpty) {

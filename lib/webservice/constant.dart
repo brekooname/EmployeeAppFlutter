@@ -10,4 +10,5 @@ var emphierarchyUrl = "Employee_Hierarchy.htm";
 var syncSapResponse = "syncSapResponse";
 var userInfo = "userInfo";
 var gatePassDatail = "gatePassDetail";
+var salarySlipUrl ="https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_1/employee_payslip.htm";
 
