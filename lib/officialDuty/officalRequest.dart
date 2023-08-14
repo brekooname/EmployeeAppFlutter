@@ -9,7 +9,7 @@ import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../home/HomePage.dart';
+import '../home/home_page.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/constant.dart';
@@ -107,25 +107,22 @@ class _OfficialRequestState extends State<OfficialRequest>  {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
         iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
-        padding: EdgeInsets.only(top: 20,left: 10, right: 10),
+        padding: const EdgeInsets.only(top: 20,left: 10, right: 10),
         height: double.infinity,
         width: double.infinity,
 
         child: SingleChildScrollView(
           child: Column(
             children: [
-
               dutyTypeSpinnerWidget(),
               const SizedBox(height: 10,),
               WorkPlaceSpinnerWidget(),
@@ -205,11 +202,11 @@ class _OfficialRequestState extends State<OfficialRequest>  {
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
-                ? Container(
+                ? const SizedBox(
               height: 30,
               width: 30,
               child:
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 color: AppColor.whiteColor,
               ),
             )
@@ -223,7 +220,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   }
 
   dutyTypeSpinnerWidget() {
-    return Container(
+    return SizedBox(
         height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -259,7 +256,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   }
 
   WorkPlaceSpinnerWidget()  {
-    return Container(
+    return SizedBox(
         height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -355,10 +352,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         //DateTime.now() - not to allow to choose before today.
         lastDate:  DateTime(2050));
     if (pickedDate != null) {
-      print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
       String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
-      print(
-          formattedDate); //formatted date output using intl package =>  2021-03-16
       setState(() {
         if (value == "0") {
           selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
@@ -373,7 +367,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   textFeildWidget(String hinttxt, TextEditingController visitPlace) {
     return  Container(
-      padding: EdgeInsets.only(left: 15),
+      padding: const EdgeInsets.only(left: 15),
       margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
@@ -416,17 +410,6 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     } else  if(remark.text.toString().isEmpty){
       Utility().showToast("Please enter Remark");
     } else {
-      setState(() {
-        print("Duty Type ${dutyTypeSpinner.toString()}");
-
-        print("visitPlace ${visitPlace.text.toString()}");
-        print("workPlace ${workPlace.toString()}");
-        print("purpose1 ${purpose1.text.toString()}");
-        print("purpose2 ${purpose2.text.toString()}");
-        print("remark ${remark.text.toString()}");
-        print("personInChanger ${remark.text.toString()}");
-      });
-
       createOD();
     }
   }
@@ -439,22 +422,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
     dynamic response = await HTTP.get(createODAPI(sapcode!,dutyTypeSpinner.toString(),fromDateController.text.toString(),toDateController.text.toString(),visitPlace.text.toString(),workPlaceSpinner.toString(),purpose1.text.toString(),purpose2.text.toString(),purpose3.text.toString(),remark.text.toString(),selectedAssginTo.toString()));
     if (response != null && response.statusCode == 200){
-
-
-
       var jsonData = convert.jsonDecode(response.body);
       OdResponse odResponse = OdResponse.fromJson(jsonData);
 
-
       if(odResponse.name.compareTo("SAPLSPO1") == 0){
-
         Utility().showToast("OD Created Successfully");
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
 
       }else{
         Utility().showToast(odResponse.name);

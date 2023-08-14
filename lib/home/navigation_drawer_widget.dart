@@ -10,6 +10,7 @@ import '../sidemenu/officaldutyreport/officialdutyReport.dart';
 import '../sidemenu/personalinfo/personalinfo.dart';
 import '../sidemenu/salaryslip/salaryslip.dart';
 import '../theme/color.dart';
+import '../webservice/constant.dart';
 import 'model/ScyncAndroidtoSAP.dart';
 import 'model/personalindoresponse.dart';
 
@@ -137,7 +138,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
           case 4:
             {
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => SalarySlip()),
+                  MaterialPageRoute(builder: (context) => const SalarySlip()),
                   (route) => true);
             }
             break;
@@ -154,6 +155,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
           case 6:
             {
               Utility().clearSharedPreference();
+              Utility().deleteDatabase(databaseName);
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const LoginPage()),
                   (route) => false);

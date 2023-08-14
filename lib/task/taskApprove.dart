@@ -1,5 +1,5 @@
 import 'dart:convert' as convert;
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:flutter/material.dart';
@@ -370,16 +370,8 @@ class _TaskApprovedState extends State<TaskApproved> {
      print("response======>${taskRespons.dataSuccess[3].syncData.toString()}");
 
      if(taskRespons.dataSuccess[3].syncData == "EMP_TASK_COMPLETE" && taskRespons.dataSuccess[3].value == "Y"){
-
        Utility().showToast("Task has been Closed.");
-
-
-       Navigator.of(context).pushAndRemoveUntil(
-           MaterialPageRoute(
-               builder: (context) =>
-                   HomePage( )),
-               (route) => true);
-
+       Navigator.of(context).pop();
      }else
      {
        Utility().showToast("Something went wrong try again.");

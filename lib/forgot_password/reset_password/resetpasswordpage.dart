@@ -96,9 +96,9 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                                   children: [
                                     Text(resetPasswordDesc, textAlign: TextAlign.center,style: const TextStyle(color:Colors.grey,
                                         fontSize: 12,fontWeight: FontWeight.w600)),
-                                    SizedBox( height: 20,),
+                                    const SizedBox( height: 20,),
                                     datePickerWidget(),
-                                    SizedBox( height: 10,),
+                                    const SizedBox( height: 10,),
                                     PasswordTextWdget(),
                                     editMobileWidget(),
                                     GestureDetector(
@@ -115,11 +115,11 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                                             color: AppColor.themeColor),
                                         child: Center(
                                           child: isLoading
-                                              ? Container(
+                                              ? const SizedBox(
                                                   height: 30,
                                                   width: 30,
                                                   child:
-                                                      const CircularProgressIndicator(
+                                                      CircularProgressIndicator(
                                                     color: AppColor.whiteColor,
                                                   ),
                                                 )
@@ -256,27 +256,17 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
     setState(() {
       isLoading = true;
     });
-
     var jsonData = null;
     dynamic response = await HTTP.get(forgotpasword(sapCode.text.toString(),mobileNo.text.toString(),indianDate.toString()));
-    print(response.statusCode);
-    if (response != null && response.statusCode == 200) {
-      print("response==============>${response.body.toString()}");
+   if (response != null && response.statusCode == 200) {
       setState(() {
         isLoading = false;
       });
 
       Iterable l = json.decode(response.body);
       List<UpdatePasswordResponse> updatepassword = List<UpdatePasswordResponse>.from(l.map((model)=> UpdatePasswordResponse.fromJson(model)));
-      print("response======>${updatepassword[0].msg}");
-
       if (updatepassword[0].msg != null && updatepassword[0].msg != "Enter correct registered Mob no." && updatepassword[0].msg !="Wrong DOB") {
         Utility().showToast(updatepassword[0].msg);
-
-       /* Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (BuildContext context) => const LoginPage()),
-            (Route<dynamic> route) => true);*/
       }else if (updatepassword[0].msg == "Enter correct registered Mob no." || updatepassword[0].msg !="Wrong DOB"){
         Utility().showToast(updatepassword[0].msg);
       }
@@ -344,7 +334,6 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
       setState(() {
         selectedDate = picked;
         indianDate =  DateFormat("dd/MM/yyyy").format(picked);
-        print("indianDate===> ${indianDate}");
       });
     }
   }

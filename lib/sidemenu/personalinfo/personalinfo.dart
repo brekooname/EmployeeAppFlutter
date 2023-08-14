@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,10 +46,8 @@ class PersonalInfoState extends State<PersonalInfo> {
         leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
         iconTheme: const IconThemeData(color: Colors.white),
 
@@ -57,7 +55,6 @@ class PersonalInfoState extends State<PersonalInfo> {
       body: Container(
         child: Column(
           children: [
-
             detailWidget("SapCode", nameValue!),
             detailWidget("Name", widget.personalInfo[0].pernr),
             detailWidget("Department", widget.personalInfo[0].btrtlTxt),
@@ -67,7 +64,6 @@ class PersonalInfoState extends State<PersonalInfo> {
             detailWidget("E-mail",  widget.personalInfo[0].emailShkt),
             detailWidget("Address",  widget.personalInfo[0].address),
             detailWidget("DOB",  widget.personalInfo[0].birth),
-
           ],
         ),
       ),

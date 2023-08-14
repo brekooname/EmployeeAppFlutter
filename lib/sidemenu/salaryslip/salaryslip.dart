@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,21 +57,19 @@ class _SalarySlipState extends State<SalarySlip> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
+        title: const robotoTextWidget(
             textval: ""
                 "Download Salary Slip ",
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
@@ -99,13 +97,13 @@ class _SalarySlipState extends State<SalarySlip> {
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
+      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
       child:   Center(
         child: DropdownButton(
           // Initial Value
-          underline: SizedBox(height: 0,),
+          underline: const SizedBox(height: 0,),
           value: yearSpinner,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_drop_down,
             color: AppColor.themeColor, // <-- SEE HERE
           ),
@@ -136,13 +134,13 @@ class _SalarySlipState extends State<SalarySlip> {
         borderRadius:
         const BorderRadius.all(Radius.circular(10)),
       ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
+      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
       child:   Center(
         child: DropdownButton(
           // Initial Value
-          underline: SizedBox(height: 0,),
+          underline: const SizedBox(height: 0,),
           value: monthSpinner,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_drop_down,
             color: AppColor.themeColor, // <-- SEE HERE
           ),
@@ -179,15 +177,15 @@ class _SalarySlipState extends State<SalarySlip> {
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
-                ? Container(
+                ? const SizedBox(
               height: 30,
               width: 30,
               child:
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 color: AppColor.whiteColor,
               ),
             )
-                : robotoTextWidget(
+                : const robotoTextWidget(
                 textval: "Download Salary Slip",
                 colorval: Colors.white,
                 sizeval: 14,
@@ -206,7 +204,7 @@ class _SalarySlipState extends State<SalarySlip> {
     } else if(monthSpinner == "Select Month"){
       Utility().showToast("Please select Month");
     }else{
-      _launchUrl('https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_1/employee_payslip.htm?id=${sapCode}&yr=${yearSpinner}&mo=${monthSpinner}');
+      _launchUrl('$salarySlipUrl?id=$sapCode&yr=$yearSpinner&mo=$monthSpinner');
 
     }
 
@@ -214,13 +212,6 @@ class _SalarySlipState extends State<SalarySlip> {
 
 
   Future<void> _launchUrl(String _url) async {
-    setState(() {
-      isLoading = true;
-    });
-    /*launchUrl(
-      Uri.parse(_url),
-      mode: LaunchMode.externalApplication,
-    );*/
     setState(() {
       isLoading = true;
     });

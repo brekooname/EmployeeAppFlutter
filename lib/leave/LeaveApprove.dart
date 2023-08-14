@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/indirectLeave.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -41,16 +41,15 @@ class _LeaveApprovedState extends State<LeaveApproved> {
         appBar:  AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>  HomePage()),
-                      (route) => false),
+              onPressed: () => Navigator.of(context).pop(),
             ),
             backgroundColor: AppColor.themeColor,
-            title: robotoTextWidget(textval: "Leave Approve", colorval: AppColor.whiteColor,
+            title: const robotoTextWidget(textval: "Leave Approve", colorval: AppColor.whiteColor,
                 sizeval: 18, fontWeight: FontWeight.normal),
-            bottom:  TabBar(
+            bottom:  const TabBar(
               isScrollable: false,
               indicatorColor: AppColor.whiteColor,
-              indicatorPadding: const EdgeInsets.all(5),
+              indicatorPadding: EdgeInsets.all(5),
               tabs: [
                 Tab(child: robotoTextWidget(textval: 'Direct',
                     colorval: AppColor.whiteColor, sizeval: 14, fontWeight: FontWeight.normal)),
@@ -59,7 +58,7 @@ class _LeaveApprovedState extends State<LeaveApproved> {
             )
         ),
         body:  TabBarView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             // first tab bar view widget
             InDirectLeave( Status: 'D', pendindLeaveList: directList,),
@@ -80,12 +79,6 @@ class _LeaveApprovedState extends State<LeaveApproved> {
           inDirectList.add(Pendingleave(leavNo: widget.pendingLeaveList[i].leavNo, horo: widget.pendingLeaveList[i].horo, pernr: widget.pendingLeaveList[i].pernr, name: widget.pendingLeaveList[i].name, dedQuta1: widget.pendingLeaveList[i].dedQuta1, levFrm: widget.pendingLeaveList[i].levFrm, levFr: widget.pendingLeaveList[i].levFr, levTo: widget.pendingLeaveList[i].levTo, levT: widget.pendingLeaveList[i].levT, timFrm: widget.pendingLeaveList[i].timFrm, timTo: widget.pendingLeaveList[i].timTo, reason: widget.pendingLeaveList[i].reason, adminChrg1: widget.pendingLeaveList[i].adminChrg1, nameperl: widget.pendingLeaveList[i].nameperl, adminChrg2: widget.pendingLeaveList[i].adminChrg2, nameperl2: widget.pendingLeaveList[i].nameperl2, nameperl3: widget.pendingLeaveList[i].nameperl3, nameperl4: widget.pendingLeaveList[i].nameperl4, person: widget.pendingLeaveList[i].person, directIndirect: widget.pendingLeaveList[i].directIndirect));
 
         }
-
-        print("odList====>${widget.pendingLeaveList.length}");
-
-        print("odList2 D====>${directList.length}");
-
-        print("odList3 ID====>${inDirectList.length}");
       }
 
     });

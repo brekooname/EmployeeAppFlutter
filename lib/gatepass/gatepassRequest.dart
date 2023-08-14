@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/model/gatePassResponse.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
@@ -77,9 +77,6 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
 
       fromTimeController.text = _time!;
       toTimeController.text = _time!;
-
-
-
     });
 
     _time = formatDate(
@@ -105,22 +102,22 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
               Navigator.pop(context);
             }
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
         height: double.infinity,
         width: double.infinity,
-        padding: EdgeInsets.only(left: 10, right: 10),
+        padding: const EdgeInsets.only(left: 10, right: 10),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -130,7 +127,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
                       selectedToDate!, toDateController, "1")
                 ],
               ),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -141,9 +138,9 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
                       selectedToDate!, toTimeController, "1")
                 ],
               ),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               leaveTypeSpinnerWidget(),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               dayTypeSpinnerWidget(),
@@ -197,8 +194,8 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
 
   textFieldWidget(String hinttxt, TextEditingController visitPlace) {
     return  Container(
-      margin: EdgeInsets.only( top: 10),
-      padding:  EdgeInsets.only( left: 15),
+      margin: const EdgeInsets.only( top: 10),
+      padding:  const EdgeInsets.only( left: 15),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -234,11 +231,11 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
-                ? Container(
+                ? const SizedBox(
               height: 30,
               width: 30,
               child:
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 color: AppColor.whiteColor,
               ),
             )
@@ -268,17 +265,12 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
          Utility().showToast("Please enter visit place ");
        }
     else {
-      setState(() {
-        print("personInChager1 ${visitPlace.text.toString()}");
-        print("personInChager3 ${purpose.text.toString()}");
-      });
-
       gatePassRequestAPI();
     }
   }
 
   leaveTypeSpinnerWidget() {
-    return Container(
+    return SizedBox(
         height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -314,7 +306,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
   }
 
   dayTypeSpinnerWidget() {
-    return Container(
+    return SizedBox(
         height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -498,8 +490,6 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
           toTimeController.text = _time!;
         }
       });
-      print("selectedFromDate Time: ${selectedFromDate}");print("fromTimeController Time: ${ fromTimeController.text.toString()}");
-      print("Current Time: ${selectedToDate}");print("Current Time: ${toTimeController.text.toString()}");
 
     }
   }
@@ -511,21 +501,14 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
 
     dynamic response = await HTTP.get(createGatePassAPI(sapcode,fromDateController.text.toString(),_time.toString(),dayTypeSpinner.toString(),returnalbeTypeSpinner.toString(),toDateController.text.toString(),_comeTime.toString(),visitPlace.text.toString(),purpose.text.toString(),selectedAssginTo.toString()));
     if (response != null && response.statusCode == 200)  {
-
-      print("response======>${response.toString()}");
       Iterable l = convert.json.decode(response.body);
       List<GatePassResponse> odResponse = List<GatePassResponse>.from(l.map((model)=> GatePassResponse.fromJson(model)));
-      print("response======>${odResponse[0].text}");
 
       if(odResponse[0].msgtyp.compareTo("S") == 0){
 
         Utility().showToast(odResponse[0].text);
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        Navigator.of(context).pop();
 
       }
       else{

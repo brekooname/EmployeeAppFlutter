@@ -1,10 +1,12 @@
+import 'dart:convert' as convert;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
-import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import '../Util/utility.dart';
 import '../theme/string.dart';
@@ -53,8 +55,8 @@ class _DailyReportState extends State<DailyReport> {
 
   DateTime selectedDate = DateTime.now();
   DateTime datefrom = DateTime.now();
-  String? indianFromDate,selectedFromDate;
-  String   dateTimeFormat ="dd/MM/yyyy";
+  String? indianFromDate, selectedFromDate;
+  String dateTimeFormat = "dd/MM/yyyy";
   DateTime? pickedDate;
 
   @override
@@ -64,7 +66,7 @@ class _DailyReportState extends State<DailyReport> {
 
     selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
     fromDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
-    indianFromDate =  DateFormat("dd/MM/yyyy").format(DateTime.now());
+    indianFromDate = DateFormat("dd/MM/yyyy").format(DateTime.now());
   }
 
   @override
@@ -86,10 +88,7 @@ class _DailyReportState extends State<DailyReport> {
               color: AppColor.whiteColor,
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
+              Navigator.of(context).pop();
             }),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -126,9 +125,9 @@ class _DailyReportState extends State<DailyReport> {
             padding: const EdgeInsets.only(left: 15),
             child: Text(
               hinttxt,
-              style:
-                  const TextStyle(color: Colors.black45, fontWeight: FontWeight.bold),
-            ),),
+              style: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.bold),
+            )),
         Container(
           padding: const EdgeInsets.only(left: 15),
           margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
@@ -142,7 +141,10 @@ class _DailyReportState extends State<DailyReport> {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: "Please Enter " + hinttxt,
-              hintStyle: const TextStyle(color: AppColor.themeColor, fontSize: 13, fontWeight: FontWeight.normal),
+              hintStyle: const TextStyle(
+                  color: AppColor.themeColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal),
             ),
             keyboardType: TextInputType.text,
           ),
@@ -264,8 +266,8 @@ class _DailyReportState extends State<DailyReport> {
           padding: const EdgeInsets.only(left: 15),
           child: Text(
             s,
-            style:
-                const TextStyle(color: Colors.black45, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.black45, fontWeight: FontWeight.bold),
           )),
       Container(
         margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
@@ -279,7 +281,10 @@ class _DailyReportState extends State<DailyReport> {
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: date,
-            hintStyle: const TextStyle(color: AppColor.themeColor,fontSize: 12, fontWeight: FontWeight.normal),
+            hintStyle: const TextStyle(
+                color: AppColor.themeColor,
+                fontSize: 12,
+                fontWeight: FontWeight.normal),
           ),
           keyboardType: TextInputType.text,
         ),
@@ -295,8 +300,8 @@ class _DailyReportState extends State<DailyReport> {
             padding: const EdgeInsets.only(left: 15),
             child: Text(
               s,
-              style:
-                  const TextStyle(color: Colors.black45, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.bold),
             )),
         Container(
           padding: const EdgeInsets.only(left: 15),
@@ -312,7 +317,10 @@ class _DailyReportState extends State<DailyReport> {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: "Please Enter " + s,
-              hintStyle: const TextStyle(color: AppColor.themeColor, fontWeight: FontWeight.normal,fontSize: 13),
+              hintStyle: const TextStyle(
+                  color: AppColor.themeColor,
+                  fontWeight: FontWeight.normal,
+                  fontSize: 13),
             ),
             keyboardType: TextInputType.text,
           ),
@@ -398,20 +406,23 @@ class _DailyReportState extends State<DailyReport> {
             ),
             Expanded(
                 child: TextField(
-                  controller: DateController,
-                  maxLines: 1,
-                  showCursor: false,
-                  enabled: false,
-                  textAlign: TextAlign.center,
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: InputDecoration(
-                      hintText: fromTO,
-                      hintStyle: const TextStyle(color: AppColor.themeColor),
-                      border: InputBorder.none),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
-                  keyboardType: TextInputType.datetime,
-                  textInputAction: TextInputAction.done,
-                ))
+              controller: DateController,
+              maxLines: 1,
+              showCursor: false,
+              enabled: false,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              decoration: InputDecoration(
+                  hintText: fromTO,
+                  hintStyle: const TextStyle(color: AppColor.themeColor),
+                  border: InputBorder.none),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold),
+              keyboardType: TextInputType.datetime,
+              textInputAction: TextInputAction.done,
+            ))
           ],
         ),
       ),
@@ -424,16 +435,14 @@ class _DailyReportState extends State<DailyReport> {
         initialDate: DateTime.now(),
         firstDate: value == "0"
             ? DateTime.now()
-            : selectedFromDate != DateFormat(dateTimeFormat).format(DateTime.now())
-            ? DateTime(2023)
-            : DateTime.now(),
+            : selectedFromDate !=
+                    DateFormat(dateTimeFormat).format(DateTime.now())
+                ? DateTime(2023)
+                : DateTime.now(),
         //DateTime.now() - not to allow to choose before today.
-        lastDate:  DateTime(2050));
+        lastDate: DateTime(2050));
     if (pickedDate != null) {
-      print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
       String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
-      print(
-          formattedDate); //formatted date output using intl package =>  2021-03-16
       setState(() {
         if (value == "0") {
           selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
@@ -442,7 +451,6 @@ class _DailyReportState extends State<DailyReport> {
       });
     }
   }
-
 
   Future<void> vendorNameListAPI(String value) async {
     var jsonData = null;
@@ -455,7 +463,6 @@ class _DailyReportState extends State<DailyReport> {
           vendorNameResponse.response.isNotEmpty)
         setState(() {
           vendorNameList = vendorNameResponse.response;
-          print('vendoreNAmeList=====>${vendorNameList.length}');
         });
     }else{
       Utility().showToast(somethingWentWrong);
@@ -470,12 +477,12 @@ class _DailyReportState extends State<DailyReport> {
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 15),
             child: Text(
-             hinttxt,
-              style:
-                  const TextStyle(color: Colors.black45, fontWeight: FontWeight.bold),
+              hinttxt,
+              style: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.bold),
             )),
         Container(
-          margin: const EdgeInsets.only(bottom: 10, left: 10,right: 10),
+          margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
           padding: const EdgeInsets.only(left: 15),
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.themeColor),
@@ -501,10 +508,11 @@ class _DailyReportState extends State<DailyReport> {
                 )
                 .toList(),
             searchInputDecoration: InputDecoration(
-              hintText:  "Search by "+hinttxt,
+              hintText: "Search by " + hinttxt,
               hintStyle: const TextStyle(
                 fontSize: 13,
-                  color: AppColor.themeColor, ),
+                color: AppColor.themeColor,
+              ),
               border: InputBorder.none,
             ),
             onSearchTextChanged: (serachValue) {
@@ -515,14 +523,7 @@ class _DailyReportState extends State<DailyReport> {
             },
             onSubmit: (String value) {
               setState(() {
-
-               /*int index = vendorNameList.indexWhere((item) =>  item.containsValue(value));
-                int index1 = vendorNameList.indexWhere((item) => item["name"] == value);*/
-                vendoreName.text = value;
-                vendoreContac.text ;
-                vendoreAddress.text ;
-
-                print("submitted\n ${value}");
+                vendoreContac.text = vendorNameList[0].telf1;
               });
             },
           ),
@@ -530,6 +531,4 @@ class _DailyReportState extends State<DailyReport> {
       ],
     );
   }
-
-
 }

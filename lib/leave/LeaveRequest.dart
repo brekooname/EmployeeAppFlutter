@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/model/leaveRequestModel.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -84,10 +84,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               color: AppColor.whiteColor,
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
+              Navigator.of(context).pop();
             }),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -264,11 +261,8 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         //DateTime.now() - not to allow to choose before today.
         lastDate:  DateTime(2050));
     if (pickedDate != null) {
-      print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
       String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
-      print(
-          formattedDate); //formatted date output using intl package =>  2021-03-16
-      setState(() {
+       setState(() {
         if (value == "0") {
           selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
           fromDateController.text = formattedDate;
@@ -395,11 +389,6 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
 
   void Validation() {
     selectedLeaveType ??= "";
-
-    print("Person===>${perInCharge1}");
-    print("Person===>${perInCharge2}");
-    print("Person===>${perInCharge3}");
-    print("Person===>${perInCharge4}");
     if (selectedLeaveType!.isEmpty) {
       Utility().showToast("Please Select Leave Type");
     }  else if (fromDateController.text.toString().isEmpty) {
@@ -438,10 +427,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               l.map((model) => LeaveRequestModelResponse.fromJson(model)));
       if (leave[0].name.compareTo("Leave request created") == 0) {
         Utility().showToast(leave[0].name);
-
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => HomePage()),
-            (route) => false);
+        Navigator.of(context).pop();
       } else {
         Utility().showToast(leave[0].name);
       }

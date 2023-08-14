@@ -11,20 +11,21 @@ import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'forgot_password/forgot_password_page.dart';
-import 'home/HomePage.dart';
+import 'home/home_page.dart';
 import 'theme/string.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  String? isLoggedIn = (sharedPreferences.getString(userID) == null) ? 'false' : 'true';
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+  String? isLoggedIn = (sharedPreferences.getString(userID) == null) ? False : True;
+  String? journeyStarts = (sharedPreferences.getString(localConveyanceJourneyStart) == null) ? False : sharedPreferences.getString(localConveyanceJourneyStart);
+  runApp(MyApp(isLoggedIn: isLoggedIn,journStar: journeyStarts,));
 }
 
 class MyApp extends StatelessWidget {
-  String? isLoggedIn;
+  String? isLoggedIn,journStar;
 
-  MyApp({Key? key, required this.isLoggedIn}) : super(key: key);
+  MyApp({Key? key, required this.isLoggedIn,required this.journStar}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: AppColor.themeColor),
       ),
-      home: isLoggedIn == 'true' ? HomePage() : const LoginPage(),
+      home: isLoggedIn == True ? HomePage(journeyStart: journStar!,) : const LoginPage(),
     );
   }
 }
@@ -88,8 +89,8 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          const robotoTextWidget(
-                              textval: "LOGIN",
+                           robotoTextWidget(
+                              textval: Login,
                               colorval: AppColor.themeColor,
                               sizeval: 30,
                               fontWeight: FontWeight.bold),
@@ -188,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
             obscureText: !isPasswordVisible,
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Password",
+              hintText: password,
               hintStyle: const TextStyle(color: AppColor.themeColor),
               prefixIcon: IconButton(
                   onPressed: () {},
@@ -291,13 +292,13 @@ class _LoginPageState extends State<LoginPage> {
       List<LoginModelResponse> loginResponse = List<LoginModelResponse>.from(
           l.map((model) => LoginModelResponse.fromJson(model)));
 
-      if (loginResponse[0].pass ==
-          passwordController.text.toUpperCase().toString()) {
+      if (loginResponse[0].name.isNotEmpty) {
         Utility().setSharedPreference(name, loginResponse[0].name);
+        Utility().setSharedPreference(localConveyanceJourneyStart,'false');
         Utility().showToast('Welcome ' + loginResponse[0].name);
         // ignore: use_build_context_synchronously
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => HomePage(journeyStart: False,)),
             (route) => false);
 
         setState(() {
@@ -309,8 +310,11 @@ class _LoginPageState extends State<LoginPage> {
           isLoading = false;
         });
       }
-    }else{
-      Utility().showToast(somethingWentWrong);
+    }else {
+      Utility().showToast("Something Went Wrong Please Try Again");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
