@@ -6,6 +6,8 @@ import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+import '../Util/utility.dart';
+import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import 'model/vendornamelistresponse.dart' as VenderList;
 import 'model/vendornamelistresponse.dart';
@@ -68,7 +70,6 @@ class _DailyReportState extends State<DailyReport> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -96,9 +97,7 @@ class _DailyReportState extends State<DailyReport> {
         child: Column(
           children: [
             radtiobuttonWidget(),
-            textVendorFeildWidget(
-              "Vendor Name",
-            ),
+            textVendorFeildWidget( "Vendor Name",),
             textFeildWidget("Vendor Code", vendoreCode),
             textFeildWidget("Vendor Address", vendoreAddress),
             textFeildWidget("Vendor Contact N0", vendoreContac),
@@ -111,8 +110,7 @@ class _DailyReportState extends State<DailyReport> {
             longTextFeildWidget("Agenda", agenda),
             longTextFeildWidget("Discussion", discussion),
             statusSpinnerWidget(),
-            datePickerWidget(
-                selectedFromDate!, fromDateController, "0"),
+            datePickerWidget(selectedFromDate!, fromDateController, "0"),
           ],
         ),
       ),
@@ -130,7 +128,7 @@ class _DailyReportState extends State<DailyReport> {
               hinttxt,
               style:
                   const TextStyle(color: Colors.black45, fontWeight: FontWeight.bold),
-            )),
+            ),),
         Container(
           padding: const EdgeInsets.only(left: 15),
           margin: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
@@ -202,7 +200,7 @@ class _DailyReportState extends State<DailyReport> {
                       color: AppColor.themeColor,
                       fontSize: 15,
                       fontWeight: FontWeight.bold),
-                )),
+                ),),
               ],
             ),
           ),
@@ -459,6 +457,8 @@ class _DailyReportState extends State<DailyReport> {
           vendorNameList = vendorNameResponse.response;
           print('vendoreNAmeList=====>${vendorNameList.length}');
         });
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
   }
 
@@ -515,7 +515,12 @@ class _DailyReportState extends State<DailyReport> {
             },
             onSubmit: (String value) {
               setState(() {
-                vendoreContac.text =  vendorNameList[0].telf1;
+
+               /*int index = vendorNameList.indexWhere((item) =>  item.containsValue(value));
+                int index1 = vendorNameList.indexWhere((item) => item["name"] == value);*/
+                vendoreName.text = value;
+                vendoreContac.text ;
+                vendoreAddress.text ;
 
                 print("submitted\n ${value}");
               });
