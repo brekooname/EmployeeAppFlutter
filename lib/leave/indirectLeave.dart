@@ -368,12 +368,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
         Navigator.of(context).pop();
 
 
-      }else{
-        setState(() {
-          isLoading  = false;
-        });
-
-      }else{
+      } else{
 
         Utility().showToast(leaveResponse[0].msg);
         setState(() {

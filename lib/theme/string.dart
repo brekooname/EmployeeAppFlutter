@@ -89,7 +89,7 @@ var fromAddress = "From Address:- ";
 var toAddress = "To Address:- ";
 var distanceTravelled = "Distance Travelled:- ";
 var offlineLocalConveyance = "Offline Local Conveyance";
-var somethingWentWrong ="Something Went Wrong, Please try again";
+
 var enterTravelMode = "Please enter travel mode";
 var dataSavedOffline = "Your data saved in offline mode";
 
