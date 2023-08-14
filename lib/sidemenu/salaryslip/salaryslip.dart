@@ -64,7 +64,7 @@ class _SalarySlipState extends State<SalarySlip> {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
               Navigator.of(context).pop();
             }
@@ -177,11 +177,11 @@ class _SalarySlipState extends State<SalarySlip> {
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
-                ? Container(
+                ? const SizedBox(
               height: 30,
               width: 30,
               child:
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 color: AppColor.whiteColor,
               ),
             )
@@ -204,7 +204,7 @@ class _SalarySlipState extends State<SalarySlip> {
     } else if(monthSpinner == "Select Month"){
       Utility().showToast("Please select Month");
     }else{
-      _launchUrl('https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_1/employee_payslip.htm?id=${sapCode}&yr=${yearSpinner}&mo=${monthSpinner}');
+      _launchUrl('$salarySlipUrl?id=$sapCode&yr=$yearSpinner&mo=$monthSpinner');
 
     }
 
@@ -212,13 +212,6 @@ class _SalarySlipState extends State<SalarySlip> {
 
 
   Future<void> _launchUrl(String _url) async {
-    setState(() {
-      isLoading = true;
-    });
-    /*launchUrl(
-      Uri.parse(_url),
-      mode: LaunchMode.externalApplication,
-    );*/
     setState(() {
       isLoading = true;
     });

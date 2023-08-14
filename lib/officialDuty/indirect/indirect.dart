@@ -87,31 +87,31 @@ class InDirectState extends State<InDirect> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         detailWidget("Document No",widget.pendindOdList[index].odno),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget("Name",widget.pendindOdList[index].ename),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
                             datedetailWidget( "OD Start",widget.pendindOdList[index].odstdateC),
-                            SizedBox(
+                            const SizedBox(
                               width: 4,
                             ),
                             datedetailWidget( "OD End",widget.pendindOdList[index].odedateC),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget( "Visit Place",widget.pendindOdList[index].vplace),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget( "Visit Purpose",widget.pendindOdList[index].purpose1),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget( "No of Days",widget.pendindOdList[index].horo),
@@ -120,7 +120,7 @@ class InDirectState extends State<InDirect> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
 
                             child: InkWell(
                               onTap: (){
@@ -137,7 +137,7 @@ class InDirectState extends State<InDirect> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
                             child: InkWell(
                               onTap: (){
                                 selectedIndex = index;
@@ -180,86 +180,84 @@ class InDirectState extends State<InDirect> {
     return AlertDialog(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
-        content: Container(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(
-                appName,
-                style: const TextStyle(
-                    color: AppColor.themeColor,
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              status==0?reject:confirmation,
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              appName,
               style: const TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.w600,
-                  fontSize: 12),
+                  fontSize: 14),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Flexible(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // <-- Radius
-                      ), backgroundColor: AppColor.whiteColor,
-                    ),
-                    child: robotoTextWidget(
-                      textval: cancel,
-                      colorval: AppColor.darkGrey,
-                      sizeval: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            status==0?reject:confirmation,
+            style: const TextStyle(
+                color: AppColor.themeColor,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w600,
+                fontSize: 12),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
+                    ), backgroundColor: AppColor.whiteColor,
+                  ),
+                  child: robotoTextWidget(
+                    textval: cancel,
+                    colorval: AppColor.darkGrey,
+                    sizeval: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                Flexible(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      if (status == 0){
-                        rejectOD(odno);
-                      }else {
-                          confirmOD(odno);
-                        }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.themeColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // <-- Radius
-                      ),
-                    ),
-                    child: robotoTextWidget(
-                      textval: confirm,
-                      colorval: AppColor.whiteColor,
-                      sizeval: 14,
-                      fontWeight: FontWeight.w600,
+              ),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (status == 0){
+                      rejectOD(odno);
+                    }else {
+                        confirmOD(odno);
+                      }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.themeColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
                     ),
                   ),
+                  child: robotoTextWidget(
+                    textval: confirm,
+                    colorval: AppColor.whiteColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ],
-            )
-          ]),
-        ));
+              ),
+            ],
+          )
+        ]));
   }
 
   detailWidget(String title, String value) {
-    return Container(
+    return SizedBox(
       width:MediaQuery.of(context).size.width/1.1,
       height: 30,
       child: Row(
@@ -270,7 +268,7 @@ class InDirectState extends State<InDirect> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -315,7 +313,7 @@ class InDirectState extends State<InDirect> {
   }
 
   datedetailWidget(String title, String value) {
-    return Container(
+    return SizedBox(
       width:MediaQuery.of(context).size.width/2.2,
       height: 30,
       child: Row(
@@ -326,7 +324,7 @@ class InDirectState extends State<InDirect> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -341,21 +339,12 @@ class InDirectState extends State<InDirect> {
   }
 
   Future<void> confirmOD(String odno) async {
-
-
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-
     dynamic response = await HTTP.get(approveODAPI(odno,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()));
     if (response != null && response.statusCode == 200)  {
-
-      print("response======>${response.toString()}");
       Iterable l = convert.json.decode(response.body);
       List<OdApproveResponse> odResponse = List<OdApproveResponse>.from(l.map((model)=> OdApproveResponse.fromJson(model)));
-      print("response======>${odResponse[0].type}");
-
       if(odResponse[0].type.compareTo("S") == 0){
-
         Utility().showToast("OD Approved Successfully");
 
         Navigator.of(context).pop();
@@ -368,21 +357,12 @@ class InDirectState extends State<InDirect> {
   }
 
   Future<void> rejectOD(String odno) async {
-
-
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-
     dynamic response = await HTTP.get(rejectODAPI(odno,sharedPreferences.getString(userID) as String ,sharedPreferences.getString(password) as String ));
     if (response != null && response.statusCode == 200)  {
-
-      print("response======>${response.toString()}");
       Iterable l = convert.json.decode(response.body);
       List<OdRejectResponse> odResponse = List<OdRejectResponse>.from(l.map((model)=> OdRejectResponse.fromJson(model)));
-      print("response======>${odResponse[0].status}");
-
       if(odResponse[0].status.compareTo("true") == 0){
-
         Utility().showToast("OD Rejected Successfully");
 
         Navigator.of(context).pop();

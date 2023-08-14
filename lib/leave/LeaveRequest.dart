@@ -237,7 +237,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                       hintText: fromTO,
-                      hintStyle: const TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(color: AppColor.themeColor),
                       border: InputBorder.none),
                   style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
                   keyboardType: TextInputType.datetime,
@@ -261,11 +261,8 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         //DateTime.now() - not to allow to choose before today.
         lastDate:  DateTime(2050));
     if (pickedDate != null) {
-      print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
       String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
-      print(
-          formattedDate); //formatted date output using intl package =>  2021-03-16
-      setState(() {
+       setState(() {
         if (value == "0") {
           selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
           fromDateController.text = formattedDate;
@@ -327,8 +324,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                     ),
                   ),
                 )
-                .toList()
-            ,
+                .toList(),
         searchStyle: const TextStyle(
             fontSize: 12,
             color: AppColor.themeColor,
@@ -356,7 +352,6 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               } else if (perInCharge == "3") {
                 perInCharge4 = value;
               }
-
           });
         },
       ),
@@ -370,7 +365,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         },
         child: Container(
           height: 50,
-          margin: const EdgeInsets.symmetric(horizontal: 50),
+
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),

@@ -39,7 +39,7 @@ class _OficialDutyReportState extends State<OficialDutyReport> {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
               Navigator.of(context).pop();
             }

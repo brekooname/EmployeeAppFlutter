@@ -14,7 +14,6 @@ class LeaveReport extends StatefulWidget {
 }
 
 class _LeaveReportState extends State<LeaveReport> {
-
   final ScrollController _horizontal = ScrollController(),
       _vertical = ScrollController();
 
@@ -28,7 +27,7 @@ class _LeaveReportState extends State<LeaveReport> {
   Widget build(BuildContext context) {
     // TODO: implement build
 
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
@@ -56,7 +55,7 @@ class _LeaveReportState extends State<LeaveReport> {
             opacity: 0.3,
           ),
         ),
-        child:  _buildTable(context),
+        child: _buildTable(context),
       ),
     );
   }
@@ -64,8 +63,8 @@ class _LeaveReportState extends State<LeaveReport> {
   _buildTable(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height/1.13,
-      child:  Scrollbar(
+      height: MediaQuery.of(context).size.height / 1.13,
+      child: Scrollbar(
           controller: _vertical,
           thumbVisibility: true,
           trackVisibility: true,
@@ -82,8 +81,9 @@ class _LeaveReportState extends State<LeaveReport> {
                       child: DataTable(
                           columns: <DataColumn>[
                             DataColumn(
-                              label: Center( child: setTitle("Leave No")),
-                              numeric: false,),
+                              label: Center(child: setTitle("Leave No")),
+                              numeric: false,
+                            ),
                             DataColumn(
                                 label: Center(child: setTitle("Duration")),
                                 numeric: true),
@@ -107,28 +107,26 @@ class _LeaveReportState extends State<LeaveReport> {
                                 numeric: true),
                           ],
                           rows: widget.leaveEmpList
-                              .map((leaveEmpList) => DataRow(
-                            cells: [
-                              DataCell(
-                                  setValue(leaveEmpList.leavNo ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.horo ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.levFrm ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.levTo ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.levTyp ?? "")),
-
-                              DataCell(setValue(
-                                  leaveEmpList.reason ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.apphod ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.dele ?? "")),
-                            ],
-                          ),
-                          )
+                              .map(
+                                (leaveEmpList) => DataRow(
+                                  cells: [
+                                    DataCell(
+                                        setValue(leaveEmpList.leavNo ?? "")),
+                                    DataCell(setValue(leaveEmpList.horo ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.levFrm ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.levTo ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.levTyp ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.reason ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.apphod ?? "")),
+                                    DataCell(setValue(leaveEmpList.dele ?? "")),
+                                  ],
+                                ),
+                              )
                               .toList()))))),
     );
   }
@@ -148,6 +146,4 @@ class _LeaveReportState extends State<LeaveReport> {
         sizeval: 12,
         fontWeight: FontWeight.w600);
   }
-
-
 }

@@ -42,12 +42,12 @@ class _OfficialApprovedState extends State<OfficialApproved> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             backgroundColor: AppColor.themeColor,
-            title: robotoTextWidget(textval: "Official Duty Approve", colorval: AppColor.whiteColor,
+            title: const robotoTextWidget(textval: "Official Duty Approve", colorval: AppColor.whiteColor,
                 sizeval: 18, fontWeight: FontWeight.normal),
-            bottom:  TabBar(
+            bottom:  const TabBar(
               isScrollable: false,
               indicatorColor: AppColor.whiteColor,
-              indicatorPadding: const EdgeInsets.all(5),
+              indicatorPadding: EdgeInsets.all(5),
               tabs: [
                 Tab(child: robotoTextWidget(textval: 'Direct',
                     colorval: AppColor.whiteColor, sizeval: 14, fontWeight: FontWeight.normal)),
@@ -56,7 +56,7 @@ class _OfficialApprovedState extends State<OfficialApproved> {
             )
         ),
         body:  TabBarView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             // first tab bar view widget
             InDirect( Status: 'D', pendindOdList: directODList,),
@@ -69,7 +69,6 @@ class _OfficialApprovedState extends State<OfficialApproved> {
 
   void setArrary() {
     setState(() {
-
       for(var i =0 ; i < widget.pendindOdList.length ; i++ ){
         if(widget.pendindOdList[i].directIndirect == 'X'){
           directODList.add(Pendingod(odno: widget.pendindOdList[i].odno, horo:  widget.pendindOdList[i].horo, ename: widget.pendindOdList[i].ename, odstdateC: widget.pendindOdList[i].odstdateC, odedateC: widget.pendindOdList[i].odedateC, atnStatus:widget.pendindOdList[i].atnStatus, vplace: widget.pendindOdList[i].vplace, purpose1: widget.pendindOdList[i].purpose1, purpose2: widget.pendindOdList[i].purpose2, purpose3: widget.pendindOdList[i].purpose3, remark: widget.pendindOdList[i].remark, directIndirect: widget.pendindOdList[i].directIndirect));
@@ -78,10 +77,6 @@ class _OfficialApprovedState extends State<OfficialApproved> {
         }
       }
     });
-
-    print("odList====>${widget.pendindOdList.length}");
-    print("odList2 D====>${directODList.length}");
-    print("odList3 ID====>${inDirectODList.length}");
   }
 
 

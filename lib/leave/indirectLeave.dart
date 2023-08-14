@@ -80,7 +80,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
           child: Container(
               width: 400,
               color: AppColor.whiteColor,
-              padding: const EdgeInsets.all(5),
+              padding:  const EdgeInsets.all(5),
               child: Stack(children: <Widget>[
                 Row(
                   children: [
@@ -88,31 +88,31 @@ class InDirectLeaveState extends State<InDirectLeave> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         detailWidget("Leave No", widget.pendindLeaveList[index].leavNo.toString()),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget("Name",widget.pendindLeaveList[index].name),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget("Leave Type",widget.pendindLeaveList[index].horo + widget.pendindLeaveList[index].dedQuta1),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
                             datedetailWidget( "Leave From", widget.pendindLeaveList[index].levFr),
-                            SizedBox(
+                            const SizedBox(
                               width: 4,
                             ),
                             datedetailWidget( "Leave To",widget.pendindLeaveList[index].levT),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
                         detailWidget( "Visit Place",widget.pendindLeaveList[index].reason),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
 
@@ -120,7 +120,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
 
                             child: InkWell(
                               onTap: (){
@@ -136,7 +136,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
                             child: InkWell(
                               onTap: (){
                                 selectedIndex = index;
@@ -169,7 +169,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
           height: 32,
         ),
         const SizedBox(width: 5,),
-        robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
+          robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
       ],
     );
   }
@@ -218,7 +218,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                       borderRadius: BorderRadius.circular(12), // <-- Radius
                     ), backgroundColor: AppColor.whiteColor,
                   ),
-                  child: robotoTextWidget(
+                  child:   robotoTextWidget(
                     textval: cancel,
                     colorval: AppColor.darkGrey,
                     sizeval: 14,
@@ -226,10 +226,9 @@ class InDirectLeaveState extends State<InDirectLeave> {
                   ),
                 ),
               ),
-              Flexible(
+             Flexible(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
                     if (i == 0){
                       rejectLeave(leaveNo);
                     }else {
@@ -242,7 +241,14 @@ class InDirectLeaveState extends State<InDirectLeave> {
                       borderRadius: BorderRadius.circular(12), // <-- Radius
                     ),
                   ),
-                  child: robotoTextWidget(
+                  child:isLoading
+                      ? const SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: CircularProgressIndicator(
+                      color: AppColor.whiteColor,
+                    ),
+                  ): robotoTextWidget(
                     textval: confirm,
                     colorval: AppColor.whiteColor,
                     sizeval: 14,
@@ -267,7 +273,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -323,7 +329,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -356,9 +362,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
       if(leaveResponse[0].type.compareTo("S") == 0){
 
-        setState(() {
-          isLoading  = false;
-        });
+
         Utility().showToast("Leave Approved Successfully");
 
         Navigator.of(context).pop();
@@ -368,7 +372,13 @@ class InDirectLeaveState extends State<InDirectLeave> {
         setState(() {
           isLoading  = false;
         });
+
+      }else{
+
         Utility().showToast(leaveResponse[0].msg);
+        setState(() {
+          isLoading  = false;
+        });
       }
     }
 
@@ -376,28 +386,29 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
   Future<void> rejectLeave(int leaveNo) async {
 
+    setState(() {
+      isLoading  = true;
+    });
+
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
     dynamic response = await HTTP.get(rejectLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString() ,sharedPreferences.getString(password).toString() ));
     if (response != null && response.statusCode == 200)  {
-
-      print("response======>${response.toString()}");
-      Iterable l = convert.json.decode(response.body);
-      List<LeaveRejectResponse> leaveResponse = List<LeaveRejectResponse>.from(l.map((model)=> LeaveRejectResponse.fromJson(model)));
-      print("response======>${leaveResponse[0].status}");
-
-      if(leaveResponse[0].status.compareTo("true") == 0){
-
+      var jsonData = convert.jsonDecode(response.body);
+      LeaveRejectResponse leaveResponse = LeaveRejectResponse.fromJson(jsonData);
+      if(leaveResponse.status.compareTo("true") == 0){
         Utility().showToast("Leave Rejected Successfully");
 
         Navigator.of(context).pop();
 
       }else{
-        Utility().showToast(leaveResponse[0].message);
+        setState(() {
+          isLoading  = false;
+        });
+
+        Utility().showToast(leaveResponse.message);
       }
     }
-
   }
 
 }

@@ -33,12 +33,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   TextEditingController purpose3 = TextEditingController();
   TextEditingController purpose4 = TextEditingController();
   TextEditingController remark = TextEditingController();
+  DateTime? pickedDate;
+  TextEditingController fromDateController = TextEditingController();
+  TextEditingController toDateController = TextEditingController();
+  String?  selectedAssginTo;
+  String?  dutyTypeSpinner, workPlaceSpinner,selectedFromDate, selectedToDate;
 
-  DateTime selectedDate = DateTime.now();
-  DateTime datefrom = DateTime.now(), dateto = DateTime.now();
-  String ? indianFromDate,indianToDate ,selectedAssginTo;
-
-  String dutyTypeSpinner = 'On Duty';
+  String  dateTimeFormat ="dd/MM/yyyy";
 
   var dutyTypeList = [
     'On Duty',
@@ -82,9 +83,14 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   void initState() {
     // TODO: implement initState
     super.initState();
+    setState(() {
+      selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
+      selectedToDate = DateFormat(dateTimeFormat).format(DateTime.now());
+      fromDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
+      toDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
 
-    indianFromDate =  DateFormat("dd/MM/yyyy").format(DateTime.now());
-    indianToDate =  DateFormat("dd/MM/yyyy").format(DateTime.now());
+    });
+
   }
 
   @override
@@ -101,7 +107,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
               Navigator.of(context).pop();
             }
@@ -110,20 +116,27 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
       ),
       body: Container(
+        padding: const EdgeInsets.only(top: 20,left: 10, right: 10),
         height: double.infinity,
         width: double.infinity,
 
         child: SingleChildScrollView(
           child: Column(
             children: [
-
               dutyTypeSpinnerWidget(),
               const SizedBox(height: 10,),
-              datePickerWidget("OD From",indianFromDate.toString()),
-              const SizedBox(height: 10,),
-              datePickerWidget("OD To",indianToDate.toString()),
-              textFeildWidget( "Visit Place", visitPlace),
               WorkPlaceSpinnerWidget(),
+              const SizedBox(height: 10,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  datePickerWidget(
+                      selectedFromDate!, fromDateController, "0"),
+                  datePickerWidget(
+                      selectedToDate!, toDateController, "1")
+                ],
+              ),
+              textFeildWidget( "Visit Place", visitPlace),
               textFeildWidget( "Purpose 1", purpose1),
               textFeildWidget("Purpose 2", purpose2),
               textFeildWidget( "Purpose 3", purpose3),
@@ -141,7 +154,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   Widget assginToSpinnerWidget(BuildContext context, List<Activeemployee> activeemployee) {
     return  Container(
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
       padding: const EdgeInsets.only(left: 3),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
@@ -161,16 +174,15 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         ).toList(),
         searchInputDecoration: const InputDecoration(
           hintText: "Assign Charge To",
-          hintStyle: TextStyle(color: AppColor.themeColor, fontWeight: FontWeight.normal),
-          prefixIcon: Icon(Icons.person, color: AppColor.themeColor,),
+          hintStyle: TextStyle(color: AppColor.themeColor, fontSize: 12, fontWeight: FontWeight.normal),
+          prefixIcon: Icon(Icons.person,   size: 20, color: AppColor.themeColor,),
           border: InputBorder.none,
         ),
         onSubmit: (String value) {
           setState(() {
             selectedAssginTo = value.toString();
           });
-
-          print("submitted\n ${value}"); },
+          },
       ),
 
     );
@@ -183,19 +195,18 @@ class _OfficialRequestState extends State<OfficialRequest>  {
           Validation();
         },
         child: Container(
+
           height: 50,
-          margin: const EdgeInsets.symmetric(
-              horizontal: 50),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
-                ? Container(
+                ? const SizedBox(
               height: 30,
               width: 30,
               child:
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 color: AppColor.whiteColor,
               ),
             )
@@ -208,118 +219,156 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         ));
   }
 
-
-
   dutyTypeSpinnerWidget() {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
-      ),
-      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
-      child:   Center(
-        child: DropdownButton(
-          // Initial Value
-          underline: const SizedBox(height: 0,),
+    return SizedBox(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: 'Select OD Type',
+              fillColor: Colors.white),
           value: dutyTypeSpinner,
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            color: AppColor.themeColor, // <-- SEE HERE
-          ),
-          // Array list of items
-          items: dutyTypeList.map((String items) {
-            return DropdownMenuItem(
-              value: items,
-              child: Center(child: robotoTextWidget(textval: items, colorval: AppColor.themeColor, sizeval: 18, fontWeight: FontWeight.w400)),
-            );
-          }).toList(),
-          // After selecting the desired option,it will
-          // change button value to selected value
-          onChanged: (String? newValue) {
+          validator: (value) =>
+          value == null || value.isEmpty ? 'Please Select OD Type' : "",
+          items: dutyTypeList
+              .map((dayType) => DropdownMenuItem(
+              value: dayType,
+              child: robotoTextWidget(
+                  textval: dayType,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold)))
+              .toList(),
+          onChanged: (Object? value) {
             setState(() {
-              dutyTypeSpinner = newValue!;
+              dutyTypeSpinner = value.toString();
             });
           },
-        ),
-      ),);
+        ));
   }
 
-  datePickerWidget( String text, String date) {
+  WorkPlaceSpinnerWidget()  {
     return SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height/20,
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.whiteColor,
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
               ),
-              onPressed: () => _selectDate(context,text),
-              child:  robotoTextWidget(textval: text, colorval: AppColor.themeColor, sizeval: 15, fontWeight: FontWeight.w400),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: 'Select Work Place',
+              fillColor: Colors.white),
+          value: workPlaceSpinner,
+          validator: (value) =>
+          value == null || value.isEmpty ? 'Please Select Work Place' : "",
+          items: workplaceList
+              .map((dayType) => DropdownMenuItem(
+              value: dayType,
+              child: robotoTextWidget(
+                  textval: dayType,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold)))
+              .toList(),
+          onChanged: (Object? value) {
+            setState(() {
+              workPlaceSpinner = value.toString();
+            });
+          },
+        ));
+  }
+
+  datePickerWidget(
+      String fromTO, TextEditingController DateController, String value) {
+    return GestureDetector(
+      onTap: () {
+        _selectDate(context, value);
+      },
+      child: Container(
+        height: 50,
+        width: MediaQuery.of(context).size.width / 2.2,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColor.themeColor,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.calendar_month,
+              color: AppColor.themeColor,
             ),
-            const SizedBox(height: 15.0,),
-            robotoTextWidget(textval: date.toString(), colorval: AppColor.themeColor, sizeval: 20, fontWeight: FontWeight.normal)
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child: TextField(
+                  controller: DateController,
+                  maxLines: 1,
+                  showCursor: false,
+                  enabled: false,
+                  textAlign: TextAlign.center,
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
+                      hintText: fromTO,
+                      hintStyle: const TextStyle(color: AppColor.themeColor),
+                      border: InputBorder.none),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
+                  keyboardType: TextInputType.datetime,
+                  textInputAction: TextInputAction.done,
+                ))
           ],
         ),
       ),
-
     );
   }
 
-  Future<void> _selectDate(BuildContext context, String text) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectDate(BuildContext context, String value) async {
+    pickedDate = await showDatePicker(
         context: context,
-        builder: (BuildContext context, Widget ?child) {
-          return Theme(
-            data: ThemeData(
-              splashColor: Colors.black,
-              textTheme: const TextTheme(
-                titleSmall: TextStyle(color: Colors.black),
-                bodySmall: TextStyle(color: Colors.black),
-              ),
-              dialogBackgroundColor: Colors.white, colorScheme: const ColorScheme.light(
-                primary: Color(0xff1565C0),
-                primaryContainer: Colors.black,
-                secondaryContainer: Colors.black,
-                onSecondary: Colors.black,
-                onPrimary: Colors.white,
-                surface: Colors.black,
-                onSurface: Colors.black,
-                secondary: Colors.black).copyWith(primaryContainer: Colors.grey, secondary: Colors.black),
-            ),
-            child: child ??const Text(""),
-          );
-        },
-        initialDate: selectedDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2026));
-    if (picked != null && picked != selectedDate) {
+        initialDate: DateTime.now(),
+        firstDate: value == "0"
+            ? DateTime.now()
+            : selectedFromDate != DateFormat(dateTimeFormat).format(DateTime.now())
+            ? DateTime(2023)
+            : DateTime.now(),
+        //DateTime.now() - not to allow to choose before today.
+        lastDate:  DateTime(2050));
+    if (pickedDate != null) {
+      String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
       setState(() {
-
-        if(text == "OD From"){
-          datefrom = picked;
-          indianFromDate =  DateFormat("dd/MM/yyyy").format(picked);
-          print("indianDate===> ${indianFromDate}");
-        }else if(text == "OD To"){
-          dateto = picked;
-          indianToDate =  DateFormat("dd/MM/yyyy").format(picked);
-          print("indianDate===> ${indianToDate}");
+        if (value == "0") {
+          selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
+          fromDateController.text = formattedDate;
+        } else {
+          selectedToDate = DateFormat(dateTimeFormat).format(pickedDate!);
+          toDateController.text = formattedDate;
         }
-
-        print("indianDate1===> ${datefrom}");
-        print("indianDate2===> ${dateto}");
       });
     }
   }
 
   textFeildWidget(String hinttxt, TextEditingController visitPlace) {
     return  Container(
-      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.only(left: 15),
+      margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -329,14 +378,10 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         controller: visitPlace,
         style: const TextStyle(color: AppColor.themeColor),
         decoration:  InputDecoration(
-          prefixIcon: const Icon(
-            Icons.person,
-            color: AppColor.themeColor,
-          ),
           border: InputBorder.none,
           hintText: hinttxt,
           hintStyle:
-          const TextStyle(color: AppColor.themeColor),
+          const TextStyle(color: AppColor.themeColor, fontSize: 12),
         ),
         keyboardType: TextInputType.text,
 
@@ -344,96 +389,27 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     );
   }
 
-  personInCharge() {
-    return Container(
-      margin: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
-      ),
-      child:  TextField(
-        controller: visitPlace,
-        style: const TextStyle(color: AppColor.themeColor),
-        decoration:  const InputDecoration(
-          prefixIcon: Icon(
-            Icons.person,
-            color: AppColor.themeColor,
-          ),
-          border: InputBorder.none,
-          hintText: "Charge Given To",
-          hintStyle:
-          TextStyle(color: AppColor.themeColor),
-        ),
-        keyboardType: TextInputType.text,
-
-      ),
-    );
-  }
-
-  WorkPlaceSpinnerWidget()  {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
-      ),
-      margin: const EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
-      child:   Center(
-        child: DropdownButton(
-          // Initial Value
-          underline: const SizedBox(height: 0,),
-          value: workPlace,
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            color: AppColor.themeColor, // <-- SEE HERE
-          ),
-          // Array list of items
-          items: workplaceList.map((String items) {
-            return DropdownMenuItem(
-              value: items,
-              child: Center(child: robotoTextWidget(textval: items, colorval: AppColor.themeColor, sizeval: 15, fontWeight: FontWeight.w400)),
-            );
-          }).toList(),
-          // After selecting the desired option,it will
-          // change button value to selected value
-          onChanged: (String? newValue) {
-            setState(() {
-              workPlace = newValue!;
-            });
-          },
-        ),
-      ),);
-  }
 
   void Validation() {
-    //Validation
+    dutyTypeSpinner ??= "";
+    workPlaceSpinner ??= "";
 
-    if(visitPlace.text.toString().isEmpty ) {
-      Utility().showToast("Please enter visit Place");
-    }else if(dateto.compareTo(datefrom) < 0){
-      Utility().showToast("To date can not be smaller then From date");
-    }if(workPlace ==  "Select Work Place") {
+    if(workPlaceSpinner!.isEmpty ) {
+      Utility().showToast("Please select Work Place");
+    }
+    if (fromDateController.text.toString().isEmpty) {
+      Utility().showToast("Please select leave from date");
+    }  else if(dutyTypeSpinner!.isEmpty) {
+        Utility().showToast("Please select OD type");
+      }else if (toDateController.text.toString().isEmpty) {
+      Utility().showToast("Please select leave to date");
+    }else if(workPlaceSpinner ==  "Select Work Place") {
       Utility().showToast("Please select Department");
     }else  if(purpose1.text.toString().isEmpty){
       Utility().showToast("Please enter Purpose");
-    }else  if(remark.text.toString().isEmpty){
+    } else  if(remark.text.toString().isEmpty){
       Utility().showToast("Please enter Remark");
     } else {
-      setState(() {
-        print("Duty Type ${dutyTypeSpinner.toString()}");
-        print("OD Date ${indianFromDate.toString()}");
-        print("OD to Date ${indianToDate.toString()}");
-        print("visitPlace ${visitPlace.text.toString()}");
-        print("workPlace ${workPlace.toString()}");
-        print("purpose1 ${purpose1.text.toString()}");
-        print("purpose2 ${purpose2.text.toString()}");
-        print("remark ${remark.text.toString()}");
-        print("personInChanger ${remark.text.toString()}");
-      });
-
       createOD();
     }
   }
@@ -444,22 +420,18 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
     String? sapcode = sharedPreferences.getString(userID).toString() ;
 
-    dynamic response = await HTTP.get(createODAPI(sapcode!,dutyTypeSpinner.toString(),indianFromDate.toString(),indianToDate.toString(),visitPlace.text.toString(),workPlace.toString(),purpose1.text.toString(),purpose2.text.toString(),purpose3.text.toString(),remark.text.toString(),selectedAssginTo.toString()));
-    if (response != null && response.statusCode == 200)  {
+    dynamic response = await HTTP.get(createODAPI(sapcode!,dutyTypeSpinner.toString(),fromDateController.text.toString(),toDateController.text.toString(),visitPlace.text.toString(),workPlaceSpinner.toString(),purpose1.text.toString(),purpose2.text.toString(),purpose3.text.toString(),remark.text.toString(),selectedAssginTo.toString()));
+    if (response != null && response.statusCode == 200){
+      var jsonData = convert.jsonDecode(response.body);
+      OdResponse odResponse = OdResponse.fromJson(jsonData);
 
-      print("response======>${response.toString()}");
-      Iterable l = convert.json.decode(response.body);
-      List<OdResponse> odResponse = List<OdResponse>.from(l.map((model)=> OdResponse.fromJson(model)));
-      print("response======>${odResponse[0].name}");
-
-      if(odResponse[0].name.compareTo("SAPLSPO1") == 0){
-
+      if(odResponse.name.compareTo("SAPLSPO1") == 0){
         Utility().showToast("OD Created Successfully");
 
         Navigator.of(context).pop();
 
       }else{
-        Utility().showToast(odResponse[0].name);
+        Utility().showToast(odResponse.name);
       }
     }
   }
