@@ -6,9 +6,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/DailyReport/image_view_widget.dart';
+import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
+    as vendorGatePassPrefix;
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Util/utility.dart';
 import '../theme/string.dart';
@@ -18,14 +21,15 @@ import 'model/vendornamelistresponse.dart' as VenderList;
 import 'model/vendornamelistresponse.dart';
 
 class DailyReport extends StatefulWidget {
-  const DailyReport({Key? key}) : super(key: key);
+  DailyReport({Key? key, required this.vendorGatePassLists}) : super(key: key);
+  List<vendorGatePassPrefix.Response> vendorGatePassLists = [];
 
   @override
   State<DailyReport> createState() => _DailyReportState();
 }
 
 class _DailyReportState extends State<DailyReport> {
-  String? _selectedType, selectVisit, selectStatus;
+  String? _selectedType, selectVisit, selectStatus, selectedGatePass;
   String TypeSpinner = 'Select Visit At ', statusType = "Select Status";
 
   var TypeList = [
@@ -59,8 +63,9 @@ class _DailyReportState extends State<DailyReport> {
   DateTime? pickedDate;
   List<ImageModel> imageList = [];
   var imageFile;
-  int? selectedIndex,selectedPassIndex;
-  bool isChecked = false;
+  int? selectedIndex, selectedPassIndex;
+  bool isChecked = false, isGatePassListShown = false, isLoading = false;
+  late SharedPreferences sharedPreferences;
 
   getAllImageData() async {
     imageList.add(
@@ -94,8 +99,8 @@ class _DailyReportState extends State<DailyReport> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: const robotoTextWidget(
-            textval: "Daily Report",
+        title: robotoTextWidget(
+            textval: dailyReport,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
@@ -115,25 +120,28 @@ class _DailyReportState extends State<DailyReport> {
           width: MediaQuery.of(context).size.width,
           child: Column(
             children: [
-              radtiobuttonWidget(),
+              radiobuttonWidget(),
               textVendorFeildWidget(
                 "Vendor Name",
               ),
-              textFeildWidget("Vendor Code", vendoreCode),
-              textFeildWidget("Vendor Address", vendoreAddress),
-              textFeildWidget("Vendor Contact N0", vendoreContac),
-              dateTextFeildWidget("Current Date",
+              textFieldWidget("Vendor Code", vendoreCode),
+              textFieldWidget("Vendor Address", vendoreAddress),
+              textFieldWidget("Vendor Contact N0", vendoreContac),
+              dateTextFieldWidget("Current Date",
                   DateFormat("dd-MM-yyyy").format(DateTime.now())),
-              TypeSpinnerWidget(),
-              textFeildWidget("Responsible person", person1),
-              textFeildWidget("Responsible person 2", person2),
-              textFeildWidget("Responsible person 3", person3),
-              longTextFeildWidget("Agenda", agenda),
-              longTextFeildWidget("Discussion", discussion),
+              visitAtSpinnerWidget(),
+              textFieldWidget("Responsible person", person1),
+              textFieldWidget("Responsible person 2", person2),
+              textFieldWidget("Responsible person 3", person3),
+              longTextFieldWidget("Agenda", agenda),
+              longTextFieldWidget("Discussion", discussion),
               datePickerWidget(selectedFromDate!, fromDateController, "0"),
               statusSpinnerWidget(),
               imageList.isNotEmpty ? imageListWidget() : Container(),
-              imageList.isNotEmpty ? gatePassListWidget() : Container(),
+              widget.vendorGatePassLists.isNotEmpty && isGatePassListShown
+                  ? gatePassListWidget()
+                  : Container(),
+              submitDailyReportWidget(),
             ],
           ),
         ),
@@ -141,45 +149,7 @@ class _DailyReportState extends State<DailyReport> {
     );
   }
 
-  textFeildWidget(String hinttxt, TextEditingController visitPlace) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(left: 15),
-            child: robotoTextWidget(
-                textval: hinttxt,
-                colorval: Colors.black45,
-                sizeval: 12,
-                fontWeight: FontWeight.bold)),
-        Container(
-          padding: const EdgeInsets.only(left: 15),
-          margin:
-              const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColor.themeColor),
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-          ),
-          child: TextField(
-            controller: visitPlace,
-            style: const TextStyle(color: AppColor.themeColor),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: "Please Enter " + hinttxt,
-              hintStyle: const TextStyle(
-                  color: AppColor.themeColor,
-                  fontSize: 13,
-                  fontWeight: FontWeight.normal),
-            ),
-            keyboardType: TextInputType.text,
-          ),
-        ),
-      ],
-    );
-  }
-
-  radtiobuttonWidget() {
+  radiobuttonWidget() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,42 +208,126 @@ class _DailyReportState extends State<DailyReport> {
     );
   }
 
-  TypeSpinnerWidget() {
-    return Container(
-        margin: const EdgeInsets.all(10),
-        height: 55,
-        width: MediaQuery.of(context).size.width,
-        child: DropdownButtonFormField(
-          isExpanded: true,
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.themeColor),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10.0),
-                ),
+  textVendorFeildWidget(String hinttxt) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.only(left: 15),
+            child: Text(
+              hinttxt,
+              style: const TextStyle(
+                  color: Colors.black45, fontWeight: FontWeight.bold),
+            )),
+        Container(
+          margin:
+              const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
+          padding: const EdgeInsets.only(left: 15),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColor.themeColor),
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+          ),
+          child: SearchField<List<VenderList.Response>>(
+            suggestions: vendorNameList
+                .map(
+                  (vendornamelist) =>
+                      SearchFieldListItem<List<VenderList.Response>>(
+                    vendornamelist.name1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        vendornamelist.name1,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 13,
+                            color: AppColor.themeColor),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+            searchInputDecoration: InputDecoration(
+              hintText: "Search by " + hinttxt,
+              hintStyle: const TextStyle(
+                fontSize: 13,
+                color: AppColor.themeColor,
               ),
-              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select visit type',
-              fillColor: Colors.white),
-          value: selectVisit,
-          validator: (value) =>
-              value == null || value.isEmpty ? 'Please Select visit type' : "",
-          items: TypeList.map((leaveType) => DropdownMenuItem(
-              value: leaveType,
-              child: robotoTextWidget(
-                  textval: leaveType,
-                  colorval: AppColor.themeColor,
-                  sizeval: 12,
-                  fontWeight: FontWeight.bold))).toList(),
-          onChanged: (Object? value) {
-            setState(() {
-              selectVisit = value.toString();
-            });
-          },
-        ));
+              border: InputBorder.none,
+            ),
+            onSearchTextChanged: (serachValue) {
+              if (serachValue.length > 2) {
+                vendorNameListAPI(serachValue);
+              }
+              return null;
+            },
+            onSubmit: (String value) {
+              setState(() {
+                vendoreContac.text = vendorNameList[0].telf1;
+              });
+            },
+          ),
+        )
+      ],
+    );
   }
 
-  dateTextFeildWidget(String title, String date) {
+  visitAtSpinnerWidget() {
+    return Container(
+      child: Column(
+        children: [
+          Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(left: 15),
+              child: robotoTextWidget(
+                  textval: visitAt,
+                  colorval: Colors.black45,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold)),
+          Container(
+              margin: const EdgeInsets.all(10),
+              height: 55,
+              width: MediaQuery.of(context).size.width,
+              child: DropdownButtonFormField(
+                isExpanded: true,
+                decoration: InputDecoration(
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(color: AppColor.themeColor),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10.0),
+                      ),
+                    ),
+                    hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+                    hintText: 'Select visit type',
+                    fillColor: Colors.white),
+                value: selectVisit,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Please Select visit type'
+                    : "",
+                items: TypeList.map((leaveType) => DropdownMenuItem(
+                    value: leaveType,
+                    child: robotoTextWidget(
+                        textval: leaveType,
+                        colorval: AppColor.themeColor,
+                        sizeval: 12,
+                        fontWeight: FontWeight.bold))).toList(),
+                onChanged: (Object? value) {
+                  setState(() {
+                    if (value.toString() == "Shakti H.O") {
+                      isGatePassListShown = true;
+                    } else {
+                      isGatePassListShown = false;
+                    }
+                    selectVisit = value.toString();
+                  });
+                },
+              ))
+        ],
+      ),
+    );
+  }
+
+  dateTextFieldWidget(String title, String date) {
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       Container(
           alignment: Alignment.centerLeft,
@@ -306,7 +360,85 @@ class _DailyReportState extends State<DailyReport> {
     ]);
   }
 
-  longTextFeildWidget(String title, TextEditingController longtext) {
+  Future<void> _selectDate(BuildContext context, String value) async {
+    pickedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: value == "0"
+            ? DateTime.now()
+            : selectedFromDate !=
+                    DateFormat(dateTimeFormat).format(DateTime.now())
+                ? DateTime(2023)
+                : DateTime.now(),
+        //DateTime.now() - not to allow to choose before today.
+        lastDate: DateTime(2050));
+    if (pickedDate != null) {
+      String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
+      setState(() {
+        if (value == "0") {
+          selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
+          fromDateController.text = formattedDate;
+        }
+      });
+    }
+  }
+
+  Future<void> vendorNameListAPI(String value) async {
+    var jsonData = null;
+    dynamic response = await HTTP.get(vendorNameAPI(value));
+    if (response != null && response.statusCode == 200) {
+      jsonData = convert.jsonDecode(response.body);
+      VendorNameResponse vendorNameResponse =
+          VendorNameResponse.fromJson(jsonData);
+      if (vendorNameResponse.status == "true" &&
+          vendorNameResponse.response.isNotEmpty)
+        setState(() {
+          vendorNameList = vendorNameResponse.response;
+        });
+    } else {
+      Utility().showToast(somethingWentWrong);
+    }
+  }
+
+  textFieldWidget(String hinttxt, TextEditingController visitPlace) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.only(left: 15),
+            child: robotoTextWidget(
+                textval: hinttxt,
+                colorval: Colors.black45,
+                sizeval: 12,
+                fontWeight: FontWeight.bold)),
+        Container(
+          padding: const EdgeInsets.only(left: 15),
+          margin:
+              const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColor.themeColor),
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+          ),
+          child: TextField(
+            controller: visitPlace,
+            style: const TextStyle(color: AppColor.themeColor),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "Please Enter " + hinttxt,
+              hintStyle: const TextStyle(
+                  color: AppColor.themeColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal),
+            ),
+            keyboardType: TextInputType.text,
+          ),
+        ),
+      ],
+    );
+  }
+
+  longTextFieldWidget(String title, TextEditingController longtext) {
     return Column(
       children: [
         Container(
@@ -473,139 +605,52 @@ class _DailyReportState extends State<DailyReport> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context, String value) async {
-    pickedDate = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: value == "0"
-            ? DateTime.now()
-            : selectedFromDate !=
-                    DateFormat(dateTimeFormat).format(DateTime.now())
-                ? DateTime(2023)
-                : DateTime.now(),
-        //DateTime.now() - not to allow to choose before today.
-        lastDate: DateTime(2050));
-    if (pickedDate != null) {
-      String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
-      setState(() {
-        if (value == "0") {
-          selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
-          fromDateController.text = formattedDate;
-        }
-      });
-    }
-  }
-
-  Future<void> vendorNameListAPI(String value) async {
-    var jsonData = null;
-    dynamic response = await HTTP.get(vendorNameAPI(value));
-    if (response != null && response.statusCode == 200) {
-      jsonData = convert.jsonDecode(response.body);
-      VendorNameResponse vendorNameResponse =
-          VendorNameResponse.fromJson(jsonData);
-      if (vendorNameResponse.status == "true" &&
-          vendorNameResponse.response.isNotEmpty)
-        setState(() {
-          vendorNameList = vendorNameResponse.response;
-        });
-    } else {
-      Utility().showToast(somethingWentWrong);
-    }
-  }
-
-  textVendorFeildWidget(String hinttxt) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(left: 15),
-            child: Text(
-              hinttxt,
-              style: const TextStyle(
-                  color: Colors.black45, fontWeight: FontWeight.bold),
-            )),
-        Container(
-          margin:
-              const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
-          padding: const EdgeInsets.only(left: 15),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColor.themeColor),
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-          ),
-          child: SearchField<List<VenderList.Response>>(
-            suggestions: vendorNameList
-                .map(
-                  (vendornamelist) =>
-                      SearchFieldListItem<List<VenderList.Response>>(
-                    vendornamelist.name1,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        vendornamelist.name1,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 13,
-                            color: AppColor.themeColor),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(),
-            searchInputDecoration: InputDecoration(
-              hintText: "Search by " + hinttxt,
-              hintStyle: const TextStyle(
-                fontSize: 13,
-                color: AppColor.themeColor,
-              ),
-              border: InputBorder.none,
-            ),
-            onSearchTextChanged: (serachValue) {
-              if (serachValue.length > 2) {
-                vendorNameListAPI(serachValue);
-              }
-              return null;
-            },
-            onSubmit: (String value) {
-              setState(() {
-                vendoreContac.text = vendorNameList[0].telf1;
-              });
-            },
-          ),
-        )
-      ],
-    );
-  }
-
   imageListWidget() {
     return Container(
         margin: const EdgeInsets.all(10),
-        child:Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          robotoTextWidget(textval: 'Click meeting with vendor images', colorval: Colors.black45,
-              sizeval: 12, fontWeight: FontWeight.bold),
-          SizedBox(height: 10,),
-          ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: imageList.length,
-              itemBuilder: (context, position) {
-                return listItem(imageList[position], position);
-              })
-        ],));
+            robotoTextWidget(
+                textval: vendorMeetingImage,
+                colorval: Colors.black45,
+                sizeval: 12,
+                fontWeight: FontWeight.bold),
+            const SizedBox(
+              height: 10,
+            ),
+            ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: imageList.length,
+                itemBuilder: (context, position) {
+                  return listItem(imageList[position], position);
+                })
+          ],
+        ));
   }
 
   gatePassListWidget() {
     return Container(
         margin: const EdgeInsets.all(10),
-        child: ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: imageList.length,
-            itemBuilder: (context, position) {
-              return gatePasslistItem(imageList[position], position);
-            }));
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          robotoTextWidget(
+              textval: vendorGatePass,
+              colorval: Colors.black45,
+              sizeval: 12,
+              fontWeight: FontWeight.bold),
+          const SizedBox(
+            height: 10,
+          ),
+          ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: widget.vendorGatePassLists.length,
+              itemBuilder: (context, position) {
+                return gatePasslistItem(
+                    widget.vendorGatePassLists[position], position);
+              })
+        ]));
   }
 
   listItem(ImageModel imageList, int position) {
@@ -645,7 +690,8 @@ class _DailyReportState extends State<DailyReport> {
     );
   }
 
-  gatePasslistItem(ImageModel imageList, int position) {
+  gatePasslistItem(
+      vendorGatePassPrefix.Response vendorGatePassList, int position) {
     return Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
@@ -653,24 +699,41 @@ class _DailyReportState extends State<DailyReport> {
         elevation: 10,
         child: Padding(
           padding: const EdgeInsets.all(10),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                robotoTextWidget(
-                    textval: imageList.imageName,
-                    colorval: AppColor.blackColor,
-                    sizeval: 12,
-                    fontWeight: FontWeight.bold),
-                   Checkbox(value: selectedPassIndex==position?isChecked:false, onChanged: (bool?value){
-                     setState(() {
-                       selectedPassIndex = position;
-                       isChecked = true;
-                     });
-                   },activeColor: Colors.blue, // Change the color of the checkbox when it is checked
-                       checkColor: Colors.white,) // Change the color of the checkmark inside the checkbox)
-              ]),
+          child: Row(children: [
+            Checkbox(
+              value: selectedPassIndex == position ? isChecked : false,
+              onChanged: (bool? value) {
+                setState(() {
+                  selectedPassIndex = position;
+                  isChecked = true;
+                });
+              },
+              activeColor: Colors.blue,
+              // Change the color of the checkbox when it is checked
+              checkColor: Colors.white,
+            ),
+            Container(
+              child: Column(
+                children: [
+                  vendorGatePassList.lifnr.isNotEmpty
+                      ? robotoTextWidget(
+                          textval: vendorGatePassList.lifnr,
+                          colorval: AppColor.blackColor,
+                          sizeval: 12,
+                          fontWeight: FontWeight.bold)
+                      : const SizedBox(
+                          height: 1,
+                        ),
+                  robotoTextWidget(
+                      textval: vendorGatePassList.name1,
+                      colorval: AppColor.blackColor,
+                      sizeval: 12,
+                      fontWeight: FontWeight.bold),
+                ],
+              ),
+            ), // Change the color of the checkmark inside the checkbox)
+          ]),
         ));
-
   }
 
   void selectImage(BuildContext context, String value) {
@@ -770,5 +833,33 @@ class _DailyReportState extends State<DailyReport> {
     } else {
       print("You have not taken image");
     }
+  }
+
+  submitDailyReportWidget() {
+    return GestureDetector(
+        onTap: () {
+          // signIn();
+        },
+        child: Container(
+            height: 50,
+             margin: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: AppColor.themeColor),
+            child: Center(
+              child: isLoading
+                  ? const SizedBox(
+                      height: 30,
+                      width: 30,
+                      child: CircularProgressIndicator(
+                        color: AppColor.whiteColor,
+                      ),
+                    )
+                  : robotoTextWidget(
+                      textval: submit,
+                      colorval: Colors.white,
+                      sizeval: 14,
+                      fontWeight: FontWeight.bold),
+            )));
   }
 }

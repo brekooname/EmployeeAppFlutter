@@ -89,8 +89,11 @@ var fromAddress = "From Address:- ";
 var toAddress = "To Address:- ";
 var distanceTravelled = "Distance Travelled:- ";
 var offlineLocalConveyance = "Offline Local Conveyance";
-
 var enterTravelMode = "Please enter travel mode";
 var dataSavedOffline = "Your data saved in offline mode";
+var vendorGatePass ="Vendor Gatepass";
+var vendorMeetingImage = "Click meeting with vendor images";
+var visitAt = "Visit At";
+var dailyReport = "Daily Report";
 
 
