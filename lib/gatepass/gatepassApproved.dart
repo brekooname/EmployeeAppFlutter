@@ -47,7 +47,18 @@ class _GatePassApprovedState extends State<GatePassApproved> {
               sizeval: 18, fontWeight: FontWeight.normal),
 
       ),
-      body: _buildPosts(context),
+      body:Stack(
+        children: [
+          _buildPosts(context),
+          Center(
+            child: isLoading == true
+                ? const CircularProgressIndicator(
+              color: Colors.indigo,
+            )
+                : const SizedBox(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -113,7 +124,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                             const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( to,widget.gatePassList[index].eindat.toString()),
+                            datedetailWidget( to,widget.gatePassList[index].closedDate.toString()),
                           ],
                         ),
                         const SizedBox(
@@ -135,7 +146,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                                 selectedIndex = index;
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context,widget.gatePassList[index].pernr, widget.gatePassList[index].gateNo, 0),
+                                  builder: (BuildContext context) => dialogue_removeDevice(context,widget.gatePassList[index].pernr, widget.gatePassList[index].gpno, 0),
                                 );
                               },
                               child: IconWidget('assets/svg/delete.svg' ,rejecttxt),
@@ -285,7 +296,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
             height: 10,
           ),
           Text(
-            i == 0 ?  leaveReject:leaveConfirmation,
+            i == 0 ?  gatePassReject:gatePassConfirmation,
             style: const TextStyle(
                 color: AppColor.themeColor,
                 fontFamily: 'Roboto',
@@ -319,7 +330,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
               Flexible(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.pop(context);
                     if (i == 0){
                       confirmGatePass(perner,leaveNo,rejecttxt);
                     }else {
@@ -345,7 +356,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         ]));
   }
 
-  Future<void> confirmGatePass(int prner, int leaveNo, String s) async {
+  Future<void> confirmGatePass(String prner, String leaveNo, String s) async {
     setState(() {
       isLoading  = true;
     });

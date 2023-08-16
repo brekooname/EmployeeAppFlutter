@@ -36,7 +36,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
   DateTime? pickedDate;
-  String? taskSpinner,departmentSpinner,dateTimeFormat ="dd/MM/yyyy";
+  String? taskSpinner,departmentSpinner,dateTimeFormat ="dd.MM.yyyy";
 
 
 
@@ -434,7 +434,9 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
 
   Future<void> createTask( String value) async {
     var jsonData = null;
-
+    setState(() {
+      isLoading =true;
+    });
     dynamic response = await HTTP.get(createTaskAPI(value));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
@@ -442,8 +444,14 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
       if(taskRespons.dataSuccess[2].syncData == "EMP_TASK" && taskRespons.dataSuccess[2].value == "Y"){
         Utility().showToast(taskAssgined);
         Navigator.of(context).pop();
+        setState(() {
+          isLoading =false;
+        });
       }else {
           Utility().showToast(somethingWentWrong);
+          setState(() {
+            isLoading =false;
+          });
         }
 
     }else{

@@ -416,22 +416,35 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   Future<void> createOD() async {
 
+    setState(() {
+      isLoading =true;
+    });
+
    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     String? sapcode = sharedPreferences.getString(userID).toString() ;
 
     dynamic response = await HTTP.get(createODAPI(sapcode!,dutyTypeSpinner.toString(),fromDateController.text.toString(),toDateController.text.toString(),visitPlaceController.text.toString(),workPlaceSpinner.toString(),purpose1.text.toString(),purpose2.text.toString(),purpose3.text.toString(),remark.text.toString(),selectedAssginTo.toString()));
     if (response != null && response.statusCode == 200){
-      var jsonData = convert.jsonDecode(response.body);
-      OdResponse odResponse = OdResponse.fromJson(jsonData);
 
-      if(odResponse.name.compareTo("SAPLSPO1") == 0){
+      Iterable l = convert.jsonDecode(response.body);
+      List<OdResponse> odResponse =
+      List<OdResponse>.from(
+          l.map((model) => OdResponse.fromJson(model)));
+
+      if(odResponse[0].name.compareTo("SAPLSPO1") == 0){
         Utility().showToast(odCreatedSuccess);
 
         Navigator.of(context).pop();
+        setState(() {
+          isLoading =false;
+        });
 
       }else{
-        Utility().showToast(odResponse.name);
+        Utility().showToast(odResponse[0].name);
+        setState(() {
+          isLoading =false;
+        });
       }
     }else{
       Utility().showToast(somethingWentWrong);

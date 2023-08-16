@@ -90,47 +90,44 @@ class _TaskApprovedState extends State<TaskApproved> {
     return Wrap(children: [
       Card(
           color: AppColor.whiteColor,
-          elevation: 10,
-          semanticContainer: true,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
+          elevation: 5,
           shape: const RoundedRectangleBorder(
             side: BorderSide(
-              color: AppColor.greyBorder,
+              color: AppColor.whiteColor,
             ),
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
-          child: Container(
-              height: 270,
-              padding: const EdgeInsets.all(5),
-              color: AppColor.whiteColor,
-              child: Stack(children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    displayWidget(docNo, widget.pendingTaskList[index].dno),
-                    SizedBox(height: 10,),
-                    displayWidget(mrcType,  widget.pendingTaskList[index].mrct1),
-                    SizedBox(height: 10,),
-                    displayWidget(assigner,  widget.pendingTaskList[index].asgnr1),
-                    SizedBox(height: 10,),
-                    taskDescWidget(desc,  widget.pendingTaskList[index].agenda),
-                    Row(
-                      children: [
-                        displayWidget(dateFrom,   widget.pendingTaskList[index].comDateFrom),
-                        SizedBox(
-                          width: 35,
-                        ),
-                        displayWidget(dateTo,   widget.pendingTaskList[index].comDateTo),
-                      ],
-                    ),
-                    assginToSpinnerWidget(context,widget.activeemployeeList),
-                    SizedBox(height: 10,),
+          child:  Stack(children: <Widget>[
+               Padding(padding: EdgeInsets.all(10),
+                 child:  Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     displayWidget(docNo, widget.pendingTaskList[index].dno),
+                     SizedBox(height: 10,),
+                     displayWidget(mrcType,  widget.pendingTaskList[index].mrct1),
+                     SizedBox(height: 10,),
+                     displayWidget(assigner,  widget.pendingTaskList[index].asgnr1),
+                     SizedBox(height: 10,),
+                     taskDescWidget(desc,  widget.pendingTaskList[index].agenda),
+                     SizedBox(height: 10,),
+                     Row(
+                       children: [
+                         displayWidget(dateFrom,   widget.pendingTaskList[index].comDateFrom),
+                         SizedBox(
+                           width: 35,
+                         ),
+                         displayWidget(dateTo,   widget.pendingTaskList[index].comDateTo),
+                       ],
+                     ),
+                     assginToSpinnerWidget(context,widget.activeemployeeList),
 
-                    submitWidget(widget.pendingTaskList[index].dno, widget.pendingTaskList[index].srno),
-                  ],
-                ),
+
+                     submitWidget(widget.pendingTaskList[index].dno, widget.pendingTaskList[index].srno),
+                   ],
+                 ),
+               ),
               ]
-            )
+
           )
       ),
     ]);
@@ -301,18 +298,14 @@ class _TaskApprovedState extends State<TaskApproved> {
           sizeval: 14.0,
           fontWeight: FontWeight.bold,
         ),
-
-        Container(
-          width: 240,
-          height: 30,
-          child:  Flexible(
+           Flexible(
             child: robotoTextWidget(
               textval: value,
               colorval:  Colors.black,
               sizeval: 14.0,
               fontWeight: FontWeight.w400,
             ),
-          ),
+
         ),
       ],
     );

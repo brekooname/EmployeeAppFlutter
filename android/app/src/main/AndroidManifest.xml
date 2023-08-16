@@ -25,7 +25,7 @@
     </queries>
 
     <application
-        android:label="shakti_employee_app"
+        android:label="Shakti Employee App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

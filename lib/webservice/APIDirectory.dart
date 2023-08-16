@@ -65,7 +65,7 @@ pendingGatePass(String sapCode){
   return Uri.parse('${productionUrl}gatepass_approval_pending.htm?app_pernr=${sapCode}');
 }
 
-approveGatePassAPI(int prner,int drno,  String sapcode,  String status){
+approveGatePassAPI(String prner,String drno,  String sapcode,  String status){
   return Uri.parse('${productionUrl}gatepass_approva_rejectl.htm?pernr=${prner}&gp_no=${drno}&app_pernr=${sapcode}&status=${status}');
 }
 

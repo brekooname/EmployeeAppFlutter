@@ -42,7 +42,19 @@ class InDirectLeaveState extends State<InDirectLeave> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildPosts(context),
+      body: Stack(
+        children: [
+          _buildPosts(context),
+          Center(
+            child: isLoading == true
+                ? const CircularProgressIndicator(
+              color: Colors.indigo,
+            )
+                : const SizedBox(),
+          ),
+        ],
+      ),
+
     );
   }
 
@@ -228,6 +240,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
              Flexible(
                 child: ElevatedButton(
                   onPressed: () {
+                    Navigator.pop(context);
                     if (i == 0){
                       rejectLeave(leaveNo);
                     }else {
@@ -240,14 +253,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                       borderRadius: BorderRadius.circular(12), // <-- Radius
                     ),
                   ),
-                  child:isLoading
-                      ? const SizedBox(
-                    height: 30,
-                    width: 30,
-                    child: CircularProgressIndicator(
-                      color: AppColor.whiteColor,
-                    ),
-                  ): robotoTextWidget(
+                  child:  robotoTextWidget(
                     textval: confirm,
                     colorval: AppColor.whiteColor,
                     sizeval: 14,
@@ -389,7 +395,9 @@ class InDirectLeaveState extends State<InDirectLeave> {
       LeaveRejectResponse leaveResponse = LeaveRejectResponse.fromJson(jsonData);
       if(leaveResponse.status.compareTo("true") == 0){
         Utility().showToast(leaveRejectSuccessfully);
-
+        setState(() {
+          isLoading  = false;
+        });
         Navigator.of(context).pop();
 
       }else{

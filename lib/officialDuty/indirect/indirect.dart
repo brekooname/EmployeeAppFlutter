@@ -41,7 +41,18 @@ class InDirectState extends State<InDirect> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: _buildPosts(context),
+      body: Stack(
+        children: [
+          _buildPosts(context),
+          Center(
+            child: isLoading == true
+                ? const CircularProgressIndicator(
+              color: Colors.indigo,
+            )
+                : const SizedBox(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -338,18 +349,31 @@ class InDirectState extends State<InDirect> {
   }
 
   Future<void> confirmOD(String odno) async {
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(approveODAPI(odno,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()));
     if (response != null && response.statusCode == 200)  {
-      Iterable l = convert.json.decode(response.body);
+     /* Iterable l = convert.json.decode(response.body);
       List<OdApproveResponse> odResponse = List<OdApproveResponse>.from(l.map((model)=> OdApproveResponse.fromJson(model)));
-      if(odResponse[0].type.compareTo("S") == 0){
-        Utility().showToast(odApprovedSuccess);
+     */
 
+      var jsonData = convert.jsonDecode(response.body);
+      OdApproveResponse odResponse = OdApproveResponse.fromJson(jsonData);
+
+      if(odResponse.type.compareTo("S") == 0){
+        Utility().showToast(odApprovedSuccess);
+        setState(() {
+          isLoading = false;
+        });
         Navigator.of(context).pop();
 
       }else{
-        Utility().showToast(odResponse[0].msg);
+        setState(() {
+          isLoading = false;
+        });
+        Utility().showToast(odResponse.msg);
       }
     }else{
       Utility().showToast(somethingWentWrong);
@@ -358,19 +382,33 @@ class InDirectState extends State<InDirect> {
   }
 
   Future<void> rejectOD(String odno) async {
+    setState(() {
+      isLoading = true;
+    });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(rejectODAPI(odno,sharedPreferences.getString(userID) as String ,sharedPreferences.getString(password) as String ));
     if (response != null && response.statusCode == 200)  {
-      Iterable l = convert.json.decode(response.body);
+    /*  Iterable l = convert.json.decode(response.body);
       List<OdRejectResponse> odResponse = List<OdRejectResponse>.from(l.map((model)=> OdRejectResponse.fromJson(model)));
-      if(odResponse[0].status.compareTo("true") == 0){
-        Utility().showToast(odRejectSuccess);
+  */
+      var jsonData = convert.jsonDecode(response.body);
+      OdRejectResponse odResponse = OdRejectResponse.fromJson(jsonData);
 
+      if(odResponse.status.compareTo("true") == 0){
+        Utility().showToast(odRejectSuccess);
+        setState(() {
+          isLoading = false;
+        });
         Navigator.of(context).pop();
 
       }else{
-        Utility().showToast(odResponse[0].message);
+        setState(() {
+          isLoading = false;
+        });
+        Utility().showToast(odResponse.message);
       }
+    }else{
+      Utility().showToast(somethingWentWrong);
     }
 
   }

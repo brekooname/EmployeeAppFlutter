@@ -407,6 +407,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   }
 
   Future<void> applyLeave() async {
+
+    setState(() {
+      isLoading = true;
+    });
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(createLeaveAPI(
         sharedPreferences.getString(userID).toString(),
@@ -428,8 +433,14 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       if (leave[0].name.compareTo("Leave request created") == 0) {
         Utility().showToast(leave[0].name);
         Navigator.of(context).pop();
+        setState(() {
+          isLoading = false;
+        });
       } else {
         Utility().showToast(leave[0].name);
+        setState(() {
+          isLoading = false;
+        });
       }
     }else{
       Utility().showToast(somethingWentWrong);

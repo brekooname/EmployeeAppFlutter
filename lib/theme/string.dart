@@ -62,6 +62,9 @@ var confirmation = "OD Approve alert !\nDo you want Approve OD ?";
 var reject = "OD Reject alert !\nDo you want Reject OD ?";
 var leaveConfirmation = "Leave Approve alert !\nDo you want Approve Leave ?";
 var leaveReject = "Leave Reject alert !\nDo you want Reject Leave ?";
+var gatePassConfirmation = "GatePass Approve alert !\nDo you want Approve GatePass ?";
+var gatePassReject = "GatePass Reject alert !\nDo you want Reject GatePass ?";
+
 var aboutdec = "Detail about your Canteen Expense ";
 var gatePass = "Employee GatePass Report";
 var gatePassdec = "Detail of the Gate Pass for the employee.";
@@ -100,9 +103,7 @@ var vendorGatePass ="Vendor Gatepass";
 var vendorMeetingImage = "Click meeting with vendor images";
 var visitAt = "Visit At";
 var dailyReport = "Daily Report";
-
-
- var responsiblePerson1 ="Responsible person" ;
+var responsiblePerson1 ="Responsible person" ;
 var responsiblePerson2 ="Responsible person 2" ;
 var responsiblePerson3 ="Responsible person 3" ;
 var agendatxt= "Agenda";
@@ -113,7 +114,6 @@ var leave = "Leave";
 var  official = "Official Duty";
 var gatePasstxt ="Gate Pass";
 var task = "Task";
-var dailyReport= "Daily Report";
 var webReport = "Web Report";
 var location = "Location services are disabled. Please enable the services";
 var locationDenid ="Location permissions are denied";

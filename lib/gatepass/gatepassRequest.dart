@@ -496,6 +496,10 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
 
   Future<void> gatePassRequestAPI() async {
 
+    setState(() {
+      isLoading =true;
+    });
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? sapcode = sharedPreferences.getString(userID).toString()  ;
 
@@ -507,10 +511,15 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
       if(odResponse[0].msgtyp.compareTo("S") == 0){
         Utility().showToast(odResponse[0].text);
         Navigator.of(context).pop();
-
+        setState(() {
+          isLoading =false;
+        });
       }
       else{
         Utility().showToast(odResponse[0].text);
+        setState(() {
+          isLoading =false;
+        });
       }
   }else{
       Utility().showToast(somethingWentWrong);
