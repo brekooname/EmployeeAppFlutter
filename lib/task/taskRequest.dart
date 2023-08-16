@@ -445,7 +445,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
         Utility().showToast("Task has been assigned.");
         Navigator.of(context).pop();
       }else {
-          Utility().showToast("Something went wrong try again.");
+          Utility().showToast(somethingWentWrong);
         }
 
     }else{

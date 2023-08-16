@@ -50,7 +50,7 @@ class _TaskApprovedState extends State<TaskApproved> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
+        title: const robotoTextWidget(
             textval: "Approved Task",
             colorval: AppColor.whiteColor,
             sizeval: 15,
@@ -109,23 +109,23 @@ class _TaskApprovedState extends State<TaskApproved> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     displayWidget("Document No - ", widget.pendingTaskList[index].dno),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     displayWidget("MRC Type - ",  widget.pendingTaskList[index].mrct1),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     displayWidget("Assigner - ",  widget.pendingTaskList[index].asgnr1),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     taskDescWidget("Description - ",  widget.pendingTaskList[index].agenda),
                     Row(
                       children: [
                         displayWidget("Date From - ",   widget.pendingTaskList[index].comDateFrom),
-                        SizedBox(
+                        const SizedBox(
                           width: 35,
                         ),
                         displayWidget("Date To - ",   widget.pendingTaskList[index].comDateTo),
                       ],
                     ),
                     assginToSpinnerWidget(context,widget.activeemployeeList),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
                     submitWidget(widget.pendingTaskList[index].dno, widget.pendingTaskList[index].srno),
                   ],
                 ),
@@ -162,7 +162,7 @@ class _TaskApprovedState extends State<TaskApproved> {
                         blurRadius: 20,
                         offset: Offset(0, 10))
                   ]),
-              child: Align(
+              child: const Align(
                 alignment: Alignment.center,
                 child: robotoTextWidget(
                     textval: "noDataFound",
@@ -211,9 +211,9 @@ class _TaskApprovedState extends State<TaskApproved> {
             const SizedBox(
               height: 10,
             ),
-            Text(
+            const Text(
               "removeDeviceConfirmation",
-              style: const TextStyle(
+              style: TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.w600,
@@ -361,13 +361,8 @@ class _TaskApprovedState extends State<TaskApproved> {
    dynamic response = await HTTP.get(completeTaskAPI(value));
    if (response != null && response.statusCode == 200) {
 
-     print("response======>${response.toString()}");
-
      jsonData = convert.jsonDecode(response.body);
      TaskRespons taskRespons = TaskRespons.fromJson(jsonData);
-
-     print("response======>${taskRespons.dataSuccess[3].value.toString()}");
-     print("response======>${taskRespons.dataSuccess[3].syncData.toString()}");
 
      if(taskRespons.dataSuccess[3].syncData == "EMP_TASK_COMPLETE" && taskRespons.dataSuccess[3].value == "Y"){
        Utility().showToast("Task has been Closed.");
@@ -383,8 +378,8 @@ class _TaskApprovedState extends State<TaskApproved> {
 
   Widget assginToSpinnerWidget(BuildContext context, List<Activeemployee> activeemployee) {
     return  Container(
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.only(left: 3),
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.only(left: 3),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -397,11 +392,11 @@ class _TaskApprovedState extends State<TaskApproved> {
             activeemployee.ename,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child:  Text(activeemployee.ename, style: TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
+              child:  Text(activeemployee.ename, style: const TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
             ),
           ),
         ).toList(),
-        searchInputDecoration: InputDecoration(
+        searchInputDecoration: const InputDecoration(
           hintText: "Assign Charge To",
           hintStyle: TextStyle(color: AppColor.themeColor, fontSize: 13, fontWeight: FontWeight.normal),
           prefixIcon: Icon(Icons.person, color: AppColor.themeColor, size: 20,),
