@@ -11,6 +11,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
+import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'as vendorGatePassPrefix;
+import 'package:shakti_employee_app/DailyReport/model/vendornamelistresponse.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
 import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
@@ -72,11 +74,14 @@ class _HomePageState extends State<HomePage> {
   List<Pendingod> pendindOdList = [];
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
+  List<vendorGatePassPrefix.Response> vendorGatePassList = [];
   List<TravelModel> travelList = [];
   List<LocalConveyanceModel> localConveyanceList = [];
   SyncAndroidToSapResponse? syncAndroidToSapResponse;
   PersonalInfoResponse? personInfo;
   PendingGatePassResponse? gatePassResponse;
+  vendorGatePassPrefix.VendorGatePassModel? vendorGatePassModel;
+
   TextEditingController travelModeController = TextEditingController();
 
   @override
@@ -183,7 +188,7 @@ class _HomePageState extends State<HomePage> {
 
   detailWidget(String title) {
     return Container(
-      margin: EdgeInsets.only(top: 5),
+      margin: const EdgeInsets.only(top: 5),
       child: Card(
         color: AppColor.whiteColor,
         elevation: 10,
@@ -209,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                   fontWeight: FontWeight.w600),
             ),
             Container(
-              margin: EdgeInsets.only(bottom: 5),
+              margin: const EdgeInsets.only(bottom: 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -228,7 +233,7 @@ class _HomePageState extends State<HomePage> {
 
   localConvenience() {
     return Container(
-        margin: EdgeInsets.only(top: 5),
+        margin: const EdgeInsets.only(top: 5),
         child: Card(
           color: AppColor.whiteColor,
           elevation: 5,
@@ -254,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -274,7 +279,7 @@ class _HomePageState extends State<HomePage> {
   dividerWidget() {
     return Container(
       width: 1,
-      margin: EdgeInsets.only(top: 15),
+      margin: const EdgeInsets.only(top: 15),
       height: MediaQuery.of(context).size.height / 8,
       color: AppColor.grey,
     );
@@ -282,7 +287,7 @@ class _HomePageState extends State<HomePage> {
 
   dailyAndWebReport(String title, String svg) {
     return Container(
-        margin: EdgeInsets.only(top: 5),
+        margin: const EdgeInsets.only(top: 5),
         child: Card(
           color: AppColor.whiteColor,
           elevation: 10,
@@ -308,7 +313,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 10),
                 child: imageTextWidget(svg, title, title),
               )
             ],
@@ -335,24 +340,20 @@ class _HomePageState extends State<HomePage> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location services are disabled. Please enable the services')));
+      Utility().showInSnackBar(value: 'Location services are disabled. Please enable the services', context: context);
+
       return false;
     }
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')));
+        Utility().showInSnackBar(value: 'Location permissions are denied', context: context);
         return false;
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
+      Utility().showInSnackBar(value: 'Location permissions are permanently denied, we cannot request permissions.', context: context);
       return false;
     }
     return true;
@@ -404,6 +405,17 @@ class _HomePageState extends State<HomePage> {
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
       setgatePassData();
     }
+
+    sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.getString(vendorGatePas) != null &&
+        sharedPreferences.getString(vendorGatePas).toString().isNotEmpty) {
+      var jsonData =
+      convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
+      vendorGatePassModel = vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData);
+      setVendorgatePassData();
+    }
+
+
   }
 
   imageTextWidget(String svg, String msg, String title) {
@@ -431,7 +443,7 @@ class _HomePageState extends State<HomePage> {
           case "Daily Report":
             {
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const DailyReport()),
+                  MaterialPageRoute(builder: (context) =>  DailyReport(vendorGatePassLists: vendorGatePassList,)),
                   (route) => true);
             }
             break;
@@ -863,7 +875,7 @@ class _HomePageState extends State<HomePage> {
   travelModeWidget() {
     return Container(
       height: 40,
-      padding: EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -892,7 +904,7 @@ class _HomePageState extends State<HomePage> {
   latLongWidget(String title) {
     return Container(
       alignment: Alignment.centerLeft,
-      margin: EdgeInsets.only(top: 10),
+      margin: const EdgeInsets.only(top: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -902,10 +914,10 @@ class _HomePageState extends State<HomePage> {
               colorval: Colors.black,
               sizeval: 12,
               fontWeight: FontWeight.normal),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
-          Divider(),
+          const Divider(),
         ],
       ),
     );
@@ -968,6 +980,24 @@ class _HomePageState extends State<HomePage> {
         setgatePassData();
       }
     }
+
+    dynamic response3 = await HTTP
+        .get(vendorOpenGatepass(sharedPreferences.getString(userID).toString()));
+    if (response3 != null && response3.statusCode == 200) {
+      jsonData1 = convert.jsonDecode(response3.body);
+      print('vendorOpenGatePass====>$jsonData1');
+      vendorGatePassPrefix.VendorGatePassModel vendorGatePass =
+      vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData1);
+      if (vendorGatePass.response.isNotEmpty) {
+        setState(() {
+          vendorGatePassList = vendorGatePass.response;
+          vendorGatePassModel = vendorGatePass;
+          isLoading = false;
+          Utility().setSharedPreference(vendorGatePas, response3.body.toString());
+        });
+        setVendorgatePassData();
+      }
+    }
   }
 
   void setListData() {
@@ -999,6 +1029,13 @@ class _HomePageState extends State<HomePage> {
     if (gatePassResponse != null && gatePassResponse!.data.isNotEmpty) {
       setState(() {
         gatePassList = gatePassResponse!.data;
+      });
+    }
+  }
+  void setVendorgatePassData() {
+    if (vendorGatePassModel != null && vendorGatePassModel!.response.isNotEmpty) {
+      setState(() {
+        vendorGatePassList = vendorGatePassModel!.response;
       });
     }
   }
@@ -1197,4 +1234,6 @@ class _HomePageState extends State<HomePage> {
           .updateLocalConveyance(localConveyance.toMapWithoutId());
     });
   }
+
+
 }

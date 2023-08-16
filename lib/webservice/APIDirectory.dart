@@ -80,3 +80,7 @@ vendorNameAPI(String value){
 syncLocalConveyanceAPI(String value){
   return Uri.parse('${productionUrl}start_end_location.htm?travel_distance=${value}');
 }
+
+vendorOpenGatepass(String sapCode){
+  return Uri.parse('${productionUrl}vendor_open_gatepass.htm?pernr=${sapCode}');
+}
