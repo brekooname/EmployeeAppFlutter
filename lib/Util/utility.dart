@@ -88,6 +88,15 @@ class Utility {
 
   Future<void> deleteDatabase(String path) =>
       databaseFactory.deleteDatabase(path);
+
+  static String getBase64FormateFile(String path) {
+    File file = File(path);
+    print('File is = ' + file.toString());
+    List<int> fileInByte = file.readAsBytesSync();
+    String fileInBase64 = base64Encode(fileInByte);
+    return fileInBase64;
+  }
+
   /*void saveArrayList(List<String> list, int position) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     switch (position) {

@@ -1077,8 +1077,7 @@ class _HomePageState extends State<HomePage> {
         .get(vendorOpenGatepass(sharedPreferences.getString(userID).toString()));
     if (response3 != null && response3.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response3.body);
-      print('vendorOpenGatePass====>$jsonData1');
-      vendorGatePassPrefix.VendorGatePassModel vendorGatePass =
+       vendorGatePassPrefix.VendorGatePassModel vendorGatePass =
       vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData1);
       if (vendorGatePass.response.isNotEmpty) {
         setState(() {

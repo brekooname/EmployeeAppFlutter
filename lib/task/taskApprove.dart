@@ -159,7 +159,7 @@ class _TaskApprovedState extends State<TaskApproved> {
                         blurRadius: 20,
                         offset: Offset(0, 10))
                   ]),
-              child: Align(
+              child: const Align(
                 alignment: Alignment.center,
                 child: robotoTextWidget(
                     textval: "noDataFound",
@@ -208,9 +208,9 @@ class _TaskApprovedState extends State<TaskApproved> {
             const SizedBox(
               height: 10,
             ),
-            Text(
+            const Text(
               "removeDeviceConfirmation",
-              style: const TextStyle(
+              style: TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.w600,
@@ -369,8 +369,8 @@ class _TaskApprovedState extends State<TaskApproved> {
 
   Widget assginToSpinnerWidget(BuildContext context, List<Activeemployee> activeemployee) {
     return  Container(
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.only(left: 3),
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.only(left: 3),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
         borderRadius:
@@ -383,11 +383,11 @@ class _TaskApprovedState extends State<TaskApproved> {
             activeemployee.ename,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child:  Text(activeemployee.ename, style: TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
+              child:  Text(activeemployee.ename, style: const TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
             ),
           ),
         ).toList(),
-        searchInputDecoration: InputDecoration(
+        searchInputDecoration: const InputDecoration(
           hintText: "Assign Charge To",
           hintStyle: TextStyle(color: AppColor.themeColor, fontSize: 13, fontWeight: FontWeight.normal),
           prefixIcon: Icon(Icons.person, color: AppColor.themeColor, size: 20,),

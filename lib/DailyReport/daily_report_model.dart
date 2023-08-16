@@ -110,4 +110,9 @@ class DailyReportModel {
         "photo4": photo4,
         "photo5": photo5,
       };
+
+  @override
+  String toString() {
+    return 'DailyReportModel{pros_vendor: $pros_vendor, vendor: $vendor, name: $name, addres: $addres, TELF2: $TELF2, VISIT_AT: $VISIT_AT, pernr1: $pernr1, pernr2: $pernr2, pernr3: $pernr3, ACTIVITY: $ACTIVITY, DISC: $DISC, TGTDATE: $TGTDATE, STATUS: $STATUS, STREET: $STREET, REGION: $REGION, CITY1: $CITY1, CONTACT_P: $CONTACT_P, GATEPASS_NO: $GATEPASS_NO, photo1: $photo1, photo2: $photo2, photo3: $photo3, photo4: $photo4, photo5: $photo5}';
+  }
 }

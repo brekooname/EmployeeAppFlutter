@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
+import 'package:shakti_employee_app/DailyReport/daily_report_model.dart';
 import 'package:shakti_employee_app/DailyReport/image_view_widget.dart';
 import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
     as vendorGatePassPrefix;
@@ -29,8 +30,18 @@ class DailyReport extends StatefulWidget {
 }
 
 class _DailyReportState extends State<DailyReport> {
-  String? _selectedType, selectVisit, selectStatus, selectedGatePass;
-  String TypeSpinner = 'Select Visit At ', statusType = "Select Status";
+  String? _selectedType, selectVisit, selectStatus;
+  String TypeSpinner = 'Select Visit At ',
+      statusType = "Select Status",
+      img1 = "",
+      img2 = "",
+      img3 = "",
+      img4 = "",
+      img5 = "",
+      vendorGatePassDocNo = "",
+      vendorGatePassRegion = "",
+      vendorGatePassCity = "",
+      vendorGatePassStreet = "";
 
   var TypeList = [
     'Select Visit At ',
@@ -50,22 +61,24 @@ class _DailyReportState extends State<DailyReport> {
   TextEditingController vendoreCode = TextEditingController();
   TextEditingController vendoreAddress = TextEditingController();
   TextEditingController vendoreContac = TextEditingController();
-  TextEditingController person1 = TextEditingController();
-  TextEditingController person2 = TextEditingController();
-  TextEditingController person3 = TextEditingController();
-  TextEditingController fromDateController = TextEditingController();
+  TextEditingController responsiblePerson1 = TextEditingController();
+  TextEditingController responsiblePerson2 = TextEditingController();
+  TextEditingController responsiblePerson3 = TextEditingController();
+  TextEditingController targetDateController = TextEditingController();
   TextEditingController agenda = TextEditingController();
   TextEditingController discussion = TextEditingController();
   DateTime selectedDate = DateTime.now();
   DateTime datefrom = DateTime.now();
-  String? indianFromDate, selectedFromDate;
+  String? indianFromDate, selectedTargateDate;
   String dateTimeFormat = "dd/MM/yyyy";
   DateTime? pickedDate;
   List<ImageModel> imageList = [];
   var imageFile;
-  int? selectedIndex, selectedPassIndex;
+  int? selectedIndex, selectedPassIndex, selectedVendorPosition;
+  int imgCount = 0;
   bool isChecked = false, isGatePassListShown = false, isLoading = false;
   late SharedPreferences sharedPreferences;
+  List<DailyReportModel> dailyReportModel = [];
 
   getAllImageData() async {
     imageList.add(
@@ -85,8 +98,9 @@ class _DailyReportState extends State<DailyReport> {
     // TODO: implement initState
     super.initState();
 
-    selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
-    fromDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
+    selectedTargateDate = DateFormat(dateTimeFormat).format(DateTime.now());
+    targetDateController.text =
+        DateFormat(dateTimeFormat).format(DateTime.now());
     indianFromDate = DateFormat("dd/MM/yyyy").format(DateTime.now());
     getAllImageData();
   }
@@ -116,26 +130,31 @@ class _DailyReportState extends State<DailyReport> {
       ),
       body: SingleChildScrollView(
         physics: const ScrollPhysics(),
-        child: Container(
+        child: SizedBox(
           width: MediaQuery.of(context).size.width,
           child: Column(
             children: [
               radiobuttonWidget(),
-              textVendorFeildWidget(
-                "Vendor Name",
-              ),
-              textFieldWidget("Vendor Code", vendoreCode),
-              textFieldWidget("Vendor Address", vendoreAddress),
-              textFieldWidget("Vendor Contact N0", vendoreContac),
-              dateTextFieldWidget("Current Date",
-                  DateFormat("dd-MM-yyyy").format(DateTime.now())),
+              textVendorFeildWidget(searchByName, vendor_name),
+              textFieldWidget(enterVendorCode, vendoreCode, vendor_code),
+              textFieldWidget(
+                  enterVendorAddress, vendoreAddress, vendor_address),
+              textFieldWidget(
+                  enterVendorContact, vendoreContac, vendor_contact),
+              dateTextFieldWidget(
+                  currentDat, DateFormat("dd-MM-yyyy").format(DateTime.now())),
               visitAtSpinnerWidget(),
-              textFieldWidget("Responsible person", person1),
-              textFieldWidget("Responsible person 2", person2),
-              textFieldWidget("Responsible person 3", person3),
-              longTextFieldWidget("Agenda", agenda),
-              longTextFieldWidget("Discussion", discussion),
-              datePickerWidget(selectedFromDate!, fromDateController, "0"),
+              textFieldWidget(
+                  enterSapCode, responsiblePerson1, responsible_person),
+              textFieldWidget(
+                  enterSapCode, responsiblePerson2, responsible_person2),
+              textFieldWidget(
+                  enterSapCode, responsiblePerson3, responsible_person3),
+              longTextFieldWidget(enterAgenda, agenda, agenda_),
+              longTextFieldWidget(
+                  enterDiscussionPoint, discussion, discussionPoint),
+              datePickerWidget(
+                  selectedTargateDate!, targetDateController, target_date),
               statusSpinnerWidget(),
               imageList.isNotEmpty ? imageListWidget() : Container(),
               widget.vendorGatePassLists.isNotEmpty && isGatePassListShown
@@ -150,16 +169,16 @@ class _DailyReportState extends State<DailyReport> {
   }
 
   radiobuttonWidget() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Expanded(
-          child: ListTile(
-            title: Row(
+    return Container(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Radio(
-                  value: "Vendor",
+                  value: vendor,
                   groupValue: _selectedType,
                   onChanged: (String? value) {
                     setState(() {
@@ -167,23 +186,20 @@ class _DailyReportState extends State<DailyReport> {
                     });
                   },
                 ),
-                const Text(
-                  'Vendor',
-                  style: TextStyle(
-                      color: AppColor.themeColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold),
-                ),
+                robotoTextWidget(
+                    textval: vendor,
+                    colorval: AppColor.themeColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold),
               ],
             ),
           ),
-        ),
-        Expanded(
-          child: ListTile(
-            title: Row(
+          Container(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 Radio(
-                  value: "Prospective Vendor",
+                  value: prospective_vendor,
                   groupValue: _selectedType,
                   onChanged: (String? value) {
                     setState(() {
@@ -191,24 +207,20 @@ class _DailyReportState extends State<DailyReport> {
                     });
                   },
                 ),
-                const Flexible(
-                  child: Text(
-                    'Prospective Vendor',
-                    style: TextStyle(
-                        color: AppColor.themeColor,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
+                robotoTextWidget(
+                    textval: prospective_vendor,
+                    colorval: AppColor.themeColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold),
               ],
             ),
-          ),
-        ),
-      ],
+          )
+        ],
+      ),
     );
   }
 
-  textVendorFeildWidget(String hinttxt) {
+  textVendorFeildWidget(String hinttxt, String title) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -216,7 +228,7 @@ class _DailyReportState extends State<DailyReport> {
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 15),
             child: Text(
-              hinttxt,
+              title,
               style: const TextStyle(
                   color: Colors.black45, fontWeight: FontWeight.bold),
             )),
@@ -236,21 +248,19 @@ class _DailyReportState extends State<DailyReport> {
                     vendornamelist.name1,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        vendornamelist.name1,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 13,
-                            color: AppColor.themeColor),
-                      ),
+                      child: robotoTextWidget(
+                          textval: vendornamelist.name1,
+                          colorval: AppColor.themeColor,
+                          sizeval: 12,
+                          fontWeight: FontWeight.normal),
                     ),
                   ),
                 )
                 .toList(),
             searchInputDecoration: InputDecoration(
-              hintText: "Search by " + hinttxt,
+              hintText: hinttxt,
               hintStyle: const TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: AppColor.themeColor,
               ),
               border: InputBorder.none,
@@ -262,8 +272,22 @@ class _DailyReportState extends State<DailyReport> {
               return null;
             },
             onSubmit: (String value) {
+              for (int i = 0; i < vendorNameList.length; i++) {
+                if (vendorNameList[i].name1 == value) {
+                  selectedVendorPosition = i;
+                  break;
+                }
+              }
+
               setState(() {
-                vendoreContac.text = vendorNameList[0].telf1;
+                vendoreName.text =
+                    vendorNameList[selectedVendorPosition!].name1;
+                vendoreCode.text =
+                    vendorNameList[selectedVendorPosition!].lifnr;
+                vendoreContac.text =
+                    vendorNameList[selectedVendorPosition!].telf1;
+                vendoreAddress.text =
+                    vendorNameList[selectedVendorPosition!].add;
               });
             },
           ),
@@ -345,7 +369,11 @@ class _DailyReportState extends State<DailyReport> {
           borderRadius: const BorderRadius.all(Radius.circular(10)),
         ),
         child: TextField(
-          style: const TextStyle(color: AppColor.themeColor),
+          style: const TextStyle(
+              color: AppColor.themeColor,
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+              fontFamily: 'Roboto'),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: date,
@@ -360,25 +388,18 @@ class _DailyReportState extends State<DailyReport> {
     ]);
   }
 
-  Future<void> _selectDate(BuildContext context, String value) async {
+  Future<void> _selectDate(BuildContext context) async {
     pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: value == "0"
-            ? DateTime.now()
-            : selectedFromDate !=
-                    DateFormat(dateTimeFormat).format(DateTime.now())
-                ? DateTime(2023)
-                : DateTime.now(),
+        firstDate: DateTime.now(),
         //DateTime.now() - not to allow to choose before today.
         lastDate: DateTime(2050));
     if (pickedDate != null) {
-      String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
       setState(() {
-        if (value == "0") {
-          selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
-          fromDateController.text = formattedDate;
-        }
+        String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
+        selectedTargateDate = DateFormat(dateTimeFormat).format(pickedDate!);
+        targetDateController.text = formattedDate;
       });
     }
   }
@@ -400,7 +421,8 @@ class _DailyReportState extends State<DailyReport> {
     }
   }
 
-  textFieldWidget(String hinttxt, TextEditingController visitPlace) {
+  textFieldWidget(
+      String hinttxt, TextEditingController visitPlace, String title) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -408,7 +430,7 @@ class _DailyReportState extends State<DailyReport> {
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 15),
             child: robotoTextWidget(
-                textval: hinttxt,
+                textval: title,
                 colorval: Colors.black45,
                 sizeval: 12,
                 fontWeight: FontWeight.bold)),
@@ -422,13 +444,17 @@ class _DailyReportState extends State<DailyReport> {
           ),
           child: TextField(
             controller: visitPlace,
-            style: const TextStyle(color: AppColor.themeColor),
+            style: const TextStyle(
+                color: AppColor.themeColor,
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                fontFamily: 'Roboto'),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Please Enter " + hinttxt,
+              hintText: hinttxt,
               hintStyle: const TextStyle(
                   color: AppColor.themeColor,
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: FontWeight.normal),
             ),
             keyboardType: TextInputType.text,
@@ -438,7 +464,8 @@ class _DailyReportState extends State<DailyReport> {
     );
   }
 
-  longTextFieldWidget(String title, TextEditingController longtext) {
+  longTextFieldWidget(
+      String hintTxt, TextEditingController longtext, String title) {
     return Column(
       children: [
         Container(
@@ -460,10 +487,14 @@ class _DailyReportState extends State<DailyReport> {
           child: TextField(
             maxLines: 3,
             controller: longtext,
-            style: const TextStyle(color: AppColor.themeColor),
+            style: const TextStyle(
+                color: AppColor.themeColor,
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                fontFamily: 'Roboto'),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Please Enter " + title,
+              hintText: hintTxt,
               hintStyle: const TextStyle(
                   color: AppColor.themeColor,
                   fontWeight: FontWeight.normal,
@@ -477,10 +508,10 @@ class _DailyReportState extends State<DailyReport> {
   }
 
   datePickerWidget(
-      String fromTO, TextEditingController DateController, String value) {
+      String fromTO, TextEditingController DateController, String title) {
     return GestureDetector(
       onTap: () {
-        _selectDate(context, value);
+        _selectDate(context);
       },
       child: Container(
         margin: const EdgeInsets.only(left: 10, right: 10),
@@ -490,8 +521,8 @@ class _DailyReportState extends State<DailyReport> {
           children: [
             Container(
               margin: const EdgeInsets.only(left: 5),
-              child: const robotoTextWidget(
-                  textval: 'Target Date',
+              child: robotoTextWidget(
+                  textval: title,
                   colorval: Colors.black45,
                   sizeval: 12,
                   fontWeight: FontWeight.bold),
@@ -530,7 +561,11 @@ class _DailyReportState extends State<DailyReport> {
                     textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
                         hintText: fromTO,
-                        hintStyle: const TextStyle(color: AppColor.themeColor),
+                        hintStyle: const TextStyle(
+                            color: AppColor.themeColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            fontFamily: 'Roboto'),
                         border: InputBorder.none),
                     style: const TextStyle(
                         color: AppColor.themeColor,
@@ -566,7 +601,7 @@ class _DailyReportState extends State<DailyReport> {
           const SizedBox(
             height: 10,
           ),
-          Container(
+          SizedBox(
               height: 60,
               width: MediaQuery.of(context).size.width,
               child: DropdownButtonFormField(
@@ -744,19 +779,19 @@ class _DailyReportState extends State<DailyReport> {
               ? Wrap(
                   children: <Widget>[
                     ListTile(
-                      title: const robotoTextWidget(
-                          textval: 'Camera',
+                      title: robotoTextWidget(
+                          textval: camera,
                           colorval: AppColor.themeColor,
                           sizeval: 12,
                           fontWeight: FontWeight.w600),
                       onTap: () => {
-                        imageSelector(context, "camera"),
+                        imageSelector(context, camera),
                         Navigator.pop(context)
                       },
                     ),
                     ListTile(
-                      title: const robotoTextWidget(
-                          textval: 'Cancel',
+                      title: robotoTextWidget(
+                          textval: cancel,
                           colorval: AppColor.blackColor,
                           sizeval: 12,
                           fontWeight: FontWeight.w600),
@@ -767,8 +802,8 @@ class _DailyReportState extends State<DailyReport> {
               : Wrap(
                   children: <Widget>[
                     ListTile(
-                      title: const robotoTextWidget(
-                          textval: 'Display',
+                      title: robotoTextWidget(
+                          textval: display,
                           colorval: AppColor.themeColor,
                           sizeval: 12,
                           fontWeight: FontWeight.w600),
@@ -783,8 +818,8 @@ class _DailyReportState extends State<DailyReport> {
                       },
                     ),
                     ListTile(
-                      title: const robotoTextWidget(
-                          textval: 'Change',
+                      title: robotoTextWidget(
+                          textval: change,
                           colorval: AppColor.themeColor,
                           sizeval: 12,
                           fontWeight: FontWeight.w600),
@@ -792,8 +827,8 @@ class _DailyReportState extends State<DailyReport> {
                           {Navigator.pop(context), selectImage(context, "0")},
                     ),
                     ListTile(
-                      title: const robotoTextWidget(
-                          textval: 'Cancel',
+                      title: robotoTextWidget(
+                          textval: cancel,
                           colorval: AppColor.blackColor,
                           sizeval: 12,
                           fontWeight: FontWeight.w600),
@@ -814,7 +849,7 @@ class _DailyReportState extends State<DailyReport> {
         );
         break;
 
-      case "camera": // CAMERA CAPTURE CODE
+      case "Camera": // CAMERA CAPTURE CODE
         imageFile = await ImagePicker.platform
             .getImageFromSource(source: ImageSource.camera);
         break;
@@ -829,6 +864,14 @@ class _DailyReportState extends State<DailyReport> {
             imagePath: imageFile.path,
             imageSelected: true));
         imageList.setAll(selectedIndex!, imageModel);
+
+        if (imgCount == 0) {
+          imgCount = 1;
+        }
+        if (imgCount == 1) {
+          imgCount = 2;
+        }
+        print('imgCount====>$imgCount');
       });
     } else {
       print("You have not taken image");
@@ -838,11 +881,11 @@ class _DailyReportState extends State<DailyReport> {
   submitDailyReportWidget() {
     return GestureDetector(
         onTap: () {
-          // signIn();
+          submitDailyReport();
         },
         child: Container(
             height: 50,
-             margin: EdgeInsets.all(10),
+            margin: EdgeInsets.all(10),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
                 color: AppColor.themeColor),
@@ -861,5 +904,142 @@ class _DailyReportState extends State<DailyReport> {
                       sizeval: 14,
                       fontWeight: FontWeight.bold),
             )));
+  }
+
+  void submitDailyReport() {
+    print(
+        'targetDateController======>${targetDateController.text.toString()}============>$selectedTargateDate');
+    if (vendoreName.text.isEmpty) {
+      Utility().showInSnackBar(value: searchByName, context: context);
+    } else if (vendoreCode.text.isEmpty) {
+      Utility().showInSnackBar(value: enterVendorCode, context: context);
+    } else if (vendoreAddress.text.isEmpty) {
+      Utility().showInSnackBar(value: enterVendorAddress, context: context);
+    } else if (vendoreContac.text.isEmpty) {
+      Utility().showInSnackBar(value: enterVendorContact, context: context);
+    } else if (selectVisit.toString().isEmpty) {
+      Utility().showInSnackBar(value: selectVisitAtStatus, context: context);
+    } else if (responsiblePerson1.text.toString().isEmpty) {
+      Utility().showInSnackBar(value: enterSapCode, context: context);
+    } else if (agenda.text.toString().isEmpty) {
+      Utility().showInSnackBar(value: enterAgenda, context: context);
+    } else if (discussion.text.toString().isEmpty) {
+      Utility().showInSnackBar(value: enterDiscussionPoint, context: context);
+    } else if (targetDateController.text.toString().isEmpty) {
+      Utility().showInSnackBar(value: selectTargetDat, context: context);
+    } else if (statusType.toString().isEmpty && statusType == "Select Status") {
+      Utility().showInSnackBar(value: selectStus, context: context);
+    } else if (imgCount < 2) {
+      Utility().showInSnackBar(value: attechImages, context: context);
+    } else {
+      setState(() {
+        if (imageList[0].imageSelected) {
+          img1 = Utility.getBase64FormateFile(imageList[0].imagePath);
+        }
+        if (imageList[1].imageSelected) {
+          img2 = Utility.getBase64FormateFile(imageList[0].imagePath);
+        }
+        if (imageList[2].imageSelected) {
+          img3 = Utility.getBase64FormateFile(imageList[0].imagePath);
+        }
+        if (imageList[3].imageSelected) {
+          img4 = Utility.getBase64FormateFile(imageList[0].imagePath);
+        }
+        if (imageList[4].imageSelected) {
+          img5 = Utility.getBase64FormateFile(imageList[0].imagePath);
+        }
+
+        if (selectedPassIndex != null) {
+          if (widget.vendorGatePassLists[selectedPassIndex!].docno.isNotEmpty) {
+            vendorGatePassDocNo =
+                widget.vendorGatePassLists[selectedPassIndex!].docno;
+          }
+
+          if (widget.vendorGatePassLists[selectedPassIndex!].ort01.isNotEmpty) {
+            vendorGatePassRegion =
+                widget.vendorGatePassLists[selectedPassIndex!].ort01;
+          }
+
+          if (widget.vendorGatePassLists[selectedPassIndex!].ort01.isNotEmpty) {
+            vendorGatePassCity =
+                widget.vendorGatePassLists[selectedPassIndex!].ort02;
+          }
+          if (widget.vendorGatePassLists[selectedPassIndex!].stras.isNotEmpty) {
+            vendorGatePassStreet =
+                widget.vendorGatePassLists[selectedPassIndex!].stras;
+          }
+        }
+
+        SubmitDailyReportAPI();
+      });
+    }
+  }
+
+  Future<void> SubmitDailyReportAPI() async {
+    dailyReportModel = [];
+
+    if (_selectedType.toString() == vendor) {
+      dailyReportModel.add(DailyReportModel(
+          pros_vendor: '',
+          vendor: _selectedType.toString(),
+          name: vendoreName.text.toString(),
+          addres: vendoreAddress.text.toString(),
+          TELF2: vendoreContac.text.toString(),
+          VISIT_AT: selectVisit.toString(),
+          pernr1: responsiblePerson1.text.toString(),
+          pernr2: responsiblePerson2.text.toString(),
+          pernr3: responsiblePerson3.text.toString(),
+          ACTIVITY: agenda.text.toString(),
+          DISC: discussion.text.toString(),
+          TGTDATE: targetDateController.text.toString(),
+          STATUS: selectStatus.toString(),
+          STREET: vendorGatePassStreet,
+          REGION: vendorGatePassRegion,
+          CITY1: vendorGatePassCity,
+          CONTACT_P: vendoreCode.text.toString(),
+          GATEPASS_NO: vendorGatePassDocNo,
+          photo1: img1,
+          photo2: img2,
+          photo3: img3,
+          photo4: img4,
+          photo5: img5));
+    } else {
+      dailyReportModel.add(DailyReportModel(
+          pros_vendor: _selectedType.toString(),
+          vendor: '',
+          name: vendoreName.text.toString(),
+          addres: vendoreAddress.text.toString(),
+          TELF2: vendoreContac.text.toString(),
+          VISIT_AT: selectVisit.toString(),
+          pernr1: responsiblePerson1.text.toString(),
+          pernr2: responsiblePerson2.text.toString(),
+          pernr3: responsiblePerson3.text.toString(),
+          ACTIVITY: agenda.text.toString(),
+          DISC: discussion.text.toString(),
+          TGTDATE: selectedTargateDate.toString(),
+          STATUS: selectStatus.toString(),
+          STREET: vendorGatePassStreet,
+          REGION: vendorGatePassRegion,
+          CITY1: vendorGatePassCity,
+          CONTACT_P: vendoreCode.text.toString(),
+          GATEPASS_NO: vendorGatePassDocNo,
+          photo1: img1,
+          photo2: img2,
+          photo3: img3,
+          photo4: img4,
+          photo5: img5));
+    }
+    String value =  convert.jsonEncode(dailyReportModel).toString();
+    var jsonData = null;
+    dynamic response = await HTTP.get(DailyReportAPI(value));
+    if (response != null && response.statusCode == 200) {
+      jsonData = convert.jsonDecode(response.body);
+        Utility().showToast(dailyReportSubmitted);
+        Navigator.of(context).pop();
+      }else {
+        Utility().showToast(somethingWentWrong);
+      }
+
+
   }
 }
