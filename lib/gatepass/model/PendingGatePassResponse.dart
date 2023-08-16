@@ -33,24 +33,24 @@ class Datum {
   String ename;
   String directindirect;
   String mandt;
-  int gpno;
+  String gpno;
   String werks;
   String gptype;
-  int pernr;
-  int plans;
-  int orgeh;
+  String pernr;
+  String plans;
+  String orgeh;
   String gpdat;
   String gptime;
   String eindat;
   String eintime;
   String reqtype;
-  int chargeGiven;
+  String chargeGiven;
   String vplace;
   String purpose1;
   String uname;
   String credt;
   String vfp;
-  int gateNo;
+  String gateNo;
 
   Datum({
     required this.gpdat1,
