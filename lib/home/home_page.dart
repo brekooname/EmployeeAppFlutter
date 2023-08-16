@@ -1061,7 +1061,6 @@ class _HomePageState extends State<HomePage> {
       jsonData1 = convert.jsonDecode(response2.body);
       PendingGatePassResponse pendingGatePassResponse =
           PendingGatePassResponse.fromJson(jsonData1);
-      if (pendingGatePassResponse.data.isNotEmpty) {
         setState(() {
           gatePassList = pendingGatePassResponse.data;
           gatePassResponse = pendingGatePassResponse;
@@ -1070,7 +1069,7 @@ class _HomePageState extends State<HomePage> {
               .setSharedPreference(gatePassDatail, response2.body.toString());
         });
         setgatePassData();
-      }
+
     }
 
     dynamic response3 = await HTTP
@@ -1079,8 +1078,7 @@ class _HomePageState extends State<HomePage> {
       jsonData1 = convert.jsonDecode(response3.body);
        vendorGatePassPrefix.VendorGatePassModel vendorGatePass =
       vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData1);
-      if (vendorGatePass.response.isNotEmpty) {
-        setState(() {
+       setState(() {
           vendorGatePassList = vendorGatePass.response;
           vendorGatePassModel = vendorGatePass;
           isLoading = false;
@@ -1088,7 +1086,7 @@ class _HomePageState extends State<HomePage> {
         });
         setVendorgatePassData();
       }
-    }
+
   }
 
   void setListData() {
