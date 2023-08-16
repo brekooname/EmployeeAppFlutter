@@ -212,6 +212,7 @@ class _SalarySlipState extends State<SalarySlip> {
       isLoading = true;
     });
 
+    print("url====>${Uri.parse(_url)}");
     if (!await launchUrl(Uri.parse(_url) ,mode: LaunchMode.externalApplication,)) {
       throw Exception('Could not launch $_url');
     }
@@ -220,5 +221,4 @@ class _SalarySlipState extends State<SalarySlip> {
       isLoading = false;
     });
   }
-
 }

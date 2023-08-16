@@ -108,7 +108,6 @@ var responsiblePerson2 ="Responsible person 2" ;
 var responsiblePerson3 ="Responsible person 3" ;
 var agendatxt= "Agenda";
 var discussiontxt= "Discussion" ;
-var vendor = "Vendor";
 var prosepetive = "Prospective Vendor";
 var leave = "Leave";
 var  official = "Official Duty";
