@@ -318,7 +318,7 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
       OtpResponse otpResponse = OtpResponse.fromJson(jsonData);
 
       if (otpResponse.status.compareTo("Success") == 0) {
-        Utility().showToast("OTP Send SuccessFully");
+        Utility().showToast(otpMessg);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (BuildContext context) => EnterOTPPage(

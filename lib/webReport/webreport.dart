@@ -33,9 +33,8 @@ class _WebScreenState extends State<WebReport> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: const robotoTextWidget(
-            textval: ""
-                "Web Report",
+        title:  robotoTextWidget(
+            textval: webReport,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),

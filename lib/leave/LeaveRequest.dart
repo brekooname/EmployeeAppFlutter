@@ -144,11 +144,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select leave type',
+              hintText: selectLeaveType,
               fillColor: Colors.white),
           value: selectedLeaveType,
           validator: (value) =>
-              value == null || value.isEmpty ? 'Please Select leave type' : "",
+              value == null || value.isEmpty ? selectLeaveType : "",
           items: widget.LeaveBalanceList.map((leaveType) => DropdownMenuItem(
               value: leaveType.leaveType,
               child: robotoTextWidget(
@@ -178,11 +178,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select Day or More',
+              hintText: selectDayOrMore,
               fillColor: Colors.white),
           value: dayTypeSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? 'Please Select Day or More' : "",
+          value == null || value.isEmpty ? selectDayOrMore : "",
           items: dayTypeList
               .map((dayType) => DropdownMenuItem(
               value: dayType,
@@ -284,15 +284,15 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       ),
       child: TextField(
         controller: reason,
-        style: const TextStyle(color: AppColor.themeColor),
-        decoration: const InputDecoration(
+        style:   TextStyle(color: AppColor.themeColor),
+        decoration:   InputDecoration(
           prefixIcon: Icon(
             Icons.edit_note,
             color: AppColor.themeColor,
             size: 20,
           ),
           border: InputBorder.none,
-          hintText: "Reason",
+          hintText: reasontxt,
           hintStyle: TextStyle(color: AppColor.themeColor,fontSize: 12),
         ),
         keyboardType: TextInputType.text,
@@ -330,8 +330,8 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
             color: AppColor.themeColor,
             fontFamily: 'Roboto',
             fontWeight: FontWeight.w600),
-        searchInputDecoration: const InputDecoration(
-          hintText: "Assign Charge To",
+        searchInputDecoration:   InputDecoration(
+          hintText: assginCharge,
           hintStyle: TextStyle(
               color: AppColor.themeColor, fontWeight: FontWeight.normal,fontSize: 12),
           prefixIcon: Icon(
@@ -390,23 +390,28 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   void Validation() {
     selectedLeaveType ??= "";
     if (selectedLeaveType!.isEmpty) {
-      Utility().showToast("Please Select Leave Type");
+      Utility().showToast(vaildLeaveType);
     }  else if (fromDateController.text.toString().isEmpty) {
-      Utility().showToast("Please select leave from date");
+      Utility().showToast(vaildLeaveDate);
     }  else if (toDateController.text.toString().isEmpty) {
-      Utility().showToast("Please select leave to date");
+      Utility().showToast(vaildLeaveDateTO);
     }  else if (reason.text.toString().isEmpty) {
-      Utility().showToast("Please enter reason");
+      Utility().showToast(vaildRaseon);
     } else if (perInCharge1.isEmpty) {
-      Utility().showToast("Please enter person in charge1");
+      Utility().showToast(vaildPerson1);
     } else if (perInCharge2.isEmpty) {
-      Utility().showToast("Please enter person in charge2");
+      Utility().showToast(vaildPerson2);
     } else {
       applyLeave();
     }
   }
 
   Future<void> applyLeave() async {
+
+    setState(() {
+      isLoading = true;
+    });
+
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(createLeaveAPI(
         sharedPreferences.getString(userID).toString(),
@@ -428,8 +433,14 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       if (leave[0].name.compareTo("Leave request created") == 0) {
         Utility().showToast(leave[0].name);
         Navigator.of(context).pop();
+        setState(() {
+          isLoading = false;
+        });
       } else {
         Utility().showToast(leave[0].name);
+        setState(() {
+          isLoading = false;
+        });
       }
     }else{
       Utility().showToast(somethingWentWrong);

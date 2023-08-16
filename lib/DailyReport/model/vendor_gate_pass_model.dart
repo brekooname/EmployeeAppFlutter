@@ -22,7 +22,7 @@ class VendorGatePassModel {
   factory VendorGatePassModel.fromJson(Map<String, dynamic> json) => VendorGatePassModel(
     status: json["status"],
     message: json["message"],
-    response: List<Response>.from(json["response"].map((x) => Response.fromJson(x))),
+    response: json["response"] != null? List<Response>.from(json["response"].map((x) => Response.fromJson(x))):[],
   );
 
   Map<String, dynamic> toJson() => {

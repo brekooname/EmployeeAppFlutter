@@ -11,8 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/string.dart';
 import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
-import '../home/home_page.dart';
-import '../leave/model/leaveResponse.dart';
 import '../theme/color.dart';
 import '../webservice/constant.dart';
 
@@ -45,11 +43,22 @@ class _GatePassApprovedState extends State<GatePassApproved> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           backgroundColor: AppColor.themeColor,
-          title: const robotoTextWidget(textval: "Gate Pass Approve", colorval: AppColor.whiteColor,
+          title:   robotoTextWidget(textval: gatePassApprove, colorval: AppColor.whiteColor,
               sizeval: 18, fontWeight: FontWeight.normal),
 
       ),
-      body: _buildPosts(context),
+      body:Stack(
+        children: [
+          _buildPosts(context),
+          Center(
+            child: isLoading == true
+                ? const CircularProgressIndicator(
+              color: Colors.indigo,
+            )
+                : const SizedBox(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -93,35 +102,35 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailWidget("GatePass No", widget.gatePassList[index].gpno.toString()),
+                        detailWidget(gatePassNo, widget.gatePassList[index].gpno.toString()),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("Name",widget.gatePassList[index].ename),
+                        detailWidget(nametxt,widget.gatePassList[index].ename),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("GatePass Type",widget.gatePassList[index].gptypeTxt ),
+                        detailWidget(gatePassType,widget.gatePassList[index].gptypeTxt ),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("Required Type",widget.gatePassList[index].reqtypeTxt),
+                        detailWidget(requiredType,widget.gatePassList[index].reqtypeTxt),
                         const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
-                            datedetailWidget( "From", widget.gatePassList[index].gpdat.toString()),
+                            datedetailWidget(from, widget.gatePassList[index].gpdat.toString()),
                             const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( "To",widget.gatePassList[index].eindat.toString()),
+                            datedetailWidget( to,widget.gatePassList[index].closedDate.toString()),
                           ],
                         ),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "Visit Place",widget.gatePassList[index].vplace),
+                        detailWidget(visitPlace,widget.gatePassList[index].vplace),
                         const SizedBox(
                           height: 2,
                         ),
@@ -137,10 +146,10 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                                 selectedIndex = index;
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context,widget.gatePassList[index].pernr, widget.gatePassList[index].gateNo, 0),
+                                  builder: (BuildContext context) => dialogue_removeDevice(context,widget.gatePassList[index].pernr, widget.gatePassList[index].gpno, 0),
                                 );
                               },
-                              child: IconWidget('assets/svg/delete.svg' ,"Reject"),
+                              child: IconWidget('assets/svg/delete.svg' ,rejecttxt),
                             ),
                           ),
                           Container(
@@ -156,7 +165,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                                 );
 
                               },
-                              child: IconWidget('assets/svg/checkmark.svg' ,"Approve"),
+                              child: IconWidget('assets/svg/checkmark.svg' ,approvetxt),
                             ),
                           ),
                         ],),
@@ -287,7 +296,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
             height: 10,
           ),
           Text(
-            i == 0 ?  leaveReject:leaveConfirmation,
+            i == 0 ?  gatePassReject:gatePassConfirmation,
             style: const TextStyle(
                 color: AppColor.themeColor,
                 fontFamily: 'Roboto',
@@ -321,11 +330,11 @@ class _GatePassApprovedState extends State<GatePassApproved> {
               Flexible(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.pop(context);
                     if (i == 0){
-                      confirmGatePass(perner,leaveNo,"reject");
+                      confirmGatePass(perner,leaveNo,rejecttxt);
                     }else {
-                      confirmGatePass(perner,leaveNo, "approve");
+                      confirmGatePass(perner,leaveNo,approvetxt);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -347,7 +356,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         ]));
   }
 
-  Future<void> confirmGatePass(int prner, int leaveNo, String s) async {
+  Future<void> confirmGatePass(String prner, String leaveNo, String s) async {
     setState(() {
       isLoading  = true;
     });
@@ -361,7 +370,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         setState(() {
           isLoading  = false;
         });
-        Utility().showToast("Gate Pass Approved Successfully");
+        Utility().showToast(gatePassSuccess);
         Navigator.of(context).pop();
       }else{
         setState(() {

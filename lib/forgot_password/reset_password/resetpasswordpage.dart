@@ -265,9 +265,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
       Iterable l = json.decode(response.body);
       List<UpdatePasswordResponse> updatepassword = List<UpdatePasswordResponse>.from(l.map((model)=> UpdatePasswordResponse.fromJson(model)));
-      if (updatepassword[0].msg != null && updatepassword[0].msg != "Enter correct registered Mob no." && updatepassword[0].msg !="Wrong DOB") {
-        Utility().showToast(updatepassword[0].msg);
-      }else if (updatepassword[0].msg == "Enter correct registered Mob no." || updatepassword[0].msg !="Wrong DOB"){
+      if (updatepassword[0].msg != null && updatepassword[0].msg != registeredMob && updatepassword[0].msg !=wrongdob) {
         Utility().showToast(updatepassword[0].msg);
       }
       else {
@@ -292,7 +290,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                 backgroundColor: AppColor.whiteColor,
               ),
               onPressed: () => _selectDate(context),
-              child: const robotoTextWidget(textval: 'Select date of DOB', colorval: AppColor.themeColor, sizeval: 15, fontWeight: FontWeight.w400),
+              child:   robotoTextWidget(textval: selectDOB, colorval: AppColor.themeColor, sizeval: 15, fontWeight: FontWeight.w400),
             ),
             const SizedBox(height: 15.0,),
             robotoTextWidget(textval: indianDate.toString(), colorval: AppColor.themeColor, sizeval: 20, fontWeight: FontWeight.normal)

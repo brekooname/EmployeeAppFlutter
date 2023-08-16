@@ -27,7 +27,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   bool isLoading = false;
   TextEditingController reason = TextEditingController();
-  TextEditingController visitPlace = TextEditingController();
+  TextEditingController visitPlaceController = TextEditingController();
   TextEditingController purpose1 = TextEditingController();
   TextEditingController purpose2 = TextEditingController();
   TextEditingController purpose3 = TextEditingController();
@@ -73,7 +73,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     "Others-21",
     "Sales Office-22",
     "Business Tour-23",
-    "Traning-24",
+    "Training-24",
     "Vendor visit-25",
     "Vendor Mtl. inspection & Dispatch-26"
   ];
@@ -124,9 +124,9 @@ class _OfficialRequestState extends State<OfficialRequest>  {
           child: Column(
             children: [
               dutyTypeSpinnerWidget(),
-              const SizedBox(height: 10,),
+                SizedBox(height: 10,),
               WorkPlaceSpinnerWidget(),
-              const SizedBox(height: 10,),
+                SizedBox(height: 10,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -136,12 +136,12 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                       selectedToDate!, toDateController, "1")
                 ],
               ),
-              textFeildWidget( "Visit Place", visitPlace),
-              textFeildWidget( "Purpose 1", purpose1),
-              textFeildWidget("Purpose 2", purpose2),
-              textFeildWidget( "Purpose 3", purpose3),
-              textFeildWidget( "Purpose 4", purpose4),
-              textFeildWidget("Remark", remark),
+              textFeildWidget(visitPlace, visitPlaceController),
+              textFeildWidget( purpose1txt, purpose1),
+              textFeildWidget(purpose2txt, purpose2),
+              textFeildWidget( purpose3txt, purpose3),
+              textFeildWidget(purpose4txt, purpose4),
+              textFeildWidget(remarktxt, remark),
               assginToSpinnerWidget(context,widget.activeemployeeList),
 
               submitWidget(),
@@ -172,8 +172,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
             ),
           ),
         ).toList(),
-        searchInputDecoration: const InputDecoration(
-          hintText: "Assign Charge To",
+        searchInputDecoration:   InputDecoration(
+          hintText: assginCharge,
           hintStyle: TextStyle(color: AppColor.themeColor, fontSize: 12, fontWeight: FontWeight.normal),
           prefixIcon: Icon(Icons.person,   size: 20, color: AppColor.themeColor,),
           border: InputBorder.none,
@@ -233,11 +233,11 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select OD Type',
+              hintText: selectODType,
               fillColor: Colors.white),
           value: dutyTypeSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? 'Please Select OD Type' : "",
+          value == null || value.isEmpty ? selectODType : "",
           items: dutyTypeList
               .map((dayType) => DropdownMenuItem(
               value: dayType,
@@ -269,11 +269,11 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select Work Place',
+              hintText: selectWorkPlace,
               fillColor: Colors.white),
           value: workPlaceSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? 'Please Select Work Place' : "",
+          value == null || value.isEmpty ? selectWorkPlace : "",
           items: workplaceList
               .map((dayType) => DropdownMenuItem(
               value: dayType,
@@ -395,20 +395,20 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     workPlaceSpinner ??= "";
 
     if(workPlaceSpinner!.isEmpty ) {
-      Utility().showToast("Please select Work Place");
+      Utility().showToast(validWorkPlace);
     }
     if (fromDateController.text.toString().isEmpty) {
-      Utility().showToast("Please select leave from date");
+      Utility().showToast(validDate);
     }  else if(dutyTypeSpinner!.isEmpty) {
-        Utility().showToast("Please select OD type");
+        Utility().showToast(validateOd);
       }else if (toDateController.text.toString().isEmpty) {
-      Utility().showToast("Please select leave to date");
-    }else if(workPlaceSpinner ==  "Select Work Place") {
-      Utility().showToast("Please select Department");
+      Utility().showToast(vaildLeave);
+    }else if(workPlaceSpinner ==  selectWorkPlace) {
+      Utility().showToast(vaildDepartment);
     }else  if(purpose1.text.toString().isEmpty){
-      Utility().showToast("Please enter Purpose");
+      Utility().showToast(vaildPurpose);
     } else  if(remark.text.toString().isEmpty){
-      Utility().showToast("Please enter Remark");
+      Utility().showToast(vaildRemark);
     } else {
       createOD();
     }
@@ -416,22 +416,35 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   Future<void> createOD() async {
 
+    setState(() {
+      isLoading =true;
+    });
+
    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     String? sapcode = sharedPreferences.getString(userID).toString() ;
 
-    dynamic response = await HTTP.get(createODAPI(sapcode!,dutyTypeSpinner.toString(),fromDateController.text.toString(),toDateController.text.toString(),visitPlace.text.toString(),workPlaceSpinner.toString(),purpose1.text.toString(),purpose2.text.toString(),purpose3.text.toString(),remark.text.toString(),selectedAssginTo.toString()));
+    dynamic response = await HTTP.get(createODAPI(sapcode!,dutyTypeSpinner.toString(),fromDateController.text.toString(),toDateController.text.toString(),visitPlaceController.text.toString(),workPlaceSpinner.toString(),purpose1.text.toString(),purpose2.text.toString(),purpose3.text.toString(),remark.text.toString(),selectedAssginTo.toString()));
     if (response != null && response.statusCode == 200){
-      var jsonData = convert.jsonDecode(response.body);
-      OdResponse odResponse = OdResponse.fromJson(jsonData);
 
-      if(odResponse.name.compareTo("SAPLSPO1") == 0){
-        Utility().showToast("OD Created Successfully");
+      Iterable l = convert.jsonDecode(response.body);
+      List<OdResponse> odResponse =
+      List<OdResponse>.from(
+          l.map((model) => OdResponse.fromJson(model)));
+
+      if(odResponse[0].name.compareTo("SAPLSPO1") == 0){
+        Utility().showToast(odCreatedSuccess);
 
         Navigator.of(context).pop();
+        setState(() {
+          isLoading =false;
+        });
 
       }else{
-        Utility().showToast(odResponse.name);
+        Utility().showToast(odResponse[0].name);
+        setState(() {
+          isLoading =false;
+        });
       }
     }else{
       Utility().showToast(somethingWentWrong);

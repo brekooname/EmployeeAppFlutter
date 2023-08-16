@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
-import 'package:shakti_employee_app/DailyReport/daily_report_model.dart';
+import 'package:shakti_employee_app/DailyReport/model/daily_report_model.dart';
 import 'package:shakti_employee_app/DailyReport/image_view_widget.dart';
 import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
     as vendorGatePassPrefix;

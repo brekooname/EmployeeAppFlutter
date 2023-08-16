@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
+import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 
 class AttendanceReport extends StatefulWidget {
@@ -33,8 +34,8 @@ class _AttendanceReportState extends State<AttendanceReport> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: const robotoTextWidget(
-            textval: "Attendance Table",
+        title:   robotoTextWidget(
+            textval: AttendanceTable,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),

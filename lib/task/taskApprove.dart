@@ -50,8 +50,8 @@ class _TaskApprovedState extends State<TaskApproved> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: const robotoTextWidget(
-            textval: "Approved Task",
+        title: robotoTextWidget(
+            textval: closeTask,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
@@ -90,47 +90,44 @@ class _TaskApprovedState extends State<TaskApproved> {
     return Wrap(children: [
       Card(
           color: AppColor.whiteColor,
-          elevation: 10,
-          semanticContainer: true,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
+          elevation: 5,
           shape: const RoundedRectangleBorder(
             side: BorderSide(
-              color: AppColor.greyBorder,
+              color: AppColor.whiteColor,
             ),
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
-          child: Container(
-              height: 270,
-              padding: const EdgeInsets.all(5),
-              color: AppColor.whiteColor,
-              child: Stack(children: <Widget>[
-                Column(
+          child:  Stack(children: <Widget>[
+               Padding(padding: EdgeInsets.all(10),
+                 child:  Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     displayWidget(docNo, widget.pendingTaskList[index].dno),
+                     SizedBox(height: 10,),
+                     displayWidget(mrcType,  widget.pendingTaskList[index].mrct1),
+                     SizedBox(height: 10,),
+                     displayWidget(assigner,  widget.pendingTaskList[index].asgnr1),
+                     SizedBox(height: 10,),
+                     taskDescWidget(desc,  widget.pendingTaskList[index].agenda),
+                     SizedBox(height: 10,),
+                     Row(
+                       children: [
+                         displayWidget(dateFrom,   widget.pendingTaskList[index].comDateFrom),
+                         SizedBox(
+                           width: 35,
+                         ),
+                         displayWidget(dateTo,   widget.pendingTaskList[index].comDateTo),
+                       ],
+                     ),
+                     assginToSpinnerWidget(context,widget.activeemployeeList),
 
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    displayWidget("Document No - ", widget.pendingTaskList[index].dno),
-                    const SizedBox(height: 10,),
-                    displayWidget("MRC Type - ",  widget.pendingTaskList[index].mrct1),
-                    const SizedBox(height: 10,),
-                    displayWidget("Assigner - ",  widget.pendingTaskList[index].asgnr1),
-                    const SizedBox(height: 10,),
-                    taskDescWidget("Description - ",  widget.pendingTaskList[index].agenda),
-                    Row(
-                      children: [
-                        displayWidget("Date From - ",   widget.pendingTaskList[index].comDateFrom),
-                        const SizedBox(
-                          width: 35,
-                        ),
-                        displayWidget("Date To - ",   widget.pendingTaskList[index].comDateTo),
-                      ],
-                    ),
-                    assginToSpinnerWidget(context,widget.activeemployeeList),
-                    const SizedBox(height: 10,),
-                    submitWidget(widget.pendingTaskList[index].dno, widget.pendingTaskList[index].srno),
-                  ],
-                ),
+
+                     submitWidget(widget.pendingTaskList[index].dno, widget.pendingTaskList[index].srno),
+                   ],
+                 ),
+               ),
               ]
-            )
+
           )
       ),
     ]);
@@ -301,18 +298,14 @@ class _TaskApprovedState extends State<TaskApproved> {
           sizeval: 14.0,
           fontWeight: FontWeight.bold,
         ),
-
-        Container(
-          width: 240,
-          height: 30,
-          child:  Flexible(
+           Flexible(
             child: robotoTextWidget(
               textval: value,
               colorval:  Colors.black,
               sizeval: 14.0,
               fontWeight: FontWeight.w400,
             ),
-          ),
+
         ),
       ],
     );
@@ -322,13 +315,10 @@ class _TaskApprovedState extends State<TaskApproved> {
     return  InkWell(
         onTap: () {
           completeTaskData.clear();
-          print("object${selectedAssginTo}");
           completeTaskData.add(CompleteTaskRequest(dno: dno, srno: srno, checker: selectedAssginTo.toString(), remark: ""));
 
           String value =  convert.jsonEncode(completeTaskData).toString();
-
-          print("TaskDetails =====>${value.toString()}");
-            closeCompleteTask(value);
+          closeCompleteTask(value);
         },
         child: Container(
           height: 50,
@@ -342,7 +332,7 @@ class _TaskApprovedState extends State<TaskApproved> {
               height: 30,
               width: 30,
               child:
-              const CircularProgressIndicator(
+                   const CircularProgressIndicator(
                 color: AppColor.whiteColor,
               ),
             )
@@ -364,12 +354,13 @@ class _TaskApprovedState extends State<TaskApproved> {
      jsonData = convert.jsonDecode(response.body);
      TaskRespons taskRespons = TaskRespons.fromJson(jsonData);
 
+
      if(taskRespons.dataSuccess[3].syncData == "EMP_TASK_COMPLETE" && taskRespons.dataSuccess[3].value == "Y"){
-       Utility().showToast("Task has been Closed.");
+       Utility().showToast(taskClosed);
        Navigator.of(context).pop();
      }else
      {
-       Utility().showToast("Something went wrong try again.");
+       Utility().showToast(somethingWentWrong);
      }
    }else{
      Utility().showToast(somethingWentWrong);
