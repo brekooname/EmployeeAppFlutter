@@ -149,13 +149,13 @@ class _HomePageState extends State<HomePage> {
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: [
-                  detailWidget("Leave"),
-                  detailWidget("Official Duty"),
-                  detailWidget("Gate Pass"),
-                  detailWidget("Task"),
+                  detailWidget(leave),
+                  detailWidget(official),
+                  detailWidget(gatePasstxt),
+                  detailWidget(task),
                   localConvenience(),
-                  dailyAndWebReport("Daily Report", "assets/svg/approved.svg"),
-                  dailyAndWebReport("Web Report", "assets/svg/report.svg"),
+                  dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
+                  dailyAndWebReport(webReport, "assets/svg/report.svg"),
                 ],
               ),
             ),
@@ -335,9 +335,8 @@ class _HomePageState extends State<HomePage> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location services are disabled. Please enable the services')));
+      ScaffoldMessenger.of(context).showSnackBar(  SnackBar(
+          content: Text(location)));
       return false;
     }
     permission = await Geolocator.checkPermission();
@@ -345,14 +344,14 @@ class _HomePageState extends State<HomePage> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')));
+              SnackBar(content: Text(locationDenid)));
         return false;
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(  SnackBar(
           content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
+              locationDenidtxt)));
       return false;
     }
     return true;
@@ -633,7 +632,7 @@ class _HomePageState extends State<HomePage> {
       listMap.forEach(
           (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
       if (localConveyanceList.isNotEmpty) {
-        print('UserID====>${localConveyanceList[localConveyanceList.length - 1].userId}');
+
         Utility().checkInternetConnection().then((connectionResult) {
           if (connectionResult) {
             calculateDistance(

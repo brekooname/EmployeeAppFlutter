@@ -3,8 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/home_page.dart';
-import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
+ import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/model/leaveResponse.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
@@ -87,31 +86,31 @@ class InDirectLeaveState extends State<InDirectLeave> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailWidget("Leave No", widget.pendindLeaveList[index].leavNo.toString()),
+                        detailWidget( leaveNo , widget.pendindLeaveList[index].leavNo.toString()),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("Name",widget.pendindLeaveList[index].name),
+                        detailWidget(nametxt,widget.pendindLeaveList[index].name),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("Leave Type",widget.pendindLeaveList[index].horo + widget.pendindLeaveList[index].dedQuta1),
+                        detailWidget(leaveType ,widget.pendindLeaveList[index].horo + widget.pendindLeaveList[index].dedQuta1),
                         const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
-                            datedetailWidget( "Leave From", widget.pendindLeaveList[index].levFr),
+                            datedetailWidget(leaveFrom , widget.pendindLeaveList[index].levFr),
                             const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( "Leave To",widget.pendindLeaveList[index].levT),
+                            datedetailWidget( leaveTo,widget.pendindLeaveList[index].levT),
                           ],
                         ),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "Visit Place",widget.pendindLeaveList[index].reason),
+                        detailWidget( visitPlace ,widget.pendindLeaveList[index].reason),
                         const SizedBox(
                           height: 2,
                         ),
@@ -130,7 +129,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                                   builder: (BuildContext context) => dialogue_removeDevice(context, widget.pendindLeaveList[index].leavNo, 0),
                                 );
                               },
-                              child: IconWidget('assets/svg/delete.svg' ,"Reject"),
+                              child: IconWidget('assets/svg/delete.svg' ,rejecttxt),
                             ),
                           ),
                           Container(
@@ -146,7 +145,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                                 );
 
                               },
-                              child: IconWidget('assets/svg/checkmark.svg' ,"Approve"),
+                              child: IconWidget('assets/svg/checkmark.svg' ,approvetxt),
                             ),
                           ),
                         ],),
@@ -355,15 +354,12 @@ class InDirectLeaveState extends State<InDirectLeave> {
     dynamic response = await HTTP.get(approveLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()  ));
     if (response != null && response.statusCode == 200)  {
 
-      print("response======>${response.toString()}");
       Iterable l = convert.json.decode(response.body);
       List<LeaveApproveResponse> leaveResponse = List<LeaveApproveResponse>.from(l.map((model)=> LeaveApproveResponse.fromJson(model)));
-      print("response======>${leaveResponse[0].type}");
 
       if(leaveResponse[0].type.compareTo("S") == 0){
 
-
-        Utility().showToast("Leave Approved Successfully");
+        Utility().showToast(leaveSuccessfully);
 
         Navigator.of(context).pop();
 
@@ -392,7 +388,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
       var jsonData = convert.jsonDecode(response.body);
       LeaveRejectResponse leaveResponse = LeaveRejectResponse.fromJson(jsonData);
       if(leaveResponse.status.compareTo("true") == 0){
-        Utility().showToast("Leave Rejected Successfully");
+        Utility().showToast(leaveRejectSuccessfully);
 
         Navigator.of(context).pop();
 

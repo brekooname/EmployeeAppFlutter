@@ -9,6 +9,7 @@ import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import '../Util/utility.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
+import '../webservice/constant.dart';
 import 'model/vendornamelistresponse.dart' as VenderList;
 import 'model/vendornamelistresponse.dart';
 
@@ -94,17 +95,17 @@ class _DailyReportState extends State<DailyReport> {
         child: Column(
           children: [
             radtiobuttonWidget(),
-            textVendorFeildWidget( "Vendor Name",),
-            textFeildWidget("Vendor Code", vendoreCode),
-            textFeildWidget("Vendor Address", vendoreAddress),
-            textFeildWidget("Vendor Contact N0", vendoreContac),
-            dateTextFeildWidget("Current Date", DateFormat("dd-MM-yyyy").format(DateTime.now())),
+            textVendorFeildWidget( vendorName),
+            textFeildWidget(vaendorCode, vendoreCode),
+            textFeildWidget(vendorAdd, vendoreAddress),
+            textFeildWidget(vendorContact, vendoreContac),
+            dateTextFeildWidget(currentDate, DateFormat("dd-MM-yyyy").format(DateTime.now())),
             TypeSpinnerWidget(),
-            textFeildWidget("Responsible person", person1),
-            textFeildWidget("Responsible person 2", person2),
-            textFeildWidget("Responsible person 3", person3),
-            longTextFeildWidget("Agenda", agenda),
-            longTextFeildWidget("Discussion", discussion),
+            textFeildWidget(responsiblePerson1, person1),
+            textFeildWidget(responsiblePerson2, person2),
+            textFeildWidget(responsiblePerson3, person3),
+            longTextFeildWidget(agendatxt, agenda),
+            longTextFeildWidget(discussiontxt, discussion),
 
             Row(
               children: [
@@ -166,7 +167,7 @@ class _DailyReportState extends State<DailyReport> {
             title: Row(
               children: <Widget>[
                 Radio(
-                  value: "Vendor",
+                  value: vendor,
                   groupValue: _selectedType,
                   onChanged: (String? value) {
                     setState(() {
@@ -174,8 +175,8 @@ class _DailyReportState extends State<DailyReport> {
                     });
                   },
                 ),
-                const Text(
-                  'Vendor',
+                  Text(
+                  vendor,
                   style: TextStyle(
                       color: AppColor.themeColor,
                       fontSize: 15,
@@ -190,7 +191,7 @@ class _DailyReportState extends State<DailyReport> {
             title: Row(
               children: <Widget>[
                 Radio(
-                  value: "Prospective Vendor",
+                  value: prosepetive,
                   groupValue: _selectedType,
                   onChanged: (String? value) {
                     setState(() {
@@ -198,9 +199,9 @@ class _DailyReportState extends State<DailyReport> {
                     });
                   },
                 ),
-                const Flexible(
+                  Flexible(
                     child: Text(
-                  'Prospective Vendor',
+                      prosepetive,
                   style: TextStyle(
                       color: AppColor.themeColor,
                       fontSize: 15,
@@ -282,14 +283,14 @@ class _DailyReportState extends State<DailyReport> {
     ]);
   }
 
-  longTextFeildWidget(String s, TextEditingController longtext) {
+  longTextFeildWidget(String text, TextEditingController longtext) {
     return Column(
       children: [
         Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 15),
             child: Text(
-              s,
+              text,
               style: const TextStyle(
                   color: Colors.black45, fontWeight: FontWeight.bold),
             )),
@@ -306,7 +307,7 @@ class _DailyReportState extends State<DailyReport> {
             style: const TextStyle(color: AppColor.themeColor),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Please Enter " + s,
+              hintText: "Please Enter " + text,
               hintStyle: const TextStyle(
                   color: AppColor.themeColor,
                   fontWeight: FontWeight.normal,

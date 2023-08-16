@@ -144,8 +144,8 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
                 height: 10,
               ),
               dayTypeSpinnerWidget(),
-              textFieldWidget("Place to Visit", visitPlace),
-              textFieldWidget("Purpose", purpose),
+              textFieldWidget(placeVisit, visitPlace),
+              textFieldWidget(purposetxt, purpose),
               assginToSpinnerWidget(context,widget.activeemployeeList),
               submitWidget(),
             ],
@@ -254,7 +254,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
     dayTypeSpinner ??= "";
 
        if(dayTypeSpinner.toString().isEmpty){
-      Utility().showToast("Please enter gate pass type");
+      Utility().showToast(selectGatePassType);
     }
     else  if(returnalbeTypeSpinner.toString().isEmpty){
       Utility().showToast("Please enter returnable type");
@@ -283,11 +283,11 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select return type',
+              hintText: selectReturn,
               fillColor: Colors.white),
           value: returnalbeTypeSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? 'Select return type' : "",
+          value == null || value.isEmpty ? selectReturn : "",
           items: returnableList
               .map((dayType) => DropdownMenuItem(
               value: dayType,
@@ -319,11 +319,11 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select Gate Pass type',
+              hintText: selectGatePass,
               fillColor: Colors.white),
           value: dayTypeSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? 'Select Gate Pass type' : "",
+          value == null || value.isEmpty ? selectGatePass : "",
           items: TypeList
               .map((dayType) => DropdownMenuItem(
               value: dayType,

@@ -51,7 +51,7 @@ class _TaskApprovedState extends State<TaskApproved> {
         backgroundColor: AppColor.themeColor,
         elevation: 0,
         title: robotoTextWidget(
-            textval: "Approved Task",
+            textval: closeTask,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
@@ -105,27 +105,27 @@ class _TaskApprovedState extends State<TaskApproved> {
               color: AppColor.whiteColor,
               child: Stack(children: <Widget>[
                 Column(
-
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    displayWidget("Document No - ", widget.pendingTaskList[index].dno),
+                    displayWidget(docNo, widget.pendingTaskList[index].dno),
                     SizedBox(height: 10,),
-                    displayWidget("MRC Type - ",  widget.pendingTaskList[index].mrct1),
+                    displayWidget(mrcType,  widget.pendingTaskList[index].mrct1),
                     SizedBox(height: 10,),
-                    displayWidget("Assigner - ",  widget.pendingTaskList[index].asgnr1),
+                    displayWidget(assigner,  widget.pendingTaskList[index].asgnr1),
                     SizedBox(height: 10,),
-                    taskDescWidget("Description - ",  widget.pendingTaskList[index].agenda),
+                    taskDescWidget(desc,  widget.pendingTaskList[index].agenda),
                     Row(
                       children: [
-                        displayWidget("Date From - ",   widget.pendingTaskList[index].comDateFrom),
+                        displayWidget(dateFrom,   widget.pendingTaskList[index].comDateFrom),
                         SizedBox(
                           width: 35,
                         ),
-                        displayWidget("Date To - ",   widget.pendingTaskList[index].comDateTo),
+                        displayWidget(dateTo,   widget.pendingTaskList[index].comDateTo),
                       ],
                     ),
                     assginToSpinnerWidget(context,widget.activeemployeeList),
                     SizedBox(height: 10,),
+
                     submitWidget(widget.pendingTaskList[index].dno, widget.pendingTaskList[index].srno),
                   ],
                 ),
@@ -322,13 +322,10 @@ class _TaskApprovedState extends State<TaskApproved> {
     return  InkWell(
         onTap: () {
           completeTaskData.clear();
-          print("object${selectedAssginTo}");
           completeTaskData.add(CompleteTaskRequest(dno: dno, srno: srno, checker: selectedAssginTo.toString(), remark: ""));
 
           String value =  convert.jsonEncode(completeTaskData).toString();
-
-          print("TaskDetails =====>${value.toString()}");
-            closeCompleteTask(value);
+          closeCompleteTask(value);
         },
         child: Container(
           height: 50,
@@ -342,7 +339,7 @@ class _TaskApprovedState extends State<TaskApproved> {
               height: 30,
               width: 30,
               child:
-              const CircularProgressIndicator(
+                   const CircularProgressIndicator(
                 color: AppColor.whiteColor,
               ),
             )
@@ -361,20 +358,16 @@ class _TaskApprovedState extends State<TaskApproved> {
    dynamic response = await HTTP.get(completeTaskAPI(value));
    if (response != null && response.statusCode == 200) {
 
-     print("response======>${response.toString()}");
-
      jsonData = convert.jsonDecode(response.body);
      TaskRespons taskRespons = TaskRespons.fromJson(jsonData);
 
-     print("response======>${taskRespons.dataSuccess[3].value.toString()}");
-     print("response======>${taskRespons.dataSuccess[3].syncData.toString()}");
 
      if(taskRespons.dataSuccess[3].syncData == "EMP_TASK_COMPLETE" && taskRespons.dataSuccess[3].value == "Y"){
-       Utility().showToast("Task has been Closed.");
+       Utility().showToast(taskClosed);
        Navigator.of(context).pop();
      }else
      {
-       Utility().showToast("Something went wrong try again.");
+       Utility().showToast(somethingWentWrong);
      }
    }else{
      Utility().showToast(somethingWentWrong);

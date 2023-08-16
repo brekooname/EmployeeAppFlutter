@@ -1,11 +1,12 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/indirectLeave.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
+
+import '../theme/string.dart';
 
 
 class LeaveApproved extends StatefulWidget {
@@ -44,16 +45,16 @@ class _LeaveApprovedState extends State<LeaveApproved> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             backgroundColor: AppColor.themeColor,
-            title: const robotoTextWidget(textval: "Leave Approve", colorval: AppColor.whiteColor,
+            title: robotoTextWidget(textval: leaveApprove, colorval: AppColor.whiteColor,
                 sizeval: 18, fontWeight: FontWeight.normal),
-            bottom:  const TabBar(
+            bottom:    TabBar(
               isScrollable: false,
               indicatorColor: AppColor.whiteColor,
               indicatorPadding: EdgeInsets.all(5),
               tabs: [
-                Tab(child: robotoTextWidget(textval: 'Direct',
+                Tab(child: robotoTextWidget(textval: direct,
                     colorval: AppColor.whiteColor, sizeval: 14, fontWeight: FontWeight.normal)),
-                Tab(child: robotoTextWidget(textval: 'InDirect', colorval: AppColor.whiteColor, sizeval: 14, fontWeight: FontWeight.normal)),
+                Tab(child: robotoTextWidget(textval: inDirect , colorval: AppColor.whiteColor, sizeval: 14, fontWeight: FontWeight.normal)),
               ],
             )
         ),

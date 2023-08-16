@@ -10,6 +10,7 @@ import '../sidemenu/officaldutyreport/officialdutyReport.dart';
 import '../sidemenu/personalinfo/personalinfo.dart';
 import '../sidemenu/salaryslip/salaryslip.dart';
 import '../theme/color.dart';
+import '../theme/string.dart';
 import '../webservice/constant.dart';
 import 'model/ScyncAndroidtoSAP.dart';
 import 'model/personalindoresponse.dart';
@@ -75,13 +76,13 @@ class _HomePageState extends State<NavigationDrawerWidget> {
                     fontWeight: FontWeight.w600),
               ),
             ),
-            navigationItemWidget(0, Icons.home, "Home"),
-            navigationItemWidget(1, Icons.calendar_month, "Attendance"),
-            navigationItemWidget(2, Icons.calendar_today_rounded, "Leave"),
-            navigationItemWidget(3, Icons.person_outline_rounded, "Official Duty"),
-            navigationItemWidget(4, Icons.person_outline_rounded, "Payslip"),
-            navigationItemWidget(5, Icons.person, "Personal Info"),
-            navigationItemWidget(6, Icons.logout, "Logout"),
+            navigationItemWidget(0, Icons.home, hometxt),
+            navigationItemWidget(1, Icons.calendar_month, attendance),
+            navigationItemWidget(2, Icons.calendar_today_rounded, leave),
+            navigationItemWidget(3, Icons.person_outline_rounded, official),
+            navigationItemWidget(4, Icons.person_outline_rounded, payslip),
+            navigationItemWidget(5, Icons.person, personalInfo),
+            navigationItemWidget(6, Icons.logout, logout),
           ],
         ));
   }
@@ -175,7 +176,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     setState(() {
-      appVersion = 'Version :- ${packageInfo.version}';
+      appVersion = version + packageInfo.version;
     });
 
   }

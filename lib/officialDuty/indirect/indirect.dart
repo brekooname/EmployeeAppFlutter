@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/officialDuty/model/odApproveResponse.dart';
 import 'package:shakti_employee_app/officialDuty/model/odRejectResponse.dart';
@@ -86,35 +85,35 @@ class InDirectState extends State<InDirect> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailWidget("Document No",widget.pendindOdList[index].odno),
+                        detailWidget(docNo,widget.pendindOdList[index].odno),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("Name",widget.pendindOdList[index].ename),
+                        detailWidget(nametxt,widget.pendindOdList[index].ename),
                         const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
-                            datedetailWidget( "OD Start",widget.pendindOdList[index].odstdateC),
+                            datedetailWidget( odStart,widget.pendindOdList[index].odstdateC),
                             const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( "OD End",widget.pendindOdList[index].odedateC),
+                            datedetailWidget(odEnd,widget.pendindOdList[index].odedateC),
                           ],
                         ),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "Visit Place",widget.pendindOdList[index].vplace),
+                        detailWidget( visitPlace,widget.pendindOdList[index].vplace),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "Visit Purpose",widget.pendindOdList[index].purpose1),
+                        detailWidget( visitPurpose,widget.pendindOdList[index].purpose1),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "No of Days",widget.pendindOdList[index].horo),
+                        detailWidget( noOfDay,widget.pendindOdList[index].horo),
 
                         Row(children: [
                           Container(
@@ -131,7 +130,7 @@ class InDirectState extends State<InDirect> {
                                 );
 
                               },
-                              child: IconWidget('assets/svg/delete.svg' ,"Reject"),
+                              child: IconWidget('assets/svg/delete.svg' ,rejecttxt),
                             ),
                           ),
                           Container(
@@ -147,7 +146,7 @@ class InDirectState extends State<InDirect> {
                                 );
 
                               },
-                              child: IconWidget('assets/svg/checkmark.svg' ,"Approve"),
+                              child: IconWidget('assets/svg/checkmark.svg' ,approvetxt),
                             ),
                           ),
                         ],),
@@ -345,7 +344,7 @@ class InDirectState extends State<InDirect> {
       Iterable l = convert.json.decode(response.body);
       List<OdApproveResponse> odResponse = List<OdApproveResponse>.from(l.map((model)=> OdApproveResponse.fromJson(model)));
       if(odResponse[0].type.compareTo("S") == 0){
-        Utility().showToast("OD Approved Successfully");
+        Utility().showToast(odApprovedSuccess);
 
         Navigator.of(context).pop();
 
@@ -365,7 +364,7 @@ class InDirectState extends State<InDirect> {
       Iterable l = convert.json.decode(response.body);
       List<OdRejectResponse> odResponse = List<OdRejectResponse>.from(l.map((model)=> OdRejectResponse.fromJson(model)));
       if(odResponse[0].status.compareTo("true") == 0){
-        Utility().showToast("OD Rejected Successfully");
+        Utility().showToast(odRejectSuccess);
 
         Navigator.of(context).pop();
 

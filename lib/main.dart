@@ -295,7 +295,7 @@ class _LoginPageState extends State<LoginPage> {
       if (loginResponse[0].name.isNotEmpty) {
         Utility().setSharedPreference(name, loginResponse[0].name);
         Utility().setSharedPreference(localConveyanceJourneyStart,'false');
-        Utility().showToast('Welcome ' + loginResponse[0].name);
+        Utility().showToast(welcome + loginResponse[0].name);
         // ignore: use_build_context_synchronously
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => HomePage(journeyStart: False,)),
@@ -311,7 +311,7 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
     }else {
-      Utility().showToast("Something Went Wrong Please Try Again");
+      Utility().showToast(somethingWentWrong);
       setState(() {
         isLoading = false;
       });

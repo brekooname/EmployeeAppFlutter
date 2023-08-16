@@ -246,7 +246,6 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
     return Container(
       height: 45,
       margin: const EdgeInsets.all(10),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -301,14 +300,14 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
       jsonData = convert.jsonDecode(response.body);
       OtpResponse otpResponse = OtpResponse.fromJson(jsonData);
       if (otpResponse.status.compareTo("Success") == 0 ) {
-        Utility().showToast("OTP Send SuccessFully");
+        Utility().showToast(otpMessg);
       } else {
         Utility().showInSnackBar(value: otpResponse.description, context: context);
         Utility().showToast(otpResponse.description);
       }
     } else {
       if (!mounted) return;
-      Utility().showInSnackBar(value: 'Unable To Login', context: context);
+      Utility().showInSnackBar(value: unableLogin, context: context);
     }
   }
 }

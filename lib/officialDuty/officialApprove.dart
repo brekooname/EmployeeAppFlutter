@@ -8,6 +8,7 @@ import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 
 import '../home/model/ScyncAndroidtoSAP.dart';
+import '../theme/string.dart';
 
 class OfficialApproved extends StatefulWidget {
 
@@ -42,16 +43,16 @@ class _OfficialApprovedState extends State<OfficialApproved> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             backgroundColor: AppColor.themeColor,
-            title: const robotoTextWidget(textval: "Official Duty Approve", colorval: AppColor.whiteColor,
+            title:   robotoTextWidget(textval: officalApprove, colorval: AppColor.whiteColor,
                 sizeval: 18, fontWeight: FontWeight.normal),
-            bottom:  const TabBar(
+            bottom:    TabBar(
               isScrollable: false,
               indicatorColor: AppColor.whiteColor,
               indicatorPadding: EdgeInsets.all(5),
               tabs: [
-                Tab(child: robotoTextWidget(textval: 'Direct',
+                Tab(child: robotoTextWidget(textval: direct,
                     colorval: AppColor.whiteColor, sizeval: 14, fontWeight: FontWeight.normal)),
-                Tab(child: robotoTextWidget(textval: 'InDirect', colorval: AppColor.whiteColor, sizeval: 14, fontWeight: FontWeight.normal)),
+                Tab(child: robotoTextWidget(colorval: AppColor.whiteColor, textval: inDirect, sizeval: 14, fontWeight: FontWeight.normal)),
               ],
             )
         ),

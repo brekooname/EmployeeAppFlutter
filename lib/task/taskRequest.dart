@@ -160,7 +160,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
                       selectedToDate!, toDateController, "1")
                 ],
               ),
-              textFeildWidget("Task Description", taskDes),
+              textFeildWidget(taskDesc, taskDes),
               assginToSpinnerWidget(context,widget.activeemployeeList),
               submitWidget(),
             ],
@@ -232,15 +232,14 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
     departmentSpinner ??= "";
     taskSpinner ??= "";
 
-    print("taskDec==>${taskDes.text.toString()}");
     if(taskSpinner!.isEmpty) {
-      Utility().showToast("Please select task type ");
+      Utility().showToast(pleaseTaskType);
     }else if(departmentSpinner!.isEmpty) {
-      Utility().showToast("Please select Department");
+      Utility().showToast(pleaseSelectDepartment);
     } else if(taskDes.text.toString().isEmpty ) {
-      Utility().showToast("Please enter Task Description");
+      Utility().showToast(pleaseEnterTask);
     } else if(selectedAssginTo!.isEmpty){
-      Utility().showToast("Please enter person in charge");
+      Utility().showToast(pleaseEnterPersonCharge);
     }else {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       taskData.add(TaskRequest(pernr: sharedPreferences.getString(userID).toString() , budat: currentDate!, time: currentTime!, description: taskDes.text.toString(), assignTo: selectedAssginTo.toString(), dateFrom: fromDateController.text.toString(), dateTo: toDateController.text.toString(), mrcType: taskSpinner.toString(), department: departmentSpinner.toString()));
@@ -416,8 +415,8 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
             ),
           ),
         ).toList(),
-        searchInputDecoration: const InputDecoration(
-          hintText: "Assign Charge To",
+        searchInputDecoration:   InputDecoration(
+          hintText: assginCharge,
           hintStyle: TextStyle(color: AppColor.themeColor, fontSize: 13, fontWeight: FontWeight.normal),
           prefixIcon: Icon(Icons.person, color: AppColor.themeColor, size: 20,),
           border: InputBorder.none,
@@ -426,8 +425,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
           setState(() {
             selectedAssginTo = value.toString();
           });
-
-          print("submitted\n ${value}"); },
+       },
       ),
 
     );
@@ -442,10 +440,10 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
       jsonData = convert.jsonDecode(response.body);
       TaskRespons taskRespons = TaskRespons.fromJson(jsonData);
       if(taskRespons.dataSuccess[2].syncData == "EMP_TASK" && taskRespons.dataSuccess[2].value == "Y"){
-        Utility().showToast("Task has been assigned.");
+        Utility().showToast(taskAssgined);
         Navigator.of(context).pop();
       }else {
-          Utility().showToast("Something went wrong try again.");
+          Utility().showToast(somethingWentWrong);
         }
 
     }else{

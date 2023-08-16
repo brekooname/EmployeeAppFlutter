@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
+import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 
 class LeaveReport extends StatefulWidget {
@@ -32,8 +32,8 @@ class _LeaveReportState extends State<LeaveReport> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: const robotoTextWidget(
-            textval: "Leave Table",
+        title:   robotoTextWidget(
+            textval: LeaveTable,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
