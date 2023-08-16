@@ -90,13 +90,17 @@ var fromAddress = "From Address:- ";
 var toAddress = "To Address:- ";
 var distanceTravelled = "Distance Travelled:- ";
 var offlineLocalConveyance = "Offline Local Conveyance";
-
 var enterTravelMode = "Please enter travel mode";
 var dataSavedOffline = "Your data saved in offline mode";
 var vendorName = "Vendor Name";
 var vaendorCode = "Vendor Code"  ;
 var vendorAdd= "Vendor Address" ;
 var vendorContact ="Vendor Contact N0"  ;
+var vendorGatePass ="Vendor Gatepass";
+var vendorMeetingImage = "Click meeting with vendor images";
+var visitAt = "Visit At";
+var dailyReport = "Daily Report";
+
 
  var responsiblePerson1 ="Responsible person" ;
 var responsiblePerson2 ="Responsible person 2" ;

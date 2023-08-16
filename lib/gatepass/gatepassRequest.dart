@@ -381,7 +381,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
                       hintText: fromTO,
                       hintStyle: const TextStyle(color: AppColor.themeColor),
                       border: InputBorder.none),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold,color: AppColor.themeColor),
                   keyboardType: TextInputType.datetime,
                   textInputAction: TextInputAction.done,
                 ))
@@ -457,7 +457,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
                       hintText: fromTO,
                       hintStyle: const TextStyle(color: AppColor.themeColor),
                       border: InputBorder.none),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold,color: AppColor.themeColor),
                   keyboardType: TextInputType.datetime,
                   textInputAction: TextInputAction.done,
                 ))
@@ -505,9 +505,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
       List<GatePassResponse> odResponse = List<GatePassResponse>.from(l.map((model)=> GatePassResponse.fromJson(model)));
 
       if(odResponse[0].msgtyp.compareTo("S") == 0){
-
         Utility().showToast(odResponse[0].text);
-
         Navigator.of(context).pop();
 
       }
