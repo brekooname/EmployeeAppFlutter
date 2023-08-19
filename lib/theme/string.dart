@@ -123,6 +123,7 @@ var selectDOB= 'Select date of DOB';
 var otpMessg = "OTP Send SuccessFully";
 var unableLogin = 'Unable To Login';
 var gatePassSuccess = "Gate Pass Approved Successfully";
+var gateRejectPassSuccess = "Gate Pass Rejected Successfully";
 var rejecttxt = "Reject";
 var approvetxt = "Approve";
 var  visitPlace = "Visit Place";

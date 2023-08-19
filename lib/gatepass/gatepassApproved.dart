@@ -27,6 +27,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
 
   bool isLoading = false;
   late int selectedIndex;
+  String rejectStatus = 'reject',approveStatus = 'approve';
 
   @override
   void initState() {
@@ -332,9 +333,9 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                   onPressed: () {
                     Navigator.pop(context);
                     if (i == 0){
-                      confirmGatePass(perner,leaveNo,rejecttxt);
+                      confirmGatePass(perner,leaveNo,rejectStatus);
                     }else {
-                      confirmGatePass(perner,leaveNo,approvetxt);
+                      confirmGatePass(perner,leaveNo,approveStatus);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -356,12 +357,12 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         ]));
   }
 
-  Future<void> confirmGatePass(String prner, String leaveNo, String s) async {
+  Future<void> confirmGatePass(String prner, String leaveNo, String status) async {
     setState(() {
       isLoading  = true;
     });
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    dynamic response = await HTTP.get(approveGatePassAPI(prner,leaveNo,sharedPreferences.getString(userID) as String ,s));
+    dynamic response = await HTTP.get(approveGatePassAPI(prner,leaveNo,sharedPreferences.getString(userID).toString() ,status));
     if (response != null && response.statusCode == 200)  {
       Iterable l = convert.json.decode(response.body);
       List<GatePassResponse> gatePassResponse = List<GatePassResponse>.from(l.map((model)=> GatePassResponse.fromJson(model)));
@@ -370,7 +371,11 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         setState(() {
           isLoading  = false;
         });
-        Utility().showToast(gatePassSuccess);
+        if(status== approveStatus){
+          Utility().showToast(gatePassSuccess);
+        } else if(status== rejectStatus){
+          Utility().showToast(gateRejectPassSuccess);
+        }
         Navigator.of(context).pop();
       }else{
         setState(() {
