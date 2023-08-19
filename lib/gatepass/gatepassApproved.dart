@@ -161,7 +161,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                                 selectedIndex = index;
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context,  widget.gatePassList[index].pernr,widget.gatePassList[index].gateNo,1),
+                                  builder: (BuildContext context) => dialogue_removeDevice(context,  widget.gatePassList[index].pernr,widget.gatePassList[index].gpno,1),
                                 );
 
                               },
