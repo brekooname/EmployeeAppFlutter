@@ -1,4 +1,4 @@
-package com.shakti_employee_app
+package shakti.shakti_employee
 
 import io.flutter.embedding.android.FlutterActivity
 
