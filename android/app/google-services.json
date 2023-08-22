@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "670091446020",
+    "project_id": "shaktiemployeeapp",
+    "storage_bucket": "shaktiemployeeapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670091446020:android:b89d0c1d720b0c2c57b251",
+        "android_client_info": {
+          "package_name": "shakti.shakti_employee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670091446020-3uijk1k4mrbmd14uvd4u51kv95fjol23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8sG_O8omWeHcpK6GvJb_pmyltoigA2zU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670091446020-3uijk1k4mrbmd14uvd4u51kv95fjol23.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

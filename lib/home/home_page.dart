@@ -1,5 +1,6 @@
 import 'dart:convert' as convert;
 import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geocoding/geocoding.dart';
@@ -31,6 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../database/database_helper.dart';
 import '../leave/LeaveApprove.dart';
+import '../notificationService/local_notification_service.dart';
 import '../theme/string.dart';
 import '../webservice/constant.dart';
 import 'model/local_convence_model.dart';
@@ -87,6 +89,44 @@ class _HomePageState extends State<HomePage> {
     journeyStart = widget.journeyStart;
     _handleLocationPermission();
     getNameValue();
+    receiveNotification();
+  }
+
+  void receiveNotification() {
+    FirebaseMessaging.instance.getInitialMessage().then(
+          (message) {
+        print("FirebaseMessaging.instance.getInitialMessage");
+        if (message != null) {
+          print("New Notification");
+        }
+      },
+    );
+
+    // 2. This method only call when App in forground it mean app must be opened
+    FirebaseMessaging.onMessage.listen(
+          (message) {
+        print("FirebaseMessaging.onMessage.listen");
+        if (message.notification != null) {
+          print(message.notification!.title);
+          print(message.notification!.body);
+          print("message.data11 ${message.data}");
+          LocalNotificationService.createanddisplaynotification(message);
+
+        }
+      },
+    );
+
+    // 3. This method only call when App in background and not terminated(not closed)
+    FirebaseMessaging.onMessageOpenedApp.listen(
+          (message) {
+        print("FirebaseMessaging.onMessageOpenedApp.listen");
+        if (message.notification != null) {
+          print(message.notification!.title);
+          print(message.notification!.body);
+          print("message.data22 ${message.data['_id']}");
+        }
+      },
+    );
   }
 
   @override

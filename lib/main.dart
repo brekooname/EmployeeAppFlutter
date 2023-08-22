@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/loginModel/LoginModel.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -12,10 +15,23 @@ import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'forgot_password/forgot_password_page.dart';
 import 'home/home_page.dart';
+import 'notificationService/local_notification_service.dart';
 import 'theme/string.dart';
 
+Future<void> backgroundHandler(RemoteMessage message) async {
+  print(message.data.toString());
+  print(message.notification!.title);
+}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  LocalNotificationService.initialize();
+  await Permission.notification.isDenied.then((value) {
+    if (value) {
+      Permission.notification.request();
+    }
+  });
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn = (sharedPreferences.getString(userID) == null) ? False : True;
   String? journeyStarts = (sharedPreferences.getString(localConveyanceJourneyStart) == null) ? False : sharedPreferences.getString(localConveyanceJourneyStart);
@@ -53,6 +69,24 @@ class _LoginPageState extends State<LoginPage> {
 
   TextEditingController sapCodeController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    retrieveFCMToken();
+  }
+
+  Future<void> retrieveFCMToken() async {
+    FirebaseMessaging.instance.getToken().then((token) {
+      final tokenStr = token.toString();
+      // do whatever you want with the token here
+
+      print('tokenStr==========>$tokenStr');
+    }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -317,5 +351,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
   }
+
+
 
 }
