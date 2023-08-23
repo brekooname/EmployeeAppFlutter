@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -32,6 +34,15 @@ Future<void> main() async {
       Permission.notification.request();
     }
   });
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn = (sharedPreferences.getString(userID) == null) ? False : True;
   String? journeyStarts = (sharedPreferences.getString(localConveyanceJourneyStart) == null) ? False : sharedPreferences.getString(localConveyanceJourneyStart);
