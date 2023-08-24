@@ -30,9 +30,6 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   TextEditingController visitPlaceController = TextEditingController();
   TextEditingController purpose1 = TextEditingController();
   TextEditingController purpose2 = TextEditingController();
-  TextEditingController purpose3 = TextEditingController();
-  TextEditingController purpose4 = TextEditingController();
-  TextEditingController remark = TextEditingController();
   DateTime? pickedDate;
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
@@ -124,9 +121,9 @@ class _OfficialRequestState extends State<OfficialRequest>  {
           child: Column(
             children: [
               dutyTypeSpinnerWidget(),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
               WorkPlaceSpinnerWidget(),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -139,9 +136,6 @@ class _OfficialRequestState extends State<OfficialRequest>  {
               textFeildWidget(visitPlace, visitPlaceController),
               textFeildWidget( purpose1txt, purpose1),
               textFeildWidget(purpose2txt, purpose2),
-              textFeildWidget( purpose3txt, purpose3),
-              textFeildWidget(purpose4txt, purpose4),
-              textFeildWidget(remarktxt, remark),
               assginToSpinnerWidget(context,widget.activeemployeeList),
 
               submitWidget(),
@@ -174,8 +168,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         ).toList(),
         searchInputDecoration:   InputDecoration(
           hintText: assginCharge,
-          hintStyle: TextStyle(color: AppColor.themeColor, fontSize: 12, fontWeight: FontWeight.normal),
-          prefixIcon: Icon(Icons.person,   size: 20, color: AppColor.themeColor,),
+          hintStyle: const TextStyle(color: AppColor.themeColor, fontSize: 12, fontWeight: FontWeight.normal),
+          prefixIcon: const Icon(Icons.person,   size: 20, color: AppColor.themeColor,),
           border: InputBorder.none,
         ),
         onSubmit: (String value) {
@@ -328,9 +322,9 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                       hintText: fromTO,
-                      hintStyle: const TextStyle(color: AppColor.themeColor),
+                      hintStyle: const TextStyle(color: AppColor.themeColor,),
                       border: InputBorder.none),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold,color: AppColor.themeColor),
                   keyboardType: TextInputType.datetime,
                   textInputAction: TextInputAction.done,
                 ))
@@ -407,9 +401,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
       Utility().showToast(vaildDepartment);
     }else  if(purpose1.text.toString().isEmpty){
       Utility().showToast(vaildPurpose);
-    } else  if(remark.text.toString().isEmpty){
-      Utility().showToast(vaildRemark);
-    } else {
+    }else {
       createOD();
     }
   }
@@ -424,7 +416,15 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
     String? sapcode = sharedPreferences.getString(userID).toString() ;
 
-    dynamic response = await HTTP.get(createODAPI(sapcode!,dutyTypeSpinner.toString(),fromDateController.text.toString(),toDateController.text.toString(),visitPlaceController.text.toString(),workPlaceSpinner.toString(),purpose1.text.toString(),purpose2.text.toString(),purpose3.text.toString(),remark.text.toString(),selectedAssginTo.toString()));
+    dynamic response = await HTTP.get(createODAPI(sapcode,
+        dutyTypeSpinner.toString(),
+        fromDateController.text.toString(),
+        toDateController.text.toString(),
+        visitPlaceController.text.toString(),
+        workPlaceSpinner.toString(),
+        purpose1.text.toString(),
+        purpose2.text.toString(),'','',
+        selectedAssginTo.toString()));
     if (response != null && response.statusCode == 200){
 
       Iterable l = convert.jsonDecode(response.body);
