@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/model/leaveRequestModel.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -37,31 +36,37 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       perInCharge2 = "",
       perInCharge3 = "",
       perInCharge4 = "",
-      dateTimeFormat ="dd/MM/yyyy";
+      dateFormat = "dd/MM/yyyy",timeFormat = "HH:mm:ss";
 
   String leaveTypeSpinner = 'Select Leave Type';
-  String?  selectedLeaveType, dayTypeSpinner,selectedFromDate, selectedToDate;
+  String? selectedLeaveType,
+      dayTypeSpinner,
+      halfDayTypeSpinner,
+      selectedFromDate,
+      selectedToDate;
   bool isListVisible = false;
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
+  TextEditingController fromTimeController = TextEditingController();
+  TextEditingController toTimeController = TextEditingController();
   DateTime? pickedDate;
-
 
   var dayTypeList = [
     'Full Day or More',
     'Half Day',
   ];
 
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     setState(() {
-      selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
-      selectedToDate = DateFormat(dateTimeFormat).format(DateTime.now());
-      fromDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
-      toDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
-
+      selectedFromDate = DateFormat(dateFormat).format(DateTime.now());
+      selectedToDate = DateFormat(dateFormat).format(DateTime.now());
+      fromDateController.text =
+          DateFormat(dateFormat).format(DateTime.now());
+      toDateController.text = DateFormat(dateFormat).format(DateTime.now());
     });
   }
 
@@ -96,22 +101,23 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
           child: Column(
             children: [
               leaveTypeSpinnerWidget(),
-              const SizedBox(
-                height: 10,
-              ),
               dayTypeSpinnerWidget(),
-              const SizedBox(
-                height: 10,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  datePickerWidget(selectedFromDate!, fromDateController, "0"),
+                  datePickerWidget(selectedToDate!, toDateController, "1")
+                ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  datePickerWidget(
-                      selectedFromDate!, fromDateController, "0"),
-                  datePickerWidget(
-                      selectedToDate!, toDateController, "1")
+                  timePickerWidget(
+                      selectFromTime, fromTimeController, "0"),
+                  timePickerWidget(selectToTime,toTimeController, "1")
                 ],
               ),
+
               reasonForLeave(),
               assginToSpinnerWidget(context, widget.activeEmpList, "0"),
               assginToSpinnerWidget(context, widget.activeEmpList, "1"),
@@ -128,10 +134,9 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     );
   }
 
-
-
   leaveTypeSpinnerWidget() {
-    return SizedBox(
+    return Container(
+        margin: const EdgeInsets.only(top: 10),
         height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -166,6 +171,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
 
   dayTypeSpinnerWidget() {
     return Container(
+        margin: const EdgeInsets.only(top: 10, bottom: 10),
         height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -182,15 +188,15 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               fillColor: Colors.white),
           value: dayTypeSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? selectDayOrMore : "",
+              value == null || value.isEmpty ? selectDayOrMore : "",
           items: dayTypeList
               .map((dayType) => DropdownMenuItem(
-              value: dayType,
-              child: robotoTextWidget(
-                  textval: dayType,
-                  colorval: AppColor.themeColor,
-                  sizeval: 12,
-                  fontWeight: FontWeight.bold)))
+                  value: dayType,
+                  child: robotoTextWidget(
+                      textval: dayType,
+                      colorval: AppColor.themeColor,
+                      sizeval: 12,
+                      fontWeight: FontWeight.bold)))
               .toList(),
           onChanged: (Object? value) {
             setState(() {
@@ -200,7 +206,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         ));
   }
 
-  datePickerWidget(
+ datePickerWidget(
       String fromTO, TextEditingController DateController, String value) {
     return GestureDetector(
       onTap: () {
@@ -229,20 +235,24 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
             ),
             Expanded(
                 child: TextField(
-                  controller: DateController,
-                  maxLines: 1,
-                  showCursor: false,
-                  enabled: false,
-                  textAlign: TextAlign.center,
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: InputDecoration(
-                      hintText: fromTO,
-                      hintStyle: const TextStyle(color: AppColor.themeColor),
-                      border: InputBorder.none),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
-                  keyboardType: TextInputType.datetime,
-                  textInputAction: TextInputAction.done,
-                ))
+              controller: DateController,
+              maxLines: 1,
+              showCursor: false,
+              enabled: false,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              decoration: InputDecoration(
+                  hintText: fromTO,
+                  hintStyle: const TextStyle(color: AppColor.themeColor),
+                  border: InputBorder.none),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.themeColor),
+              keyboardType: TextInputType.datetime,
+              textInputAction: TextInputAction.done,
+            ))
           ],
         ),
       ),
@@ -255,20 +265,92 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         initialDate: DateTime.now(),
         firstDate: value == "0"
             ? DateTime.now()
-            : selectedFromDate != DateFormat(dateTimeFormat).format(DateTime.now())
-            ? DateTime(2023)
-            : DateTime.now(),
+            : selectedFromDate !=
+                    DateFormat(dateFormat).format(DateTime.now())
+                ? DateTime(2023)
+                : DateTime.now(),
         //DateTime.now() - not to allow to choose before today.
-        lastDate:  DateTime(2050));
+        lastDate: DateTime(2050));
     if (pickedDate != null) {
-      String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
-       setState(() {
+
+      setState(() {
         if (value == "0") {
-          selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
-          fromDateController.text = formattedDate;
+          selectedFromDate = DateFormat(dateFormat).format(pickedDate!);
+          fromDateController.text = selectedFromDate!;
         } else {
-          selectedToDate = DateFormat(dateTimeFormat).format(pickedDate!);
-          toDateController.text = formattedDate;
+          selectedToDate = DateFormat(dateFormat).format(pickedDate!);
+          toDateController.text = selectedToDate!;
+        }
+      });
+    }
+  }
+
+  timePickerWidget(
+      String fromTO, TextEditingController timeController, String value) {
+    return GestureDetector(
+      onTap: () {
+        _selectTime(value);
+      },
+      child: Container(
+        height: 50,
+        width: MediaQuery.of(context).size.width / 2.2,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColor.themeColor,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.timer_outlined,
+              color: AppColor.themeColor,
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child: TextField(
+                  controller: timeController,
+                  maxLines: 1,
+                  showCursor: false,
+                  enabled: false,
+                  textAlign: TextAlign.center,
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
+                      hintText: fromTO,
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      border: InputBorder.none),
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.themeColor),
+                  keyboardType: TextInputType.datetime,
+                  textInputAction: TextInputAction.done,
+                ))
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _selectTime(String value) async {
+    final TimeOfDay? newTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (newTime != null) {
+      setState(() {
+        if (value == "0") {
+          fromTimeController.text = DateFormat(timeFormat).format(DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+        } else if (value == "1") {
+            toTimeController.text = DateFormat(timeFormat).format(
+                DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+          
         }
       });
     }
@@ -284,16 +366,16 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       ),
       child: TextField(
         controller: reason,
-        style:   TextStyle(color: AppColor.themeColor),
-        decoration:   InputDecoration(
-          prefixIcon: Icon(
+        style: const TextStyle(color: AppColor.themeColor),
+        decoration: InputDecoration(
+          prefixIcon: const Icon(
             Icons.edit_note,
             color: AppColor.themeColor,
             size: 20,
           ),
           border: InputBorder.none,
           hintText: reasontxt,
-          hintStyle: TextStyle(color: AppColor.themeColor,fontSize: 12),
+          hintStyle: const TextStyle(color: AppColor.themeColor, fontSize: 12),
         ),
         keyboardType: TextInputType.text,
       ),
@@ -311,30 +393,32 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       ),
       child: SearchField<List<Activeemployee>>(
         suggestions: activeemployee
-                .map(
-                  (activeemployee) => SearchFieldListItem<List<Activeemployee>>(
-                    activeemployee.ename,
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: robotoTextWidget(
-                          textval: activeemployee.ename,
-                          colorval: AppColor.themeColor,
-                          sizeval: 12,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                )
-                .toList(),
+            .map(
+              (activeemployee) => SearchFieldListItem<List<Activeemployee>>(
+                activeemployee.ename,
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: robotoTextWidget(
+                      textval: activeemployee.ename,
+                      colorval: AppColor.themeColor,
+                      sizeval: 12,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+            )
+            .toList(),
         searchStyle: const TextStyle(
             fontSize: 12,
             color: AppColor.themeColor,
             fontFamily: 'Roboto',
             fontWeight: FontWeight.w600),
-        searchInputDecoration:   InputDecoration(
+        searchInputDecoration: InputDecoration(
           hintText: assginCharge,
-          hintStyle: TextStyle(
-              color: AppColor.themeColor, fontWeight: FontWeight.normal,fontSize: 12),
-          prefixIcon: Icon(
+          hintStyle: const TextStyle(
+              color: AppColor.themeColor,
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
+          prefixIcon: const Icon(
             Icons.person,
             color: AppColor.themeColor,
             size: 20,
@@ -343,15 +427,15 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         ),
         onSubmit: (String value) {
           setState(() {
-              if (perInCharge == "0") {
-                perInCharge1 = value;
-              } else if (perInCharge == "1") {
-                perInCharge2 = value;
-              } else if (perInCharge == "2") {
-                perInCharge3 = value;
-              } else if (perInCharge == "3") {
-                perInCharge4 = value;
-              }
+            if (perInCharge == "0") {
+              perInCharge1 = value;
+            } else if (perInCharge == "1") {
+              perInCharge2 = value;
+            } else if (perInCharge == "2") {
+              perInCharge3 = value;
+            } else if (perInCharge == "3") {
+              perInCharge4 = value;
+            }
           });
         },
       ),
@@ -365,24 +449,23 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         },
         child: Container(
           height: 50,
-
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
                 ? const SizedBox(
-              height: 30,
-              width: 30,
-              child: CircularProgressIndicator(
-                color: AppColor.whiteColor,
-              ),
-            )
+                    height: 30,
+                    width: 30,
+                    child: CircularProgressIndicator(
+                      color: AppColor.whiteColor,
+                    ),
+                  )
                 : robotoTextWidget(
-                textval: submit,
-                colorval: Colors.white,
-                sizeval: 14,
-                fontWeight: FontWeight.bold),
+                    textval: submit,
+                    colorval: Colors.white,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold),
           ),
         ));
   }
@@ -391,10 +474,14 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     selectedLeaveType ??= "";
     if (selectedLeaveType!.isEmpty) {
       Utility().showToast(vaildLeaveType);
-    }  else if (fromDateController.text.toString().isEmpty) {
+    } else if (fromDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeaveDate);
-    }  else if (toDateController.text.toString().isEmpty) {
+    } else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeaveDateTO);
+    } else if (fromTimeController.text.toString().isEmpty) {
+      Utility().showToast(selectFromTime);
+    }else if (toTimeController.text.toString().isEmpty) {
+      Utility().showToast(selectToTime);
     }  else if (reason.text.toString().isEmpty) {
       Utility().showToast(vaildRaseon);
     } else if (perInCharge1.isEmpty) {
@@ -402,12 +489,12 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     } else if (perInCharge2.isEmpty) {
       Utility().showToast(vaildPerson2);
     } else {
+
       applyLeave();
     }
   }
 
   Future<void> applyLeave() async {
-
     setState(() {
       isLoading = true;
     });
@@ -419,13 +506,14 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         dayTypeSpinner!,
         selectedFromDate!,
         selectedToDate!,
+        fromTimeController.text.toString(),
+        toTimeController.text.toString(),
         reason.text.toString(),
         perInCharge1.toString(),
         perInCharge2.toString(),
         perInCharge3.toString(),
         perInCharge4.toString()));
     if (response != null && response.statusCode == 200) {
-
       Iterable l = json.decode(response.body);
       List<LeaveRequestModelResponse> leave =
           List<LeaveRequestModelResponse>.from(
@@ -442,7 +530,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
           isLoading = false;
         });
       }
-    }else{
+    } else {
       Utility().showToast(somethingWentWrong);
     }
   }

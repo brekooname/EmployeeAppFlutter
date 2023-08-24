@@ -977,7 +977,9 @@ class _DailyReportState extends State<DailyReport> {
 
   Future<void> SubmitDailyReportAPI() async {
     dailyReportModel = [];
-
+    setState(() {
+      isLoading = true;
+    });
     if (_selectedType.toString() == vendor) {
       dailyReportModel.add(DailyReportModel(
           pros_vendor: '',
@@ -1029,17 +1031,23 @@ class _DailyReportState extends State<DailyReport> {
           photo4: img4,
           photo5: img5));
     }
-    String value =  convert.jsonEncode(dailyReportModel).toString();
+    String value = convert.jsonEncode(dailyReportModel).toString();
+    print('value$value');
     var jsonData = null;
     dynamic response = await HTTP.get(DailyReportAPI(value));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-        Utility().showToast(dailyReportSubmitted);
-        Navigator.of(context).pop();
-      }else {
-        Utility().showToast(somethingWentWrong);
-      }
-
-
+      Utility().showToast(dailyReportSubmitted);
+      setState(() {
+        isLoading = false;
+      });
+      Navigator.of(context).pop();
+    } else {
+      Utility().showToast(somethingWentWrong);
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
+
 }

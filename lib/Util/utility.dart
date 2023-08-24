@@ -97,43 +97,6 @@ class Utility {
     return fileInBase64;
   }
 
-  /*void saveArrayList(List<String> list, int position) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    switch (position) {
-      case 0:
-        String jsonstring = json.encode(list);
-        print('jsonstring=========>$jsonstring');
-        preferences.setString(leaveBalanceLists, jsonstring);
-        break;
-      case 1:
-        preferences.setStringList(activeEmployeeLists, list);
-        break;
-      case 2:
-        preferences.setStringList(attendenceLists, list);
-        break;
-      case 3:
-        preferences.setStringList(odEmpLists, list);
-        break;
-      case 4:
-        preferences.setStringList(leaveEmpLists, list);
-        break;
-      case 5:
-        preferences.setStringList(pendingTaskLists, list);
-        break;
-      case 6:
-        preferences.setStringList(pendingLeaveLists, list);
-        break;
-      case 7:
-        preferences.setStringList(pendindOdLists, list);
-        break;
-      case 8:
-        preferences.setStringList(personalInfos, list);
-        break;
-      case 9:
-        preferences.setStringList(gatePassLists, list);
-        break;
-    }
-  }*/
 
 
 }

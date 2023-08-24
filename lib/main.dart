@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/loginModel/LoginModel.dart';
@@ -77,9 +80,12 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool isLoading = false, isScreenVisible = false;
   bool isPasswordVisible = false;
-
+  String platform ='',appVersion='',fcmToken='',imeiNumber='',apiNumber='',platformVersion='';
   TextEditingController sapCodeController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+  bool getPermission = false;
+
 
 @override
   void initState() {
@@ -89,15 +95,6 @@ class _LoginPageState extends State<LoginPage> {
     retrieveFCMToken();
   }
 
-  Future<void> retrieveFCMToken() async {
-    FirebaseMessaging.instance.getToken().then((token) {
-      final tokenStr = token.toString();
-      // do whatever you want with the token here
-
-      print('tokenStr==========>$tokenStr');
-    }
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -330,8 +327,18 @@ class _LoginPageState extends State<LoginPage> {
     Utility().setSharedPreference(userID, sapCodeController.text.toString());
     Utility().setSharedPreference(password, passwordController.text.toString());
 
-    dynamic response = await HTTP.get(userLogin(
-        sapCodeController.text.toString(), passwordController.text.toString()));
+    if (Platform.isAndroid) {
+      platform = "Android";
+    } else if (Platform.isIOS) {
+      platform = "IOS";
+    }
+    print('LoginURL=====>${userLogin(
+        sapCodeController.text.toString(), passwordController.text.toString(),platformVersion!,apiNumber!,appVersion!,imeiNumber!,platform!,fcmToken!)}');
+
+   dynamic response = await HTTP.get(userLogin(
+        sapCodeController.text.toString(), passwordController.text.toString(),platformVersion!,apiNumber!,appVersion!,imeiNumber!,platform!,fcmToken!));
+
+
     if (response != null && response.statusCode == 200) {
        Iterable l = json.decode(response.body);
       List<LoginModelResponse> loginResponse = List<LoginModelResponse>.from(
@@ -364,5 +371,47 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 
+
+  Future<void> retrieveFCMToken() async {
+    FirebaseMessaging.instance.getToken().then((token) {
+      final tokenStr = token.toString();
+      // do whatever you want with the token here
+      fcmToken = tokenStr;
+      print('tokenStr==========>$tokenStr');
+    }
+    );
+
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    if (!mounted) return;
+    setState(() {
+      appVersion = packageInfo.version;
+    });
+    _deviceDetails();
+  }
+  Future<void>_deviceDetails() async{
+    final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    try {
+      if (Platform.isAndroid) {
+        var build = await deviceInfoPlugin.androidInfo;
+        setState(() {
+          apiNumber  = build.version.sdkInt.toString();
+          platformVersion = build.version.release;
+         imeiNumber =  build.id;
+        });
+        //UUID for Android
+      } else if (Platform.isIOS) {
+        var data = await deviceInfoPlugin.iosInfo;
+        setState(() {
+          apiNumber  = data.utsname.version;
+          platformVersion = data.systemVersion;
+          imeiNumber  = data.identifierForVendor!;
+        });//UUID for iOS
+      }
+    } on PlatformException {
+      print('Failed to get platform version');
+    }
+
+  }
 
 }

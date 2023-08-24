@@ -152,6 +152,7 @@ var leaveRejectSuccessfully = "Leave Rejected Successfully";
 var leaveNo = "Leave No";
 var leaveType = "Leave Type";
 var selectDayOrMore = 'Select Day or More';
+var selectHalfDaySession = 'Select Half Day Session';
 var selectLeaveType = 'Select leave type';
 var odCreatedSuccess = "OD Created Successfully";
 var selectWorkPlace =  'Select Work Place';
@@ -246,6 +247,7 @@ var prospective_vendor ="prospective Vendor";
 var display = "Display";
 var camera = "Camera";
 var dailyReportSubmitted = "Daily Report Submitted Successfully";
-
-
+var selectDepartment = "Select Department";
+var selectFromTime = "Select From Time";
+var selectToTime = "Select To Time";
 

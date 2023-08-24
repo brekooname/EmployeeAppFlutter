@@ -349,7 +349,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: const EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 10,top: 10),
                 child: imageTextWidget(svg, title, title),
               )
             ],
@@ -573,12 +573,12 @@ class _HomePageState extends State<HomePage> {
 
     if (title == "Leave") {
       return Visibility(
-        visible: pendingLeaveList.length == 0? false : true ,
+        visible: pendingLeaveList.isEmpty? false : true ,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child:  Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: AppColor.themeColor,
             ),
@@ -595,12 +595,12 @@ class _HomePageState extends State<HomePage> {
     }
     if (title == "Official Duty") {
       return Visibility(
-        visible: pendindOdList.length == 0? false:true ,
+        visible: pendindOdList.isEmpty? false:true ,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: AppColor.themeColor,),
             width: msg == "Request"? 0:20,
@@ -616,12 +616,12 @@ class _HomePageState extends State<HomePage> {
     }
     if (title == "Gate Pass") {
       return Visibility(
-        visible: gatePassList.length == 0? false:true ,
+        visible: gatePassList.isEmpty? false:true ,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color:  AppColor.themeColor,),
             width: msg == "Request"? 0:20,
@@ -638,12 +638,12 @@ class _HomePageState extends State<HomePage> {
 
     if (title == "Task") {
       return Visibility(
-        visible: pendingTaskList.length == 0? false:true ,
+        visible: pendingTaskList.isEmpty? false:true ,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color:  AppColor.themeColor,),
             width: msg == "Request"? 0:20,
@@ -1134,7 +1134,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         leaveBalanceList = syncAndroidToSapResponse!.leavebalance;
         leaveBalanceList
-            .add(Leavebalance(leaveType: 'WITHOUT PAY-999.0', leaveBal: 999.0));
+            .add(Leavebalance(leaveType: 'WITHOUT PAY-0.0', leaveBal: 999.0));
         activeEmployeeList = syncAndroidToSapResponse!.activeemployee;
         attendenceList = syncAndroidToSapResponse!.attendanceemp;
         odEmpList = syncAndroidToSapResponse!.odemp;

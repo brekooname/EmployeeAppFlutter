@@ -1,119 +1,65 @@
 import 'dart:convert' as convert;
-import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
-import 'package:shakti_employee_app/task/model/taskrequest.dart';
-import 'package:shakti_employee_app/webservice/APIDirectory.dart';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
+import 'package:shakti_employee_app/task/model/taskrequest.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
-import 'package:searchfield/searchfield.dart';
+import 'package:shakti_employee_app/webservice/APIDirectory.dart';
+import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'model/DepartmentModel.dart';
 import 'model/taskresponse.dart';
 
 class TaskRequestScreen extends StatefulWidget {
-
   List<Activeemployee> activeemployeeList = [];
-  TaskRequestScreen({Key? key , required this.activeemployeeList} ) : super(key: key);
+
+  TaskRequestScreen({Key? key, required this.activeemployeeList})
+      : super(key: key);
 
   @override
   State<TaskRequestScreen> createState() => _TaskRequestScreenState();
 }
 
 class _TaskRequestScreenState extends State<TaskRequestScreen> {
-
   bool isLoading = false;
   List<TaskRequest> taskData = [];
   TextEditingController taskDes = TextEditingController();
   String? currentDate, currentTime;
   DateTime datefrom = DateTime.now(), dateto = DateTime.now();
-  String ?  selectedAssginTo;
+  String? selectedAssginTo;
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
   DateTime? pickedDate;
-  String? taskSpinner,departmentSpinner,dateTimeFormat ="dd.MM.yyyy";
-
-
-
+  String? taskSpinner, selectedDepartmentCode, dateTimeFormat = "dd.MM.yyyy";
+  List<Response> departmentList = [];
   String returnableSpinner = 'DRC-Daily Review Committee (YTT)';
-  // List of items in our dropdown menu
-  var taskList = [
-    'DRC-Daily Review Committee (YTT)',
-    'WRC-Weekly Review Committee',
-    'MINI-Monthly Review Committee',
-    'WOBJ-Weekly Object',
-    'MOBJ-Monthly Object',
-    'YOBJ-Yearly Object',
-    'PJOB-Periodic Task'
-  ];
 
-  String?  selectedFromDate, selectedToDate;
 
-  // List of items in our dropdown menu
-  var TypeList = [
-    'Department',
-     '1-ALL',
-     '2-SAP/IT',
-     '3-HR/ADMIN',
-     '4-FINANCE',
-     '5-DOMESTIC SALES',
-     '6-INTERNATIONAL BUSINESS',
-      '7-VINTEX',
-       '8-STORES',
-       '9-MATERIAL MANAGEMENT[PURC]',
-      ' 10-MAINTENANCE',
-       '11-1200 PUMP',
-       '12-1199 MOTOR V6, V8 TO V12',
-       '13-1201 MOTOR V4',
-       '14-1198 SRN',
-      ' 15-1196 SMG',
-       '16-1100 SEZ ALL',
-       '17-VENDOR DEVLOPMENT[PURCHA]',
-       '18-MARKETING',
-       '19-QUALITY/TESTING',
-       '20-PRODUCT ENGG.',
-       '21-PACKING/DISPATCH',
-       '23-AUDIT',
-       '25-SERVICE',
-       '27-R/D',
-      ' 28-1197 SHOS/SNB',
-       '29-1300 NEW PLANT',
-       '32-1194-CNC',
-       '34-SOLAR SALES (GOVT.)',
-       '35-MR DEPT.',
-       '36-IMPORT DEPT.',
-       '37-SOLAR SALES (OEM)',
-       '38-INDUSTRIAL SALES',
-       '41-7000SHAKTI IRRIGATION-RAU',
-       '42-7010SHAKTI IRRIGATION-DRI',
-       '46-PRODUCT MANAGEMENT',
-       '47-CHANNEL MANAGEMENT',
-       '48-VECTOR MOM',
-       '49-SOLAR NABARD',
-       '50-SOLAR MARKETING'
-  ];
 
+  String? selectedFromDate, selectedToDate;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    getDepartmentList();
     setState(() {
       currentDate = DateFormat("dd.MM.yyyy").format(DateTime.now());
       currentTime = DateFormat("hh:mm:ss").format(DateTime.now());
       selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
       selectedToDate = DateFormat(dateTimeFormat).format(DateTime.now());
-      fromDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
+      fromDateController.text =
+          DateFormat(dateTimeFormat).format(DateTime.now());
       toDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
 
     });
-
   }
 
   @override
@@ -121,7 +67,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
     // TODO: implement build
     return Scaffold(
       backgroundColor: AppColor.whiteColor,
-      appBar:AppBar(
+      appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
         title: robotoTextWidget(
@@ -130,38 +76,35 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: AppColor.whiteColor,
+            ),
             onPressed: () {
               Navigator.of(context).pop();
-            }
-        ),
+            }),
         iconTheme: const IconThemeData(color: Colors.white),
-
       ),
       body: Container(
-        margin: EdgeInsets.only(left: 10, right: 10),
+        margin: const EdgeInsets.only(left: 10, right: 10,top: 10),
         height: double.infinity,
         width: double.infinity,
-
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 10,),
-              MRCTypeSpinnerWidget(),
-              SizedBox(height: 10,),
-              departmentTypeSpinnerWidget(),
-              SizedBox(height: 10,),
+              departmentDropdown(),
+              const SizedBox(
+                height: 10,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  datePickerWidget(
-                      selectedFromDate!, fromDateController, "0"),
-                  datePickerWidget(
-                      selectedToDate!, toDateController, "1")
+                  datePickerWidget(selectedFromDate!, fromDateController, "0"),
+                  datePickerWidget(selectedToDate!, toDateController, "1")
                 ],
               ),
               textFeildWidget(taskDesc, taskDes),
-              assginToSpinnerWidget(context,widget.activeemployeeList),
+              assginToSpinnerWidget(context, widget.activeemployeeList),
               submitWidget(),
             ],
           ),
@@ -171,17 +114,16 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
   }
 
   textFeildWidget(String hinttxt, TextEditingController visitPlace) {
-    return  Container(
-      margin: const EdgeInsets.all(10),
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child:  TextField(
+      child: TextField(
         controller: visitPlace,
         style: const TextStyle(color: AppColor.themeColor),
-        decoration:  InputDecoration(
+        decoration: InputDecoration(
           prefixIcon: const Icon(
             Icons.notes_outlined,
             color: AppColor.themeColor,
@@ -189,103 +131,75 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
           ),
           border: InputBorder.none,
           hintText: hinttxt,
-          hintStyle:
-          const TextStyle(color: AppColor.themeColor ,fontSize: 13, fontWeight: FontWeight.normal),
+          hintStyle: const TextStyle(
+              color: AppColor.themeColor,
+              fontSize: 13,
+              fontWeight: FontWeight.normal),
         ),
         keyboardType: TextInputType.text,
-
       ),
     );
   }
 
   submitWidget() {
-    return  GestureDetector(
+    return GestureDetector(
         onTap: () {
           Validation();
         },
         child: Container(
+          margin: EdgeInsets.only(top: 10),
           height: 50,
-
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
-                ? Container(
-              height: 30,
-              width: 30,
-              child:
-              const CircularProgressIndicator(
-                color: AppColor.whiteColor,
-              ),
-            )
+                ? const SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: CircularProgressIndicator(
+                      color: AppColor.whiteColor,
+                    ),
+                  )
                 : robotoTextWidget(
-                textval: submit,
-                colorval: Colors.white,
-                sizeval: 14,
-                fontWeight: FontWeight.bold),
+                    textval: submit,
+                    colorval: Colors.white,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold),
           ),
         ));
   }
 
   Future<void> Validation() async {
-    departmentSpinner ??= "";
-    taskSpinner ??= "";
-
-    if(taskSpinner!.isEmpty) {
-      Utility().showToast(pleaseTaskType);
-    }else if(departmentSpinner!.isEmpty) {
+    selectedDepartmentCode ??= "";
+    if (selectedDepartmentCode!.isEmpty) {
       Utility().showToast(pleaseSelectDepartment);
-    } else if(taskDes.text.toString().isEmpty ) {
+    } else if (taskDes.text.toString().isEmpty) {
       Utility().showToast(pleaseEnterTask);
-    } else if(selectedAssginTo!.isEmpty){
+    } else if (selectedAssginTo!.isEmpty) {
       Utility().showToast(pleaseEnterPersonCharge);
-    }else {
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      taskData.add(TaskRequest(pernr: sharedPreferences.getString(userID).toString() , budat: currentDate!, time: currentTime!, description: taskDes.text.toString(), assignTo: selectedAssginTo.toString(), dateFrom: fromDateController.text.toString(), dateTo: toDateController.text.toString(), mrcType: taskSpinner.toString(), department: departmentSpinner.toString()));
+    } else {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      taskData.add(TaskRequest(
+          pernr: sharedPreferences.getString(userID).toString(),
+          budat: currentDate!,
+          time: currentTime!,
+          description: taskDes.text.toString(),
+          assignTo: selectedAssginTo.toString(),
+          dateFrom: fromDateController.text.toString(),
+          dateTo: toDateController.text.toString(),
+          department: selectedDepartmentCode.toString()));
 
-      String value =  convert.jsonEncode(taskData).toString();
+      String value = convert.jsonEncode(taskData).toString();
       createTask(value);
     }
   }
 
-  MRCTypeSpinnerWidget() {
-    return SizedBox(
-        height: 55,
-        width: MediaQuery.of(context).size.width,
-        child: DropdownButtonFormField(
-          isExpanded: true,
-          decoration: InputDecoration(
-              border: const OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.themeColor),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10.0),
-                ),
-              ),
-              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select task type',
-              fillColor: Colors.white),
-          value: taskSpinner,
-          validator: (value) =>
-          value == null || value.isEmpty ? 'Please Select task type' : "",
-          items: taskList.map((taskListType) => DropdownMenuItem(
-              value: taskListType,
-              child: robotoTextWidget(
-                  textval: taskListType,
-                  colorval: AppColor.themeColor,
-                  sizeval: 12,
-                  fontWeight: FontWeight.bold))).toList(),
-          onChanged: (Object? value) {
-            setState(() {
-              taskSpinner = value.toString();
-            });
-          },
-        ));
-  }
 
-  departmentTypeSpinnerWidget() {
+  departmentDropdown() {
     return SizedBox(
-        height: 55,
+        height: 50,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
           isExpanded: true,
@@ -296,22 +210,26 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
                   Radius.circular(10.0),
                 ),
               ),
+              filled: true,
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: 'Select department type',
+              hintText: selectDepartment,
               fillColor: Colors.white),
-          value: departmentSpinner,
-          validator: (value) =>
-          value == null || value.isEmpty ? 'Please Select department type' : "",
-          items: TypeList.map((department) => DropdownMenuItem(
-              value: department,
-              child: robotoTextWidget(
-                  textval: department,
-                  colorval: AppColor.themeColor,
-                  sizeval: 12,
-                  fontWeight: FontWeight.bold))).toList(),
+          value: selectedDepartmentCode,
+          validator: (value) => value == null || value.isEmpty
+              ? 'Please select the department'
+              : "",
+          items: departmentList
+              .map((department) => DropdownMenuItem(
+                  value: department.departName,
+                  child: robotoTextWidget(
+                      textval: department.departName,
+                      colorval: AppColor.blackColor,
+                      sizeval: 11,
+                      fontWeight: FontWeight.bold)))
+              .toList(),
           onChanged: (Object? value) {
             setState(() {
-              departmentSpinner = value.toString();
+              selectedDepartmentCode = value.toString();
             });
           },
         ));
@@ -346,20 +264,24 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
             ),
             Expanded(
                 child: TextField(
-                  controller: DateController,
-                  maxLines: 1,
-                  showCursor: false,
-                  enabled: false,
-                  textAlign: TextAlign.center,
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: InputDecoration(
-                      hintText: fromTO,
-                      hintStyle: const TextStyle(color: AppColor.themeColor),
-                      border: InputBorder.none),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Roboto',fontWeight: FontWeight.bold),
-                  keyboardType: TextInputType.datetime,
-                  textInputAction: TextInputAction.done,
-                ))
+              controller: DateController,
+              maxLines: 1,
+              showCursor: false,
+              enabled: false,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              decoration: InputDecoration(
+                  hintText: fromTO,
+                  hintStyle: const TextStyle(color: AppColor.themeColor),
+                  border: InputBorder.none),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.themeColor),
+              keyboardType: TextInputType.datetime,
+              textInputAction: TextInputAction.done,
+            ))
           ],
         ),
       ),
@@ -372,11 +294,12 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
         initialDate: DateTime.now(),
         firstDate: value == "0"
             ? DateTime.now()
-            : selectedFromDate != DateFormat(dateTimeFormat).format(DateTime.now())
-            ? DateTime(2023)
-            : DateTime.now(),
+            : selectedFromDate !=
+                    DateFormat(dateTimeFormat).format(DateTime.now())
+                ? DateTime(2023)
+                : DateTime.now(),
         //DateTime.now() - not to allow to choose before today.
-        lastDate:  DateTime(2050));
+        lastDate: DateTime(2050));
     if (pickedDate != null) {
       print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
       String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
@@ -394,69 +317,93 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
     }
   }
 
-
-  Widget assginToSpinnerWidget(BuildContext context, List<Activeemployee> activeemployee) {
-    return  Container(
-      margin: const EdgeInsets.all(10),
+  Widget assginToSpinnerWidget(
+      BuildContext context, List<Activeemployee> activeemployee) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.only(left: 3),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child: SearchField< List<Activeemployee>>(
+      child: SearchField<List<Activeemployee>>(
         suggestions: activeemployee
             .map(
-              (activeemployee) => SearchFieldListItem< List<Activeemployee>>(
+              (activeemployee) => SearchFieldListItem<List<Activeemployee>>(
                 activeemployee.ename,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child:  Text(activeemployee.ename, style: const TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
-            ),
-          ),
-        ).toList(),
-        searchInputDecoration:   InputDecoration(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    activeemployee.ename,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: AppColor.themeColor),
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+        searchInputDecoration: InputDecoration(
           hintText: assginCharge,
-          hintStyle: TextStyle(color: AppColor.themeColor, fontSize: 13, fontWeight: FontWeight.normal),
-          prefixIcon: Icon(Icons.person, color: AppColor.themeColor, size: 20,),
+          hintStyle: const TextStyle(
+              color: AppColor.themeColor,
+              fontSize: 13,
+              fontWeight: FontWeight.normal),
+          prefixIcon: const Icon(
+            Icons.person,
+            color: AppColor.themeColor,
+            size: 20,
+          ),
           border: InputBorder.none,
         ),
         onSubmit: (String value) {
           setState(() {
             selectedAssginTo = value.toString();
           });
-       },
+        },
       ),
-
     );
   }
 
-
-  Future<void> createTask( String value) async {
+  Future<void> createTask(String value) async {
     var jsonData = null;
     setState(() {
-      isLoading =true;
+      isLoading = true;
     });
     dynamic response = await HTTP.get(createTaskAPI(value));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
       TaskRespons taskRespons = TaskRespons.fromJson(jsonData);
-      if(taskRespons.dataSuccess[2].syncData == "EMP_TASK" && taskRespons.dataSuccess[2].value == "Y"){
+      if (taskRespons.dataSuccess[2].syncData == "EMP_TASK" &&
+          taskRespons.dataSuccess[2].value == "Y") {
         Utility().showToast(taskAssgined);
         Navigator.of(context).pop();
         setState(() {
-          isLoading =false;
+          isLoading = false;
         });
-      }else {
-          Utility().showToast(somethingWentWrong);
-          setState(() {
-            isLoading =false;
-          });
-        }
-
-    }else{
+      } else {
+        Utility().showToast(somethingWentWrong);
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } else {
       Utility().showToast(somethingWentWrong);
     }
   }
 
+  getDepartmentList() async {
+    dynamic res = await HTTP.get(getDepartment());
+    var jsonData = null;
+    departmentList = [];
+    if (res != null && res.statusCode != null && res.statusCode == 200) {
+      jsonData = convert.jsonDecode(res.body);
+      DepartmentModel departmentModel = DepartmentModel.fromJson(jsonData);
+      if (departmentModel.status.toString() == "True") {
+        setState(() {
+          departmentList = departmentModel.response;
+        });
+      }
+    }
+  }
 }
