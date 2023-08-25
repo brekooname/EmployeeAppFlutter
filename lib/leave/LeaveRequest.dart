@@ -38,7 +38,6 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       perInCharge4 = "",
       dateFormat = "dd/MM/yyyy",timeFormat = "HH:mm:ss";
 
-  String leaveTypeSpinner = 'Select Leave Type';
   String? selectedLeaveType,
       dayTypeSpinner,
       halfDayTypeSpinner,
@@ -109,6 +108,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                   datePickerWidget(selectedToDate!, toDateController, "1")
                 ],
               ),
+              SizedBox(height: 10,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

@@ -250,4 +250,9 @@ var dailyReportSubmitted = "Daily Report Submitted Successfully";
 var selectDepartment = "Select Department";
 var selectFromTime = "Select From Time";
 var selectToTime = "Select To Time";
-
+var selectFromDate = "Select From Date";
+var selectToDate = "Select To Date";
+var search = "Search";
+var myTask ="My Task";
+var taskDetails = "Task Details";
+var selectTime = "selectTime";
