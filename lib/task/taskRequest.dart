@@ -223,7 +223,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
                   value: department.departName,
                   child: robotoTextWidget(
                       textval: department.departName,
-                      colorval: AppColor.blackColor,
+                      colorval: AppColor.themeColor,
                       sizeval: 11,
                       fontWeight: FontWeight.bold)))
               .toList(),

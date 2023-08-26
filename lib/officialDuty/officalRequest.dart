@@ -33,10 +33,12 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   DateTime? pickedDate;
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
+  TextEditingController fromTimeController = TextEditingController();
+  TextEditingController toTimeController = TextEditingController();
   String?  selectedAssginTo;
   String?  dutyTypeSpinner, workPlaceSpinner,selectedFromDate, selectedToDate;
 
-  String  dateTimeFormat ="dd/MM/yyyy";
+  String  dateFormat ="dd/MM/yyyy",timeFormat = "HH:mm:ss";
 
   var dutyTypeList = [
     'On Duty',
@@ -81,10 +83,10 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     // TODO: implement initState
     super.initState();
     setState(() {
-      selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
-      selectedToDate = DateFormat(dateTimeFormat).format(DateTime.now());
-      fromDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
-      toDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
+      selectedFromDate = DateFormat(dateFormat).format(DateTime.now());
+      selectedToDate = DateFormat(dateFormat).format(DateTime.now());
+      fromDateController.text = DateFormat(dateFormat).format(DateTime.now());
+      toDateController.text = DateFormat(dateFormat).format(DateTime.now());
 
     });
 
@@ -133,6 +135,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                       selectedToDate!, toDateController, "1")
                 ],
               ),
+              SizedBox(height: 10,),
+              timePickerWidget(selectTime, fromTimeController, "0"),
               textFeildWidget(visitPlace, visitPlaceController),
               textFeildWidget( purpose1txt, purpose1),
               textFeildWidget(purpose2txt, purpose2),
@@ -338,22 +342,89 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: value == "0"
-            ? DateTime.now()
-            : selectedFromDate != DateFormat(dateTimeFormat).format(DateTime.now())
-            ? DateTime(2023)
-            : DateTime.now(),
+        firstDate: DateTime.now(),
         //DateTime.now() - not to allow to choose before today.
         lastDate:  DateTime(2050));
     if (pickedDate != null) {
-      String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
+      String formattedDate = DateFormat(dateFormat).format(pickedDate!);
       setState(() {
         if (value == "0") {
-          selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
+          selectedFromDate = DateFormat(dateFormat).format(pickedDate!);
           fromDateController.text = formattedDate;
         } else {
-          selectedToDate = DateFormat(dateTimeFormat).format(pickedDate!);
+          selectedToDate = DateFormat(dateFormat).format(pickedDate!);
           toDateController.text = formattedDate;
+        }
+      });
+    }
+  }
+
+  timePickerWidget(
+      String fromTO, TextEditingController timeController, String value) {
+    return GestureDetector(
+      onTap: () {
+        _selectTime(value);
+      },
+      child: Container(
+        height: 50,
+        width: MediaQuery.of(context).size.width ,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColor.themeColor,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.timer_outlined,
+              color: AppColor.themeColor,
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child: TextField(
+                  controller: timeController,
+                  maxLines: 1,
+                  showCursor: false,
+                  enabled: false,
+                  textAlign: TextAlign.center,
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
+                      hintText: fromTO,
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      border: InputBorder.none),
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.themeColor),
+                  keyboardType: TextInputType.datetime,
+                  textInputAction: TextInputAction.done,
+                ))
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _selectTime(String value) async {
+    final TimeOfDay? newTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (newTime != null) {
+      setState(() {
+        if (value == "0") {
+          fromTimeController.text = DateFormat(timeFormat).format(DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+        } else if (value == "1") {
+          toTimeController.text = DateFormat(timeFormat).format(
+              DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+
         }
       });
     }
@@ -397,6 +468,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         Utility().showToast(validateOd);
       }else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeave);
+    }else if (fromTimeController.text.toString().isEmpty) {
+      Utility().showToast(selectFromTime);
     }else if(workPlaceSpinner ==  selectWorkPlace) {
       Utility().showToast(vaildDepartment);
     }else  if(purpose1.text.toString().isEmpty){
@@ -423,8 +496,11 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         visitPlaceController.text.toString(),
         workPlaceSpinner.toString(),
         purpose1.text.toString(),
-        purpose2.text.toString(),'','',
-        selectedAssginTo.toString()));
+        purpose2.text.toString(),
+        '',
+        '',
+        selectedAssginTo.toString(),
+        fromTimeController.text.toString()));
     if (response != null && response.statusCode == 200){
 
       Iterable l = convert.jsonDecode(response.body);
