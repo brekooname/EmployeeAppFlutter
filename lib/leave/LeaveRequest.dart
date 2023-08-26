@@ -36,7 +36,8 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       perInCharge2 = "",
       perInCharge3 = "",
       perInCharge4 = "",
-      dateFormat = "dd/MM/yyyy",timeFormat = "HH:mm:ss";
+      dateFormat = "dd/MM/yyyy",
+      timeFormat = "HH:mm:ss";
 
   String? selectedLeaveType,
       dayTypeSpinner,
@@ -55,7 +56,6 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     'Half Day',
   ];
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -63,8 +63,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     setState(() {
       selectedFromDate = DateFormat(dateFormat).format(DateTime.now());
       selectedToDate = DateFormat(dateFormat).format(DateTime.now());
-      fromDateController.text =
-          DateFormat(dateFormat).format(DateTime.now());
+      fromDateController.text = DateFormat(dateFormat).format(DateTime.now());
       toDateController.text = DateFormat(dateFormat).format(DateTime.now());
     });
   }
@@ -108,16 +107,19 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                   datePickerWidget(selectedToDate!, toDateController, "1")
                 ],
               ),
-              SizedBox(height: 10,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  timePickerWidget(
-                      selectFromTime, fromTimeController, "0"),
-                  timePickerWidget(selectToTime,toTimeController, "1")
-                ],
+              SizedBox(
+                height: 10,
               ),
-
+              dayTypeSpinner == "Half Day"
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        timePickerWidget(
+                            selectFromTime, fromTimeController, "0"),
+                        timePickerWidget(selectToTime, toTimeController, "1")
+                      ],
+                    )
+                  : Container(),
               reasonForLeave(),
               assginToSpinnerWidget(context, widget.activeEmpList, "0"),
               assginToSpinnerWidget(context, widget.activeEmpList, "1"),
@@ -206,7 +208,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         ));
   }
 
- datePickerWidget(
+  datePickerWidget(
       String fromTO, TextEditingController DateController, String value) {
     return GestureDetector(
       onTap: () {
@@ -263,16 +265,10 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: value == "0"
-            ? DateTime.now()
-            : selectedFromDate !=
-                    DateFormat(dateFormat).format(DateTime.now())
-                ? DateTime(2023)
-                : DateTime.now(),
+        firstDate:  DateTime.now(),
         //DateTime.now() - not to allow to choose before today.
         lastDate: DateTime(2050));
     if (pickedDate != null) {
-
       setState(() {
         if (value == "0") {
           selectedFromDate = DateFormat(dateFormat).format(pickedDate!);
@@ -314,24 +310,24 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
             ),
             Expanded(
                 child: TextField(
-                  controller: timeController,
-                  maxLines: 1,
-                  showCursor: false,
-                  enabled: false,
-                  textAlign: TextAlign.center,
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: InputDecoration(
-                      hintText: fromTO,
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      border: InputBorder.none),
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.bold,
-                      color: AppColor.themeColor),
-                  keyboardType: TextInputType.datetime,
-                  textInputAction: TextInputAction.done,
-                ))
+              controller: timeController,
+              maxLines: 1,
+              showCursor: false,
+              enabled: false,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              decoration: InputDecoration(
+                  hintText: fromTO,
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  border: InputBorder.none),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.themeColor),
+              keyboardType: TextInputType.datetime,
+              textInputAction: TextInputAction.done,
+            ))
           ],
         ),
       ),
@@ -342,15 +338,25 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     final TimeOfDay? newTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              // Using 24-Hour format
+                alwaysUse24HourFormat: false),
+            // If you want 12-Hour format, just change alwaysUse24HourFormat to false or remove all the builder argument
+            child: child!);
+
+      },
+
     );
     if (newTime != null) {
       setState(() {
         if (value == "0") {
-          fromTimeController.text = DateFormat(timeFormat).format(DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+          fromTimeController.text = DateFormat(timeFormat)
+              .format(DateTime(2019, 08, 1, newTime.hour, newTime.minute));
         } else if (value == "1") {
-            toTimeController.text = DateFormat(timeFormat).format(
-                DateTime(2019, 08, 1, newTime.hour, newTime.minute));
-          
+          toTimeController.text = DateFormat(timeFormat)
+              .format(DateTime(2019, 08, 1, newTime.hour, newTime.minute));
         }
       });
     }
@@ -478,19 +484,24 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       Utility().showToast(vaildLeaveDate);
     } else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeaveDateTO);
-    } else if (fromTimeController.text.toString().isEmpty) {
-      Utility().showToast(selectFromTime);
-    }else if (toTimeController.text.toString().isEmpty) {
-      Utility().showToast(selectToTime);
-    }  else if (reason.text.toString().isEmpty) {
+    } else if (reason.text.toString().isEmpty) {
       Utility().showToast(vaildRaseon);
     } else if (perInCharge1.isEmpty) {
       Utility().showToast(vaildPerson1);
     } else if (perInCharge2.isEmpty) {
       Utility().showToast(vaildPerson2);
     } else {
-
-      applyLeave();
+      if (dayTypeSpinner == "Half Day") {
+        if (fromTimeController.text.toString().isEmpty) {
+          Utility().showToast(selectFromTime);
+        } else if (toTimeController.text.toString().isEmpty) {
+          Utility().showToast(selectToTime);
+        } else {
+          applyLeave();
+        }
+      } else {
+        applyLeave();
+      }
     }
   }
 
@@ -500,14 +511,27 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     });
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    dynamic response = await HTTP.get(createLeaveAPI(
+    print('URLLeave======>${createLeaveAPI(
         sharedPreferences.getString(userID).toString(),
         selectedLeaveType.toString(),
         dayTypeSpinner!,
         selectedFromDate!,
         selectedToDate!,
-        fromTimeController.text.toString(),
-        toTimeController.text.toString(),
+        fromTimeController.text.toString().isEmpty?"08:30:00":fromTimeController.text.toString(),
+        toTimeController.text.toString().isEmpty?"17:00:00":toTimeController.text.toString(),
+        reason.text.toString(),
+        perInCharge1.toString(),
+        perInCharge2.toString(),
+        perInCharge3.toString(),
+        perInCharge4.toString())}');
+  dynamic response = await HTTP.get(createLeaveAPI(
+        sharedPreferences.getString(userID).toString(),
+        selectedLeaveType.toString(),
+        dayTypeSpinner!,
+        selectedFromDate!,
+        selectedToDate!,
+        fromTimeController.text.toString().isEmpty?"08:30:00":fromTimeController.text.toString(),
+        toTimeController.text.toString().isEmpty?"17:00:00":toTimeController.text.toString(),
         reason.text.toString(),
         perInCharge1.toString(),
         perInCharge2.toString(),
