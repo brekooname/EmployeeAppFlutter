@@ -50,7 +50,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  LatLng? latlong = null;
+  LatLng? latlong;
   String packageName = "",
       version = "",
       nameValue = "",
@@ -190,13 +190,13 @@ class _HomePageState extends State<HomePage> {
               width: MediaQuery.of(context).size.width,
               child: Column(
                 children: [
-                  detailWidget("Leave"),
-                  detailWidget("Official Duty"),
-                  detailWidget("Gate Pass"),
-                  detailWidget("Task"),
+                  detailWidget(leave),
+                  detailWidget(officialDuty),
+                  detailWidget(gatePasstxt),
+                  detailWidget(task),
                   localConvenience(),
-                  dailyAndWebReport("Daily Report", "assets/svg/approved.svg"),
-                  dailyAndWebReport("Web Report", "assets/svg/report.svg"),
+                  dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
+                  dailyAndWebReport(webReport, "assets/svg/report.svg"),
                 ],
               ),
             ),
@@ -255,9 +255,9 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  imageTextWidget("assets/svg/request.svg", "Request", title),
+                  imageTextWidget("assets/svg/request.svg", request, title),
                   dividerWidget(),
-                  imageTextWidget("assets/svg/approved.svg", "Approve", title)
+                  imageTextWidget("assets/svg/approved.svg", title == task?close:approve, title)
                 ],
               ),
             )
@@ -488,6 +488,17 @@ class _HomePageState extends State<HomePage> {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const WebReport()),
                   (route) => true);
+            }
+            break;
+          case "Close":
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => TaskApproved(
+                        pendingTaskList: pendingTaskList,
+                        activeemployeeList: activeEmployeeList,
+                      )),
+                      (route) => true);
             }
             break;
         }
@@ -744,7 +755,6 @@ class _HomePageState extends State<HomePage> {
       if (mounted) {
         setState(() {
           Address = '${place.street},  ${place.subAdministrativeArea},  ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}';
-         // Address = Utility().formatAddress(Address);
         });
         setState(() {
           isLoading = false;
@@ -777,8 +787,7 @@ class _HomePageState extends State<HomePage> {
       listMap.forEach(
           (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
       if (localConveyanceList.isNotEmpty) {
-        print('UserID====>${localConveyanceList[localConveyanceList.length - 1].userId}');
-        Utility().checkInternetConnection().then((connectionResult) {
+       Utility().checkInternetConnection().then((connectionResult) {
           if (connectionResult) {
             calculateDistance(
                 localConveyanceList[localConveyanceList.length - 1]);
@@ -927,10 +936,10 @@ class _HomePageState extends State<HomePage> {
                         '$fromLongitude  ${localConveyanceList.fromLongitude}',
                       ),
                       latLongWidget(
-                        '$toLatitude  ${toLatitud}',
+                        '$toLatitude  $toLatitud',
                       ),
                       latLongWidget(
-                        '$toLongitude  ${toLongitud}',
+                        '$toLongitude  $toLongitud',
                       ),
                       latLongWidget(
                         '$fromAddress ${distanceCalculateModel.originAddresses[0]}',
@@ -1060,8 +1069,8 @@ class _HomePageState extends State<HomePage> {
       isLoading = true;
     });
 
-    var jsonData = null;
-    var jsonData1 = null;
+    var jsonData;
+    var jsonData1;
 
     dynamic response = await HTTP.get(
         SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
@@ -1245,28 +1254,17 @@ class _HomePageState extends State<HomePage> {
               (route) => true);
         }
         break;
-      case "Task":
-        {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) => TaskApproved(
-                        pendingTaskList: pendingTaskList,
-                        activeemployeeList: activeEmployeeList,
-                      )),
-              (route) => true);
-        }
-        break;
     }
   }
 
   Future<void> calculateDistance(
       LocalConveyanceModel localConveyanceList) async {
-    var jsonData = null;
+    var jsonData;
     String toLatitude = latlong!.latitude.toString();
     String toLongitude = latlong!.longitude.toString();
     dynamic response = await HTTP.get(getDistanceAPI(
         '${localConveyanceList.fromLatitude},${localConveyanceList.fromLongitude}',
-        '${toLatitude},${toLongitude}'));
+        '$toLatitude,$toLongitude'));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
       distancePrefix.DistanceCalculateModel distanceCalculateModel =
@@ -1316,7 +1314,7 @@ class _HomePageState extends State<HomePage> {
         travelMode: travelModeController.text.toString(),
         latLong: allLatLng));
     String value = convert.jsonEncode(travelList).toString();
-    var jsonData = null;
+    var jsonData;
     dynamic response = await HTTP.get(syncLocalConveyanceAPI(value));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);

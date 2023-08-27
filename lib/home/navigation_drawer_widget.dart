@@ -81,7 +81,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
             navigationItemWidget(1, Icons.task, myTask),
             navigationItemWidget(2, Icons.calendar_month, attendance),
             navigationItemWidget(3, Icons.calendar_today_rounded, leave),
-            navigationItemWidget(4, Icons.person_outline_rounded, official),
+            navigationItemWidget(4, Icons.person_outline_rounded, officialDuty),
             navigationItemWidget(5, Icons.person_outline_rounded, payslip),
             navigationItemWidget(6, Icons.person, personalInfo),
             navigationItemWidget(7, Icons.logout, logout),

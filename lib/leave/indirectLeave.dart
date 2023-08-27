@@ -30,13 +30,13 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
   bool isLoading = false;
   late int selectedIndex;
-
+  late SharedPreferences sharedPreferences;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+   Init();
   }
 
   @override
@@ -347,15 +347,15 @@ class InDirectLeaveState extends State<InDirectLeave> {
       ),
     );
   }
+  Future<void> Init() async {
+    sharedPreferences = await SharedPreferences.getInstance();
 
+  }
   Future<void> confirmLeave(int leaveNo) async {
 
     setState(() {
       isLoading  = true;
     });
-
-
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     dynamic response = await HTTP.get(approveLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()  ));
     if (response != null && response.statusCode == 200)  {
@@ -365,10 +365,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
       if(leaveResponse[0].type.compareTo("S") == 0){
 
-        Utility().showToast(leaveSuccessfully);
-
-        Navigator.of(context).pop();
-
+        updateSharedPreference("0");
 
       } else{
 
@@ -387,18 +384,13 @@ class InDirectLeaveState extends State<InDirectLeave> {
       isLoading  = true;
     });
 
-
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(rejectLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString() ,sharedPreferences.getString(password).toString() ));
     if (response != null && response.statusCode == 200)  {
       var jsonData = convert.jsonDecode(response.body);
       LeaveRejectResponse leaveResponse = LeaveRejectResponse.fromJson(jsonData);
       if(leaveResponse.status.compareTo("true") == 0){
-        Utility().showToast(leaveRejectSuccessfully);
-        setState(() {
-          isLoading  = false;
-        });
-        Navigator.of(context).pop();
+
+        updateSharedPreference("1");
 
       }else{
         setState(() {
@@ -411,5 +403,30 @@ class InDirectLeaveState extends State<InDirectLeave> {
       Utility().showToast(somethingWentWrong);
     }
   }
+  updateSharedPreference(String value) async {
+
+    dynamic response = await HTTP.get(
+        SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
+    if (response != null && response.statusCode == 200) {
+      setState(() {
+        isLoading  = false;
+        Utility().setSharedPreference(syncSapResponse, response.body.toString());
+      });
+
+      if(value=="0"){
+        Utility().showToast(leaveSuccessfully);
+      }else{
+        Utility().showToast(leaveRejectSuccessfully);
+      }
+      Navigator.of(context).pop();
+    }else{
+      setState(() {
+        isLoading  = false;
+      });
+      Utility().showToast(somethingWentWrong);
+    }
+  }
+
+
 
 }

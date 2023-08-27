@@ -11,31 +11,32 @@ import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../theme/string.dart';import 'dart:convert' as convert;
+import '../../theme/string.dart';
+import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
 import '../../webservice/constant.dart';
 
 class InDirect extends StatefulWidget {
-    String Status;
-    List<Pendingod> pendindOdList = [];
-   InDirect({Key? key, required this.Status , required this.pendindOdList}) : super(key: key);
+  String Status;
+  List<Pendingod> pendindOdList = [];
+
+  InDirect({Key? key, required this.Status, required this.pendindOdList})
+      : super(key: key);
 
   @override
   State<InDirect> createState() => InDirectState();
 }
 
 class InDirectState extends State<InDirect> {
-
   bool isLoading = false;
   late int selectedIndex;
-
+  late SharedPreferences sharedPreferences;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
   }
 
   @override
@@ -47,8 +48,8 @@ class InDirectState extends State<InDirect> {
           Center(
             child: isLoading == true
                 ? const CircularProgressIndicator(
-              color: Colors.indigo,
-            )
+                    color: Colors.indigo,
+                  )
                 : const SizedBox(),
           ),
         ],
@@ -57,8 +58,7 @@ class InDirectState extends State<InDirect> {
   }
 
   Widget _buildPosts(BuildContext context) {
-
-    if ( widget.pendindOdList.isEmpty) {
+    if (widget.pendindOdList.isEmpty) {
       return NoDataFound();
     }
     return Container(
@@ -92,79 +92,90 @@ class InDirectState extends State<InDirect> {
               padding: const EdgeInsets.all(5),
               child: Stack(children: <Widget>[
                 Row(
-                    children: [
+                  children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailWidget(docNo,widget.pendindOdList[index].odno),
+                        detailWidget(docNo, widget.pendindOdList[index].odno),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget(nametxt,widget.pendindOdList[index].ename),
+                        detailWidget(
+                            nametxt, widget.pendindOdList[index].ename),
                         const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
-                            datedetailWidget( odStart,widget.pendindOdList[index].odstdateC),
+                            datedetailWidget(
+                                odStart, widget.pendindOdList[index].odstdateC),
                             const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget(odEnd,widget.pendindOdList[index].odedateC),
+                            datedetailWidget(
+                                odEnd, widget.pendindOdList[index].odedateC),
                           ],
                         ),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( visitPlace,widget.pendindOdList[index].vplace),
+                        detailWidget(
+                            visitPlace, widget.pendindOdList[index].vplace),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( visitPurpose,widget.pendindOdList[index].purpose1),
+                        detailWidget(
+                            visitPurpose, widget.pendindOdList[index].purpose1),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( noOfDay,widget.pendindOdList[index].horo),
-
-                        Row(children: [
-                          Container(
-                            width:  MediaQuery.of(context).size.width/2.2,
-                            height: 40,
-                            padding: const EdgeInsets.only(left: 30),
-
-                            child: InkWell(
-                              onTap: (){
-                                selectedIndex = index;
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context, widget.pendindOdList[index].odno, 0),
-                                );
-
-                              },
-                              child: IconWidget('assets/svg/delete.svg' ,rejecttxt),
+                        detailWidget(noOfDay, widget.pendindOdList[index].horo),
+                        Row(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.2,
+                              height: 40,
+                              padding: const EdgeInsets.only(left: 30),
+                              child: InkWell(
+                                onTap: () {
+                                  selectedIndex = index;
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        dialogue_removeDevice(
+                                            context,
+                                            widget.pendindOdList[index].odno,
+                                            0),
+                                  );
+                                },
+                                child: IconWidget(
+                                    'assets/svg/delete.svg', rejecttxt),
+                              ),
                             ),
-                          ),
-                          Container(
-                            width:  MediaQuery.of(context).size.width/2.2,
-                            height: 40,
-                            padding: const EdgeInsets.only(left: 30),
-                            child: InkWell(
-                              onTap: (){
-                                selectedIndex = index;
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context, widget.pendindOdList[index].odno, 1),
-                                );
-
-                              },
-                              child: IconWidget('assets/svg/checkmark.svg' ,approvetxt),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.2,
+                              height: 40,
+                              padding: const EdgeInsets.only(left: 30),
+                              child: InkWell(
+                                onTap: () {
+                                  selectedIndex = index;
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        dialogue_removeDevice(
+                                            context,
+                                            widget.pendindOdList[index].odno,
+                                            1),
+                                  );
+                                },
+                                child: IconWidget(
+                                    'assets/svg/checkmark.svg', approvetxt),
+                              ),
                             ),
-                          ),
-                        ],),
-
+                          ],
+                        ),
                       ],
                     ),
-
                   ],
                 ),
               ]))),
@@ -179,14 +190,19 @@ class InDirectState extends State<InDirect> {
           width: 32,
           height: 32,
         ),
-        const SizedBox(width: 5,),
-        robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
+        const SizedBox(
+          width: 5,
+        ),
+        robotoTextWidget(
+            textval: txt,
+            colorval: Colors.black,
+            sizeval: 16,
+            fontWeight: FontWeight.w600)
       ],
     );
   }
 
   Widget dialogue_removeDevice(BuildContext context, String odno, var status) {
-
     return AlertDialog(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -206,7 +222,7 @@ class InDirectState extends State<InDirect> {
             height: 10,
           ),
           Text(
-            status==0?reject:confirmation,
+            status == 0 ? reject : confirmation,
             style: const TextStyle(
                 color: AppColor.themeColor,
                 fontFamily: 'Roboto',
@@ -227,7 +243,8 @@ class InDirectState extends State<InDirect> {
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12), // <-- Radius
-                    ), backgroundColor: AppColor.whiteColor,
+                    ),
+                    backgroundColor: AppColor.whiteColor,
                   ),
                   child: robotoTextWidget(
                     textval: cancel,
@@ -241,11 +258,11 @@ class InDirectState extends State<InDirect> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    if (status == 0){
+                    if (status == 0) {
                       rejectOD(odno);
-                    }else {
-                        confirmOD(odno);
-                      }
+                    } else {
+                      confirmOD(odno);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.themeColor,
@@ -268,12 +285,12 @@ class InDirectState extends State<InDirect> {
 
   detailWidget(String title, String value) {
     return SizedBox(
-      width:MediaQuery.of(context).size.width/1.1,
+      width: MediaQuery.of(context).size.width / 1.1,
       height: 30,
       child: Row(
         children: [
           robotoTextWidget(
-            textval: title ,
+            textval: title,
             colorval: AppColor.blackColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -282,7 +299,7 @@ class InDirectState extends State<InDirect> {
             width: 10,
           ),
           robotoTextWidget(
-            textval: value ,
+            textval: value,
             colorval: AppColor.themeColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -293,43 +310,42 @@ class InDirectState extends State<InDirect> {
   }
 
   SizedBox NoDataFound() {
-
     return SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Center(
             child: Container(
-              height: MediaQuery.of(context).size.height / 10,
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 20, right: 20),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Color.fromRGBO(30, 136, 229, .5),
-                        blurRadius: 20,
-                        offset: Offset(0, 10))
-                  ]),
-              child: Align(
-                alignment: Alignment.center,
-                child: robotoTextWidget(
-                    textval: noDataFound,
-                    colorval: AppColor.themeColor,
-                    sizeval: 14,
-                    fontWeight: FontWeight.bold),
-              ),
-            )));
+          height: MediaQuery.of(context).size.height / 10,
+          width: MediaQuery.of(context).size.width,
+          margin: const EdgeInsets.only(left: 20, right: 20),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: const [
+                BoxShadow(
+                    color: Color.fromRGBO(30, 136, 229, .5),
+                    blurRadius: 20,
+                    offset: Offset(0, 10))
+              ]),
+          child: Align(
+            alignment: Alignment.center,
+            child: robotoTextWidget(
+                textval: noDataFound,
+                colorval: AppColor.themeColor,
+                sizeval: 14,
+                fontWeight: FontWeight.bold),
+          ),
+        )));
   }
 
   datedetailWidget(String title, String value) {
     return SizedBox(
-      width:MediaQuery.of(context).size.width/2.2,
+      width: MediaQuery.of(context).size.width / 2.2,
       height: 30,
       child: Row(
         children: [
           robotoTextWidget(
-            textval: title ,
+            textval: title,
             colorval: AppColor.blackColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -338,7 +354,7 @@ class InDirectState extends State<InDirect> {
             width: 10,
           ),
           robotoTextWidget(
-            textval: value ,
+            textval: value,
             colorval: AppColor.themeColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -352,66 +368,76 @@ class InDirectState extends State<InDirect> {
     setState(() {
       isLoading = true;
     });
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    dynamic response = await HTTP.get(approveODAPI(odno,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()));
-    if (response != null && response.statusCode == 200)  {
-     /* Iterable l = convert.json.decode(response.body);
-      List<OdApproveResponse> odResponse = List<OdApproveResponse>.from(l.map((model)=> OdApproveResponse.fromJson(model)));
-     */
-
+    sharedPreferences = await SharedPreferences.getInstance();
+    dynamic response = await HTTP.get(approveODAPI(
+        odno,
+        sharedPreferences.getString(userID).toString(),
+        sharedPreferences.getString(password).toString()));
+    if (response != null && response.statusCode == 200) {
       var jsonData = convert.jsonDecode(response.body);
       OdApproveResponse odResponse = OdApproveResponse.fromJson(jsonData);
 
-      if(odResponse.type.compareTo("S") == 0){
-        Utility().showToast(odApprovedSuccess);
-        setState(() {
-          isLoading = false;
-        });
-        Navigator.of(context).pop();
-
-      }else{
+      if (odResponse.type.compareTo("S") == 0) {
+        updateSharedPreference("0");
+      } else {
         setState(() {
           isLoading = false;
         });
         Utility().showToast(odResponse.msg);
       }
-    }else{
+    } else {
       Utility().showToast(somethingWentWrong);
     }
-
   }
 
   Future<void> rejectOD(String odno) async {
     setState(() {
       isLoading = true;
     });
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    dynamic response = await HTTP.get(rejectODAPI(odno,sharedPreferences.getString(userID) as String ,sharedPreferences.getString(password) as String ));
-    if (response != null && response.statusCode == 200)  {
-    /*  Iterable l = convert.json.decode(response.body);
-      List<OdRejectResponse> odResponse = List<OdRejectResponse>.from(l.map((model)=> OdRejectResponse.fromJson(model)));
-  */
+    sharedPreferences = await SharedPreferences.getInstance();
+    dynamic response = await HTTP.get(rejectODAPI(
+        odno,
+        sharedPreferences.getString(userID) as String,
+        sharedPreferences.getString(password) as String));
+    if (response != null && response.statusCode == 200) {
       var jsonData = convert.jsonDecode(response.body);
       OdRejectResponse odResponse = OdRejectResponse.fromJson(jsonData);
 
-      if(odResponse.status.compareTo("true") == 0){
-        Utility().showToast(odRejectSuccess);
-        setState(() {
-          isLoading = false;
-        });
-        Navigator.of(context).pop();
-
-      }else{
+      if (odResponse.status.compareTo("true") == 0) {
+        updateSharedPreference("1");
+      } else {
         setState(() {
           isLoading = false;
         });
         Utility().showToast(odResponse.message);
       }
-    }else{
+    } else {
       Utility().showToast(somethingWentWrong);
     }
-
   }
 
+  updateSharedPreference(String value) async {
+    dynamic response = await HTTP.get(
+        SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
+    if (response != null && response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+        Utility()
+            .setSharedPreference(syncSapResponse, response.body.toString());
+      });
 
+      if (value == "0") {
+        Utility().showToast(odApprovedSuccess);
+      } else {
+        Utility().showToast(odRejectSuccess);
+      }
+
+      Navigator.of(context).pop();
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      Utility().showToast(somethingWentWrong);
+    }
+  }
 }
