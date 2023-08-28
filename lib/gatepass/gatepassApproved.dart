@@ -382,12 +382,12 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   }
 
   updateSharedPreference(String value) async {
-    dynamic response = await HTTP.get(
-        SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
+    dynamic response = await HTTP
+        .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
     if (response != null && response.statusCode == 200) {
       setState(() {
         isLoading  = false;
-        Utility().setSharedPreference(syncSapResponse, response.body.toString());
+        Utility().setSharedPreference(gatePassDatail, response.body.toString());
       });
 
       if(status== approveStatus){
@@ -403,5 +403,6 @@ class _GatePassApprovedState extends State<GatePassApproved> {
       Utility().showToast(somethingWentWrong);
     }
   }
+
   
 }

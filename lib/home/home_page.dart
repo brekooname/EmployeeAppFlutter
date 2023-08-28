@@ -492,13 +492,11 @@ class _HomePageState extends State<HomePage> {
             break;
           case "Close":
             {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (context) => TaskApproved(
-                        pendingTaskList: pendingTaskList,
-                        activeemployeeList: activeEmployeeList,
-                      )),
-                      (route) => true);
+              Navigator.of(context).push(MaterialPageRoute(builder:(context)=>TaskApproved(
+                pendingTaskList: pendingTaskList,
+                activeemployeeList: activeEmployeeList,
+              )))
+                  .then((value)=>{ getSPArrayList()});
             }
             break;
         }
@@ -1152,6 +1150,8 @@ class _HomePageState extends State<HomePage> {
         pendingLeaveList = syncAndroidToSapResponse!.pendingleave;
         pendindOdList = syncAndroidToSapResponse!.pendingod;
       });
+
+      print("DataUpdate=======>true");
     }
   }
 
@@ -1168,6 +1168,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         gatePassList = gatePassResponse!.data;
       });
+      print("DataUpdate2=======>true");
     }
   }
   void setVendorgatePassData() {
@@ -1189,6 +1190,7 @@ class _HomePageState extends State<HomePage> {
                         activeEmpList: activeEmployeeList,
                       )),
               (route) => true);
+
         }
         break;
       case "Official Duty":
@@ -1228,30 +1230,24 @@ class _HomePageState extends State<HomePage> {
     switch (title) {
       case "Leave":
         {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) => LeaveApproved(
-                        pendingLeaveList: pendingLeaveList,
-                      )),
-              (route) => true);
+
+          Navigator.of(context).push(MaterialPageRoute(builder:(context)=>LeaveApproved(
+            pendingLeaveList: pendingLeaveList,
+          )))
+              .then((value)=>{ getSPArrayList()});
         }
         break;
       case "Official Duty":
         {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) =>
-                      OfficialApproved(pendindOdList: pendindOdList)),
-              (route) => true);
+          Navigator.of(context).push(MaterialPageRoute(builder:(context)=>OfficialApproved(pendindOdList: pendindOdList)))
+              .then((value)=>{ getSPArrayList()});
         }
         break;
       case "Gate Pass":
         {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) =>
-                      GatePassApproved(gatePassList: gatePassList)),
-              (route) => true);
+
+          Navigator.of(context).push(MaterialPageRoute(builder:(context)=>GatePassApproved(gatePassList: gatePassList)))
+              .then((value)=>{ getSPArrayList()});
         }
         break;
     }

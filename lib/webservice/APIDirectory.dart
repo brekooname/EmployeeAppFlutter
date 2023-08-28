@@ -90,7 +90,7 @@ syncLocalConveyanceAPI(String value){
 }
 
 vendorOpenGatepass(String sapCode){
-  return Uri.parse('${productionUrl}vendor_open_gatepass.htm?pernr=4897');
+  return Uri.parse('${productionUrl}vendor_open_gatepass.htm?pernr=$sapCode');
 }
 
 DailyReportAPI(String value){
