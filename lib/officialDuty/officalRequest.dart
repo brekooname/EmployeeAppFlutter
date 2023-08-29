@@ -460,11 +460,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     workPlaceSpinner ??= "";
 
     if(workPlaceSpinner!.isEmpty ) {
+      workPlaceSpinner = null;
       Utility().showToast(validWorkPlace);
     }
     if (fromDateController.text.toString().isEmpty) {
       Utility().showToast(validDate);
     }  else if(dutyTypeSpinner!.isEmpty) {
+      dutyTypeSpinner = null;
         Utility().showToast(validateOd);
       }else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeave);
@@ -502,7 +504,9 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         selectedAssginTo.toString(),
         fromTimeController.text.toString()));
     if (response != null && response.statusCode == 200){
-
+      setState(() {
+        isLoading =false;
+      });
       Iterable l = convert.jsonDecode(response.body);
       List<OdResponse> odResponse =
       List<OdResponse>.from(
@@ -510,11 +514,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
       if(odResponse[0].name.compareTo("SAPLSPO1") == 0){
         Utility().showToast(odCreatedSuccess);
-
         Navigator.of(context).pop();
-        setState(() {
-          isLoading =false;
-        });
+
 
       }else{
         Utility().showToast(odResponse[0].name);

@@ -427,17 +427,14 @@ class _HomePageState extends State<HomePage> {
       setListData();
     }
 
-    if (sharedPreferences.getString(userInfo) != null &&
-        sharedPreferences.getString(userInfo).toString().isNotEmpty) {
+    if (sharedPreferences.getString(userInfo) != null ) {
       var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
       personInfo = PersonalInfoResponse.fromJson(jsonData);
       setpersonData();
     }
 
-    if (sharedPreferences.getString(gatePassDatail) != null &&
-        sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
-      var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+    if (sharedPreferences.getString(gatePassDatail) != null ) {
+      var jsonData = convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
       setgatePassData();
     }
