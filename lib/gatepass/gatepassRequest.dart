@@ -246,8 +246,10 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
     gatePassType ??= "";
 
     if (gatePassType.toString().isEmpty) {
+      gatePassType = null;
       Utility().showToast(selectGatePassType);
     } else if (returnalbeTypeSpinner.toString().isEmpty) {
+      returnalbeTypeSpinner = null;
       Utility().showToast("Please enter returnable type");
     } else if (purpose.text.toString().isEmpty) {
       Utility().showToast("Please enter purpose");
@@ -350,7 +352,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
       String fromTO, TextEditingController DateController, String value) {
     return GestureDetector(
       onTap: () {
-        _selectDate(context, value);
+      //  _selectDate(context, value);
       },
       child: Container(
         height: 50,
@@ -485,6 +487,16 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
     final TimeOfDay? newTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              // Using 24-Hour format
+                alwaysUse24HourFormat: false),
+            // If you want 12-Hour format, just change alwaysUse24HourFormat to false or remove all the builder argument
+            child: child!);
+
+      },
+
     );
     if (newTime != null) {
       setState(() {
@@ -495,12 +507,9 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
               DateTime(2019, 08, 1, newTime.hour, newTime.minute),
               [hh, ':', nn, " ", am]).toString();
 
-          if(returnalbeTypeSpinner == 'Returnable') {
             toTimeController.text = DateFormat(timeFormate).format(
                 DateTime(2019, 08, 1, newTime.hour, newTime.minute));
-          }else{
-            toTimeController.text = '00:00:00';
-          }
+
         }
       });
     }

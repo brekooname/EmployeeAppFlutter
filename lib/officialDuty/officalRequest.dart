@@ -136,14 +136,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                 ],
               ),
               SizedBox(height: 10,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  timePickerWidget(
-                      selectFromTime, fromTimeController, "0"),
-                  timePickerWidget(selectToTime,toTimeController, "1")
-                ],
-              ),
+              timePickerWidget(selectTime, fromTimeController, "0"),
               textFeildWidget(visitPlace, visitPlaceController),
               textFeildWidget( purpose1txt, purpose1),
               textFeildWidget(purpose2txt, purpose2),
@@ -429,13 +422,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         if (value == "0") {
           fromTimeController.text = DateFormat(timeFormat).format(DateTime(2019, 08, 1, newTime.hour, newTime.minute));
         } else if (value == "1") {
-
-          if(dutyTypeSpinner == 'On Duty') {
-            toTimeController.text = DateFormat(timeFormat).format(
-                DateTime(2019, 08, 1, newTime.hour, newTime.minute));
-          }else{
-            toTimeController.text = '00:00:00';
-          }
+          toTimeController.text = DateFormat(timeFormat).format(
+              DateTime(2019, 08, 1, newTime.hour, newTime.minute));
 
         }
       });
@@ -472,39 +460,25 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     workPlaceSpinner ??= "";
 
     if(workPlaceSpinner!.isEmpty ) {
+      workPlaceSpinner = null;
       Utility().showToast(validWorkPlace);
     }
     if (fromDateController.text.toString().isEmpty) {
       Utility().showToast(validDate);
     }  else if(dutyTypeSpinner!.isEmpty) {
+      dutyTypeSpinner = null;
         Utility().showToast(validateOd);
       }else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeave);
+    }else if (fromTimeController.text.toString().isEmpty) {
+      Utility().showToast(selectFromTime);
     }else if(workPlaceSpinner ==  selectWorkPlace) {
       Utility().showToast(vaildDepartment);
     }else  if(purpose1.text.toString().isEmpty){
       Utility().showToast(vaildPurpose);
     }else {
-      if ( dutyTypeSpinner == 'On Duty') {
-        if(fromTimeController.text.toString().isEmpty){
-          Utility().showToast("Please select from time");
-        }
-        else if(toTimeController.text.toString().isEmpty){
-          Utility().showToast("Please select to time");
-        }else{
-          createOD();
-        }
-
-
-      }else {
-        if(fromTimeController.text.toString().isEmpty){
-          Utility().showToast("Please select from time");
-        }else {
-          toTimeController.text = '00:00:00';
-          createOD();
-        }
+      createOD();
     }
-  }
   }
 
   Future<void> createOD() async {
@@ -530,7 +504,9 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         selectedAssginTo.toString(),
         fromTimeController.text.toString()));
     if (response != null && response.statusCode == 200){
-
+      setState(() {
+        isLoading =false;
+      });
       Iterable l = convert.jsonDecode(response.body);
       List<OdResponse> odResponse =
       List<OdResponse>.from(
@@ -538,11 +514,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
       if(odResponse[0].name.compareTo("SAPLSPO1") == 0){
         Utility().showToast(odCreatedSuccess);
-
         Navigator.of(context).pop();
-        setState(() {
-          isLoading =false;
-        });
+
 
       }else{
         Utility().showToast(odResponse[0].name);

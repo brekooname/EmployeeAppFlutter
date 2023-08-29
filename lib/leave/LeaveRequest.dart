@@ -479,6 +479,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   void Validation() {
     selectedLeaveType ??= "";
     if (selectedLeaveType!.isEmpty) {
+      selectedLeaveType = null;
       Utility().showToast(vaildLeaveType);
     } else if (fromDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeaveDate);
