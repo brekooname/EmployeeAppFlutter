@@ -136,7 +136,14 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                 ],
               ),
               SizedBox(height: 10,),
-              timePickerWidget(selectTime, fromTimeController, "0"),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  timePickerWidget(
+                      selectFromTime, fromTimeController, "0"),
+                  timePickerWidget(selectToTime,toTimeController, "1")
+                ],
+              ),
               textFeildWidget(visitPlace, visitPlaceController),
               textFeildWidget( purpose1txt, purpose1),
               textFeildWidget(purpose2txt, purpose2),
@@ -422,8 +429,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         if (value == "0") {
           fromTimeController.text = DateFormat(timeFormat).format(DateTime(2019, 08, 1, newTime.hour, newTime.minute));
         } else if (value == "1") {
-          toTimeController.text = DateFormat(timeFormat).format(
-              DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+
+          if(dutyTypeSpinner == 'On Duty') {
+            toTimeController.text = DateFormat(timeFormat).format(
+                DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+          }else{
+            toTimeController.text = '00:00:00';
+          }
 
         }
       });
@@ -468,15 +480,31 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         Utility().showToast(validateOd);
       }else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeave);
-    }else if (fromTimeController.text.toString().isEmpty) {
-      Utility().showToast(selectFromTime);
     }else if(workPlaceSpinner ==  selectWorkPlace) {
       Utility().showToast(vaildDepartment);
     }else  if(purpose1.text.toString().isEmpty){
       Utility().showToast(vaildPurpose);
     }else {
-      createOD();
+      if ( dutyTypeSpinner == 'On Duty') {
+        if(fromTimeController.text.toString().isEmpty){
+          Utility().showToast("Please select from time");
+        }
+        else if(toTimeController.text.toString().isEmpty){
+          Utility().showToast("Please select to time");
+        }else{
+          createOD();
+        }
+
+
+      }else {
+        if(fromTimeController.text.toString().isEmpty){
+          Utility().showToast("Please select from time");
+        }else {
+          toTimeController.text = '00:00:00';
+          createOD();
+        }
     }
+  }
   }
 
   Future<void> createOD() async {
