@@ -1,50 +1,45 @@
+import 'dart:convert' as convert;
+
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/model/gatePassResponse.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
-import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../webservice/constant.dart';
 
-
 class GatepassRequestScreen extends StatefulWidget {
   List<Activeemployee> activeemployeeList = [];
-   GatepassRequestScreen({Key? key, required this.activeemployeeList}) : super(key: key);
+
+  GatepassRequestScreen({Key? key, required this.activeemployeeList})
+      : super(key: key);
 
   @override
   State<GatepassRequestScreen> createState() => _GatepassRequestState();
 }
 
 class _GatepassRequestState extends State<GatepassRequestScreen> {
-
   bool isLoading = false;
 
   TextEditingController visitPlace = TextEditingController();
   TextEditingController purpose = TextEditingController();
 
-  DateTime datefrom = DateTime.now(), dateto = DateTime.now();
-  DateTime selectedDate = DateTime.now();
-  String ? indianFromDate,indianToDate ,selectedAssginTo;
-  TimeOfDay? fromTime = TimeOfDay.now(), comeBackTime = TimeOfDay.now();
+  String? selectedAssginTo;
+  String dateTimeFormat = "dd/MM/yyyy", timeFormate = "HH:mm:ss";
 
-  String returnableSpinner = 'Returnable';
   // List of items in our dropdown menu
   var returnableList = [
     'Returnable',
     'Non-Returnable',
   ];
-
-  String typeSpinner = 'Personal';
 
   // List of items in our dropdown menu
   var TypeList = [
@@ -52,24 +47,30 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
     'Official',
   ];
 
-  String? _hour, _minute, _time, _comeTime;
-
+  String? _time, _comeTime;
+  String? gatePassType, returnalbeTypeSpinner, selectedFromDate, selectedToDate;
+  bool isListVisible = false;
+  TextEditingController fromDateController = TextEditingController();
+  TextEditingController toDateController = TextEditingController();
+  TextEditingController fromTimeController = TextEditingController();
+  TextEditingController toTimeController = TextEditingController();
+  DateTime? pickedDate;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    indianFromDate =  DateFormat("dd/MM/yyyy").format(DateTime.now());
-    indianToDate =  DateFormat("dd/MM/yyyy").format(DateTime.now());
+    setState(() {
+      selectedFromDate = DateFormat(dateTimeFormat).format(DateTime.now());
+      selectedToDate = DateFormat(dateTimeFormat).format(DateTime.now());
+      fromDateController.text =
+          DateFormat(dateTimeFormat).format(DateTime.now());
+      toDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
 
-    _time = formatDate(
-        DateTime(2019, 08, 1, fromTime!.hour, fromTime!.minute),
-        [hh, ':', nn, " ", am]).toString();
+    });
 
-    _comeTime = formatDate(
-        DateTime(2019, 08, 1, comeBackTime!.hour, comeBackTime!.minute),
-        [hh, ':', nn, " ", am]).toString();
+
   }
 
   @override
@@ -77,7 +78,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
     // TODO: implement build
     return Scaffold(
       backgroundColor: AppColor.whiteColor,
-      appBar:AppBar(
+      appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
         title: robotoTextWidget(
@@ -86,34 +87,55 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: AppColor.whiteColor,
+            ),
             onPressed: () {
               Navigator.pop(context);
-            }
-        ),
-        iconTheme: IconThemeData(color: Colors.white),
-
+            }),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
         height: double.infinity,
         width: double.infinity,
-
+        padding: const EdgeInsets.only(left: 10, right: 10),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              SizedBox(height: 10,),
-              datePickerWidget("Gatepass Date",indianFromDate.toString()),
-              SizedBox(height: 10,),
-              timePickerWidget("Gatepass Time",_time),
-              SizedBox(height: 10,),
-              datePickerWidget("Comeback Date",indianToDate.toString()),
-              SizedBox(height: 10,),
-              timePickerWidget("Comeback Time",_comeTime),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  datePickerWidget(selectedFromDate!, fromDateController, "0"),
+                  datePickerWidget(selectedToDate!, toDateController, "1")
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+               Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        timePickerWidget(
+                            selectFromTime, fromTimeController, "0"),
+                        timePickerWidget(selectToTime,toTimeController, "1")
+                      ],
+                    ),
+
+              const SizedBox(
+                height: 10,
+              ),
               leaveTypeSpinnerWidget(),
-              dayTypeSpinnerWidget(),
-              textFieldWidget("Place to Visit", visitPlace),
-              textFieldWidget("Purpose", purpose),
-              assginToSpinnerWidget(context,widget.activeemployeeList),
+              const SizedBox(
+                height: 10,
+              ),
+              gatePassTypeSpinnerWidget(),
+              textFieldWidget(placeVisit, visitPlace),
+              textFieldWidget(purposetxt, purpose),
+              assginToSpinnerWidget(context, widget.activeemployeeList),
               submitWidget(),
             ],
           ),
@@ -122,354 +144,415 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
     );
   }
 
-  Widget assginToSpinnerWidget(BuildContext context, List<Activeemployee> activeemployee) {
-    return  Container(
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.only(left: 3),
+  Widget assginToSpinnerWidget(
+      BuildContext context, List<Activeemployee> activeemployee) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
+      padding: const EdgeInsets.only(left: 3),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child: SearchField< List<Activeemployee>>(
+      child: SearchField<List<Activeemployee>>(
         suggestions: activeemployee
             .map(
-              (activeemployee) => SearchFieldListItem< List<Activeemployee>>(
-            activeemployee.ename,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child:  Text(activeemployee.ename, style: TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
-            ),
-          ),
-        ).toList(),
-        searchInputDecoration: InputDecoration(
+              (activeemployee) => SearchFieldListItem<List<Activeemployee>>(
+                activeemployee.ename,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    activeemployee.ename,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.normal,
+                        color: AppColor.themeColor),
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+        searchInputDecoration: const InputDecoration(
           hintText: "Assign Charge To",
-          hintStyle: TextStyle(color: AppColor.themeColor, fontWeight: FontWeight.normal),
-          prefixIcon: Icon(Icons.person, color: AppColor.themeColor,),
+          hintStyle: TextStyle(
+              color: AppColor.themeColor,
+              fontSize: 12,
+              fontWeight: FontWeight.normal),
+          prefixIcon: Icon(
+            Icons.person,
+            size: 20,
+            color: AppColor.themeColor,
+          ),
           border: InputBorder.none,
         ),
         onSubmit: (String value) {
           setState(() {
             selectedAssginTo = value.toString();
           });
-
-          print("submitted\n ${value}"); },
+        },
       ),
-
     );
   }
 
   textFieldWidget(String hinttxt, TextEditingController visitPlace) {
-    return  Container(
-      margin: EdgeInsets.all(10),
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.only(left: 15),
       decoration: BoxDecoration(
         border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
-      child:  TextField(
+      child: TextField(
         controller: visitPlace,
         style: const TextStyle(color: AppColor.themeColor),
-        decoration:  InputDecoration(
-          prefixIcon: const Icon(
-            Icons.star_border,
-            color: AppColor.themeColor,
-          ),
+        decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hinttxt,
-          hintStyle:
-          const TextStyle(color: AppColor.themeColor),
+          hintStyle: const TextStyle(color: AppColor.themeColor, fontSize: 12),
         ),
         keyboardType: TextInputType.text,
-
       ),
     );
   }
 
-
   submitWidget() {
-    return  GestureDetector(
+    return GestureDetector(
         onTap: () {
           Validation();
         },
         child: Container(
           height: 50,
-          margin: const EdgeInsets.symmetric(
-              horizontal: 50),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
-                ? Container(
-              height: 30,
-              width: 30,
-              child:
-              const CircularProgressIndicator(
-                color: AppColor.whiteColor,
-              ),
-            )
+                ? const SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: CircularProgressIndicator(
+                      color: AppColor.whiteColor,
+                    ),
+                  )
                 : robotoTextWidget(
-                textval: submit,
-                colorval: Colors.white,
-                sizeval: 14,
-                fontWeight: FontWeight.bold),
+                    textval: submit,
+                    colorval: Colors.white,
+                    sizeval: 14,
+                    fontWeight: FontWeight.bold),
           ),
         ));
   }
 
   void Validation() {
-    //Validation
+    returnalbeTypeSpinner ??= "";
+    gatePassType ??= "";
 
-    if(visitPlace.text.toString().isEmpty ) {
-      Utility().showToast("Please enter person in charge");
-    }
-    else  if(purpose.text.toString().isEmpty){
-      Utility().showToast("Please enter person in charge");
-    }
-    else {
-      setState(() {
-        print("personInChager1 ${visitPlace.text.toString()}");
-        print("personInChager3 ${purpose.text.toString()}");
-      });
+    if (gatePassType.toString().isEmpty) {
+      gatePassType = null;
+      Utility().showToast(selectGatePassType);
+    } else if (returnalbeTypeSpinner.toString().isEmpty) {
+      returnalbeTypeSpinner = null;
+      Utility().showToast("Please enter returnable type");
+    } else if (purpose.text.toString().isEmpty) {
+      Utility().showToast("Please enter purpose");
+    } else if (visitPlace.text.toString().isEmpty) {
+      Utility().showToast("Please enter visit place ");
+    } else {
+      if ( returnalbeTypeSpinner == 'Returnable') {
+              if(fromTimeController.text.toString().isEmpty){
+                Utility().showToast("Please select from time");
+              }
+              else if(toTimeController.text.toString().isEmpty){
+                Utility().showToast("Please select to time");
+              }else{
+                gatePassRequestAPI();
+              }
 
-      gatePassRequestAPI();
+
+      }else {
+        if(fromTimeController.text.toString().isEmpty){
+          Utility().showToast("Please select from time");
+        }else {
+          toTimeController.text = '00:00:00';
+          gatePassRequestAPI();
+        }
+      }
     }
   }
 
   leaveTypeSpinnerWidget() {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
-      ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
-      child:   Center(
-        child: DropdownButton(
-          // Initial Value
-          underline: SizedBox(height: 0,),
-          value: returnableSpinner,
-          icon: Icon(
-            Icons.arrow_drop_down,
-            color: AppColor.themeColor, // <-- SEE HERE
-          ),
-          // Array list of items
-          items: returnableList.map((String items) {
-            return DropdownMenuItem(
-              value: items,
-              child: Center(child: robotoTextWidget(textval: items, colorval: AppColor.themeColor, sizeval: 20, fontWeight: FontWeight.w400)),
-            );
-          }).toList(),
-          // After selecting the desired option,it will
-          // change button value to selected value
-          onChanged: (String? newValue) {
-            setState(() {
-              returnableSpinner = newValue!;
-            });
-          },
-        ),
-      ),);
-  }
-
-  dayTypeSpinnerWidget() {
-    return  Container(
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
-      ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
-      child:   Center(
-        child: DropdownButton(
-          // Initial Value
-          underline: SizedBox(height: 0,),
-          value: typeSpinner,
-          icon: Icon(
-            Icons.arrow_drop_down,
-            color: AppColor.themeColor, // <-- SEE HERE
-          ),
-          // Array list of items
-          items: TypeList.map((String items) {
-            return DropdownMenuItem(
-              value: items,
-              child: Center(child: robotoTextWidget(textval: items, colorval: AppColor.themeColor, sizeval: 20, fontWeight: FontWeight.w400)),
-            );
-          }).toList(),
-          // After selecting the desired option,it will
-          // change button value to selected value
-          onChanged: (String? newValue) {
-            setState(() {
-              typeSpinner = newValue!;
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-
-  datePickerWidget( String text, String date) {
     return SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height/20,
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.whiteColor,
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
               ),
-              onPressed: () => _selectDate(context,text),
-              child:  robotoTextWidget(textval: text, colorval: AppColor.themeColor, sizeval: 15, fontWeight: FontWeight.w400),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: selectReturn,
+              fillColor: Colors.white),
+          value: returnalbeTypeSpinner,
+          validator: (value) =>
+              value == null || value.isEmpty ? selectReturn : "",
+          items: returnableList
+              .map((dayType) => DropdownMenuItem(
+                  value: dayType,
+                  child: robotoTextWidget(
+                      textval: dayType,
+                      colorval: AppColor.themeColor,
+                      sizeval: 12,
+                      fontWeight: FontWeight.bold)))
+              .toList(),
+          onChanged: (Object? value) {
+            setState(() {
+              returnalbeTypeSpinner = value.toString();
+            });
+          },
+        ));
+  }
+
+  gatePassTypeSpinnerWidget() {
+    return SizedBox(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: selectGatePass,
+              fillColor: Colors.white),
+          value: gatePassType,
+          validator: (value) =>
+              value == null || value.isEmpty ? selectGatePass : "",
+          items: TypeList.map((dayType) => DropdownMenuItem(
+              value: dayType,
+              child: robotoTextWidget(
+                  textval: dayType,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold))).toList(),
+          onChanged: (Object? value) {
+            setState(() {
+              gatePassType = value.toString();
+            });
+          },
+        ));
+  }
+
+  datePickerWidget(
+      String fromTO, TextEditingController DateController, String value) {
+    return GestureDetector(
+      onTap: () {
+      //  _selectDate(context, value);
+      },
+      child: Container(
+        height: 50,
+        width: MediaQuery.of(context).size.width / 2.2,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColor.themeColor,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.calendar_month,
+              color: AppColor.themeColor,
             ),
-            const SizedBox(height: 15.0,),
-            robotoTextWidget(textval: date.toString(), colorval: AppColor.themeColor, sizeval: 20, fontWeight: FontWeight.normal)
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child: TextField(
+              controller: DateController,
+              maxLines: 1,
+              showCursor: false,
+              enabled: false,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              decoration: InputDecoration(
+                  hintText: fromTO,
+                  hintStyle: const TextStyle(color: AppColor.themeColor),
+                  border: InputBorder.none),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.themeColor),
+              keyboardType: TextInputType.datetime,
+              textInputAction: TextInputAction.done,
+            ))
           ],
         ),
       ),
-
     );
   }
 
-  Future<void> _selectDate(BuildContext context, String text) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectDate(BuildContext context, String value) async {
+    pickedDate = await showDatePicker(
         context: context,
-        builder: (BuildContext context, Widget ?child) {
-          return Theme(
-            data: ThemeData(
-              splashColor: Colors.black,
-              textTheme: const TextTheme(
-                titleSmall: TextStyle(color: Colors.black),
-                bodySmall: TextStyle(color: Colors.black),
-              ),
-              dialogBackgroundColor: Colors.white, colorScheme: const ColorScheme.light(
-                primary: Color(0xff1565C0),
-                primaryContainer: Colors.black,
-                secondaryContainer: Colors.black,
-                onSecondary: Colors.black,
-                onPrimary: Colors.white,
-                surface: Colors.black,
-                onSurface: Colors.black,
-                secondary: Colors.black).copyWith(primaryContainer: Colors.grey, secondary: Colors.black),
-            ),
-            child: child ??const Text(""),
-          );
-        },
-        initialDate: selectedDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2026));
-    if (picked != null && picked != selectedDate) {
+        initialDate: DateTime.now(),
+        firstDate: value == "0"
+            ? DateTime.now()
+            : selectedFromDate !=
+                    DateFormat(dateTimeFormat).format(DateTime.now())
+                ? DateTime(2023)
+                : DateTime.now(),
+        //DateTime.now() - not to allow to choose before today.
+        lastDate: DateTime(2050));
+    if (pickedDate != null) {
+      print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+      String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
+      print(
+          formattedDate); //formatted date output using intl package =>  2021-03-16
       setState(() {
-
-        if(text == "Gatepass Date"){
-          datefrom = picked;
-          indianFromDate =  DateFormat("dd/MM/yyyy").format(picked);
-        }else if(text == "Comeback Date"){
-          dateto = picked;
-          indianToDate =  DateFormat("dd/MM/yyyy").format(picked);
-
+        if (value == "0") {
+          selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
+          fromDateController.text = formattedDate;
+        } else {
+          selectedToDate = DateFormat(dateTimeFormat).format(pickedDate!);
+          toDateController.text = formattedDate;
         }
-
-
       });
     }
   }
 
-  timePickerWidget(String text, String? time)  {
-    return SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height/20,
-      child: Center(
+  timePickerWidget(
+      String fromTO, TextEditingController timeController, String value) {
+    return GestureDetector(
+      onTap: () {
+        _selectTime(value);
+      },
+      child: Container(
+        height: 50,
+        width: MediaQuery.of(context).size.width / 2.2,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColor.themeColor,
+          ),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+        ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.whiteColor,
-              ),
-              onPressed: () => _selectTime(text),
-              child:  robotoTextWidget(textval: text, colorval: AppColor.themeColor, sizeval: 15, fontWeight: FontWeight.w400),
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.timer_outlined,
+              color: AppColor.themeColor,
             ),
-            const SizedBox(height: 15.0,),
-            robotoTextWidget(textval: time.toString(), colorval: AppColor.themeColor, sizeval: 20, fontWeight: FontWeight.normal)
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child: TextField(
+              controller: timeController,
+              maxLines: 1,
+              showCursor: false,
+              enabled: false,
+              textAlign: TextAlign.center,
+              textAlignVertical: TextAlignVertical.center,
+              decoration: InputDecoration(
+                  hintText: fromTO,
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  border: InputBorder.none),
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.themeColor),
+              keyboardType: TextInputType.datetime,
+              textInputAction: TextInputAction.done,
+            ))
           ],
         ),
       ),
     );
   }
 
-  void _selectTime(String title) async {
+  void _selectTime(String value) async {
     final TimeOfDay? newTime = await showTimePicker(
       context: context,
-      initialTime: fromTime!,
+      initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              // Using 24-Hour format
+                alwaysUse24HourFormat: false),
+            // If you want 12-Hour format, just change alwaysUse24HourFormat to false or remove all the builder argument
+            child: child!);
+
+      },
+
     );
     if (newTime != null) {
       setState(() {
-
-        if(title == "Gatepass Time"){
-
-          fromTime = newTime;
-          _hour = fromTime?.hour.toString();
-          _minute = fromTime?.minute.toString();
-          _time = _hour! + ' : ' + _minute!;
-
+        if (value == "0") {
+          fromTimeController.text = DateFormat(timeFormate).format(DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+        } else if (value == "1") {
           _time = formatDate(
-              DateTime(2019, 08, 1, fromTime!.hour, fromTime!.minute),
+              DateTime(2019, 08, 1, newTime.hour, newTime.minute),
               [hh, ':', nn, " ", am]).toString();
-        }else{
-          comeBackTime = newTime;
-          _hour = comeBackTime?.hour.toString();
-          _minute = comeBackTime?.minute.toString();
-          _comeTime = _hour! + ' : ' + _minute!;
 
-          _comeTime = formatDate(
-              DateTime(2019, 08, 1, comeBackTime!.hour, comeBackTime!.minute),
-              [hh, ':', nn, " ", am]).toString();
+            toTimeController.text = DateFormat(timeFormate).format(
+                DateTime(2019, 08, 1, newTime.hour, newTime.minute));
+
         }
-
       });
-
-      setState(() {
-
-      });
-
-      print("Current Time: ${_time}");
     }
   }
 
   Future<void> gatePassRequestAPI() async {
+    setState(() {
+      isLoading = true;
+    });
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? sapcode = sharedPreferences.getString(userID).toString()  ;
+    String? sapcode = sharedPreferences.getString(userID).toString();
 
-    dynamic response = await HTTP.get(createGatePassAPI(sapcode,indianFromDate.toString(),_time.toString(),typeSpinner.toString(),returnableSpinner.toString(),indianToDate.toString(),_comeTime.toString(),visitPlace.text.toString(),purpose.text.toString(),selectedAssginTo.toString()));
-    if (response != null && response.statusCode == 200)  {
-
-      print("response======>${response.toString()}");
+    dynamic response = await HTTP.get(createGatePassAPI(
+        sapcode,
+        fromDateController.text.toString(),
+        fromTimeController.text.toString(),
+        gatePassType.toString(),
+        returnalbeTypeSpinner.toString(),
+        toDateController.text.toString(),
+        toTimeController.text.toString(),
+        visitPlace.text.toString(),
+        purpose.text.toString(),
+        selectedAssginTo.toString()));
+    if (response != null && response.statusCode == 200) {
       Iterable l = convert.json.decode(response.body);
-      List<GatePassResponse> odResponse = List<GatePassResponse>.from(l.map((model)=> GatePassResponse.fromJson(model)));
-      print("response======>${odResponse[0].text}");
+      List<GatePassResponse> odResponse = List<GatePassResponse>.from(
+          l.map((model) => GatePassResponse.fromJson(model)));
 
-      if(odResponse[0].msgtyp.compareTo("S") == 0){
-
+      if (odResponse[0].msgtyp.compareTo("S") == 0) {
         Utility().showToast(odResponse[0].text);
-
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
-
-      }
-      else{
+        Navigator.of(context).pop();
+        setState(() {
+          isLoading = false;
+        });
+      } else {
         Utility().showToast(odResponse[0].text);
+        setState(() {
+          isLoading = false;
+        });
       }
-  }
+    } else {
+      Utility().showToast(somethingWentWrong);
+    }
   }
 }

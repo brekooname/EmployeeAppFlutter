@@ -3,8 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
-import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
+ import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/model/leaveResponse.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
@@ -31,19 +30,31 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
   bool isLoading = false;
   late int selectedIndex;
-
+  late SharedPreferences sharedPreferences;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+   Init();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildPosts(context),
+      body: Stack(
+        children: [
+          _buildPosts(context),
+          Center(
+            child: isLoading == true
+                ? const CircularProgressIndicator(
+              color: Colors.indigo,
+            )
+                : const SizedBox(),
+          ),
+        ],
+      ),
+
     );
   }
 
@@ -80,39 +91,39 @@ class InDirectLeaveState extends State<InDirectLeave> {
           child: Container(
               width: 400,
               color: AppColor.whiteColor,
-              padding: const EdgeInsets.all(5),
+              padding:  const EdgeInsets.all(5),
               child: Stack(children: <Widget>[
                 Row(
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailWidget("Leave No", widget.pendindLeaveList[index].leavNo.toString()),
-                        SizedBox(
+                        detailWidget( leaveNo , widget.pendindLeaveList[index].leavNo.toString()),
+                        const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("Name",widget.pendindLeaveList[index].name),
-                        SizedBox(
+                        detailWidget(nametxt,widget.pendindLeaveList[index].name),
+                        const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("Leave Type",widget.pendindLeaveList[index].horo + widget.pendindLeaveList[index].dedQuta1),
-                        SizedBox(
+                        detailWidget(leaveType ,widget.pendindLeaveList[index].horo + widget.pendindLeaveList[index].dedQuta1),
+                        const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
-                            datedetailWidget( "Leave From", widget.pendindLeaveList[index].levFr),
-                            SizedBox(
+                            datedetailWidget(leaveFrom , widget.pendindLeaveList[index].levFr),
+                            const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( "Leave To",widget.pendindLeaveList[index].levT),
+                            datedetailWidget( leaveTo,widget.pendindLeaveList[index].levT),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "Visit Place",widget.pendindLeaveList[index].reason),
-                        SizedBox(
+                        detailWidget( visitPlace ,widget.pendindLeaveList[index].reason),
+                        const SizedBox(
                           height: 2,
                         ),
 
@@ -120,7 +131,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
 
                             child: InkWell(
                               onTap: (){
@@ -130,13 +141,13 @@ class InDirectLeaveState extends State<InDirectLeave> {
                                   builder: (BuildContext context) => dialogue_removeDevice(context, widget.pendindLeaveList[index].leavNo, 0),
                                 );
                               },
-                              child: IconWidget('assets/svg/delete.svg' ,"Reject"),
+                              child: IconWidget('assets/svg/delete.svg' ,rejecttxt),
                             ),
                           ),
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
-                            padding: EdgeInsets.only(left: 30),
+                            padding: const EdgeInsets.only(left: 30),
                             child: InkWell(
                               onTap: (){
                                 selectedIndex = index;
@@ -146,7 +157,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                                 );
 
                               },
-                              child: IconWidget('assets/svg/checkmark.svg' ,"Approve"),
+                              child: IconWidget('assets/svg/checkmark.svg' ,approvetxt),
                             ),
                           ),
                         ],),
@@ -169,7 +180,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
           height: 32,
         ),
         const SizedBox(width: 5,),
-        robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
+          robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
       ],
     );
   }
@@ -218,7 +229,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                       borderRadius: BorderRadius.circular(12), // <-- Radius
                     ), backgroundColor: AppColor.whiteColor,
                   ),
-                  child: robotoTextWidget(
+                  child:   robotoTextWidget(
                     textval: cancel,
                     colorval: AppColor.darkGrey,
                     sizeval: 14,
@@ -226,10 +237,10 @@ class InDirectLeaveState extends State<InDirectLeave> {
                   ),
                 ),
               ),
-              Flexible(
+             Flexible(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.pop(context);
                     if (i == 0){
                       rejectLeave(leaveNo);
                     }else {
@@ -242,7 +253,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                       borderRadius: BorderRadius.circular(12), // <-- Radius
                     ),
                   ),
-                  child: robotoTextWidget(
+                  child:  robotoTextWidget(
                     textval: confirm,
                     colorval: AppColor.whiteColor,
                     sizeval: 14,
@@ -267,7 +278,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -323,7 +334,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
@@ -336,43 +347,32 @@ class InDirectLeaveState extends State<InDirectLeave> {
       ),
     );
   }
+  Future<void> Init() async {
+    sharedPreferences = await SharedPreferences.getInstance();
 
+  }
   Future<void> confirmLeave(int leaveNo) async {
 
     setState(() {
       isLoading  = true;
     });
 
-
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
     dynamic response = await HTTP.get(approveLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()  ));
     if (response != null && response.statusCode == 200)  {
 
-      print("response======>${response.toString()}");
       Iterable l = convert.json.decode(response.body);
       List<LeaveApproveResponse> leaveResponse = List<LeaveApproveResponse>.from(l.map((model)=> LeaveApproveResponse.fromJson(model)));
-      print("response======>${leaveResponse[0].type}");
 
       if(leaveResponse[0].type.compareTo("S") == 0){
 
-        setState(() {
-          isLoading  = false;
-        });
-        Utility().showToast("Leave Approved Successfully");
+        updateSharedPreference("0");
 
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+      } else{
 
-
-      }else{
-        setState(() {
-          isLoading  = false;
-        });
         Utility().showToast(leaveResponse[0].msg);
+        setState(() {
+          isLoading  = false;
+        });
       }
     }
 
@@ -380,32 +380,53 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
   Future<void> rejectLeave(int leaveNo) async {
 
-
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      isLoading  = true;
+    });
 
     dynamic response = await HTTP.get(rejectLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString() ,sharedPreferences.getString(password).toString() ));
     if (response != null && response.statusCode == 200)  {
+      var jsonData = convert.jsonDecode(response.body);
+      LeaveRejectResponse leaveResponse = LeaveRejectResponse.fromJson(jsonData);
+      if(leaveResponse.status.compareTo("true") == 0){
 
-      print("response======>${response.toString()}");
-      Iterable l = convert.json.decode(response.body);
-      List<LeaveRejectResponse> leaveResponse = List<LeaveRejectResponse>.from(l.map((model)=> LeaveRejectResponse.fromJson(model)));
-      print("response======>${leaveResponse[0].status}");
-
-      if(leaveResponse[0].status.compareTo("true") == 0){
-
-        Utility().showToast("Leave Rejected Successfully");
-
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
+        updateSharedPreference("1");
 
       }else{
-        Utility().showToast(leaveResponse[0].message);
-      }
-    }
+        setState(() {
+          isLoading  = false;
+        });
 
+        Utility().showToast(leaveResponse.message);
+      }
+    }else{
+      Utility().showToast(somethingWentWrong);
+    }
   }
+  updateSharedPreference(String value) async {
+
+    dynamic response = await HTTP.get(
+        SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
+    if (response != null && response.statusCode == 200) {
+      setState(() {
+        isLoading  = false;
+        Utility().setSharedPreference(syncSapResponse, response.body.toString());
+      });
+
+      if(value=="0"){
+        Utility().showToast(leaveSuccessfully);
+      }else{
+        Utility().showToast(leaveRejectSuccessfully);
+      }
+      Navigator.of(context).pop();
+    }else{
+      setState(() {
+        isLoading  = false;
+      });
+      Utility().showToast(somethingWentWrong);
+    }
+  }
+
+
 
 }

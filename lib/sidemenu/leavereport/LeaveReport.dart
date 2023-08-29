@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
+import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 
 class LeaveReport extends StatefulWidget {
@@ -14,7 +14,6 @@ class LeaveReport extends StatefulWidget {
 }
 
 class _LeaveReportState extends State<LeaveReport> {
-
   final ScrollController _horizontal = ScrollController(),
       _vertical = ScrollController();
 
@@ -28,38 +27,35 @@ class _LeaveReportState extends State<LeaveReport> {
   Widget build(BuildContext context) {
     // TODO: implement build
 
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
-            textval: "Leave Table",
+        title:   robotoTextWidget(
+            textval: LeaveTable,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();}
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        decoration:  BoxDecoration(
+        decoration:  const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/shaktiLogo.png'),
             fit: BoxFit.contain,
             opacity: 0.3,
           ),
         ),
-        child:  _buildTable(context),
+        child: _buildTable(context),
       ),
     );
   }
@@ -67,8 +63,8 @@ class _LeaveReportState extends State<LeaveReport> {
   _buildTable(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height/1.13,
-      child:  Scrollbar(
+      height: MediaQuery.of(context).size.height / 1.13,
+      child: Scrollbar(
           controller: _vertical,
           thumbVisibility: true,
           trackVisibility: true,
@@ -85,8 +81,9 @@ class _LeaveReportState extends State<LeaveReport> {
                       child: DataTable(
                           columns: <DataColumn>[
                             DataColumn(
-                              label: Center( child: setTitle("Leave No")),
-                              numeric: false,),
+                              label: Center(child: setTitle("Leave No")),
+                              numeric: false,
+                            ),
                             DataColumn(
                                 label: Center(child: setTitle("Duration")),
                                 numeric: true),
@@ -110,28 +107,26 @@ class _LeaveReportState extends State<LeaveReport> {
                                 numeric: true),
                           ],
                           rows: widget.leaveEmpList
-                              .map((leaveEmpList) => DataRow(
-                            cells: [
-                              DataCell(
-                                  setValue(leaveEmpList.leavNo ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.horo ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.levFrm ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.levTo ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.levTyp ?? "")),
-
-                              DataCell(setValue(
-                                  leaveEmpList.reason ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.apphod ?? "")),
-                              DataCell(setValue(
-                                  leaveEmpList.dele ?? "")),
-                            ],
-                          ),
-                          )
+                              .map(
+                                (leaveEmpList) => DataRow(
+                                  cells: [
+                                    DataCell(
+                                        setValue(leaveEmpList.leavNo ?? "")),
+                                    DataCell(setValue(leaveEmpList.horo ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.levFrm ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.levTo ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.levTyp ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.reason ?? "")),
+                                    DataCell(
+                                        setValue(leaveEmpList.apphod ?? "")),
+                                    DataCell(setValue(leaveEmpList.dele ?? "")),
+                                  ],
+                                ),
+                              )
                               .toList()))))),
     );
   }
@@ -151,6 +146,4 @@ class _LeaveReportState extends State<LeaveReport> {
         sizeval: 12,
         fontWeight: FontWeight.w600);
   }
-
-
 }

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/webReport/webpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-import '../Util/utility.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/constant.dart';
 
@@ -19,7 +16,6 @@ class WebReport extends StatefulWidget {
 }
 
 class _WebScreenState extends State<WebReport> {
-
   String? sapCode;
 
   @override
@@ -37,56 +33,58 @@ class _WebScreenState extends State<WebReport> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: const robotoTextWidget(
-            textval: ""
-                "Web Report",
+        title:  robotoTextWidget(
+            textval: webReport,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: AppColor.whiteColor,
+            ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
-        ),
+              Navigator.of(context).pop();
+            }),
         iconTheme: const IconThemeData(color: Colors.white),
-
       ),
       body: optionWidget(),
     );
   }
 
-
   optionWidget() {
     return Center(
       child: Container(
         margin: const EdgeInsets.only(top: 20),
-      color: AppColor.whiteColor,
+        color: AppColor.whiteColor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            detailWidget(about, aboutdec, "assets/svg/restaurant.svg",
+                '$webBaseURL$canteenUrl?perno=$sapCode'),
+            const SizedBox(
+              height: 5,
+            ),
+            lineWidget(),
+            detailWidget(gatePass, gatePassdec, "assets/svg/clipboard.svg",
+                '$webBaseURL$gatePassUrl?perno=$sapCode'),
+            const SizedBox(
+              height: 5,
+            ),
+            lineWidget(),
+            detailWidget(taskReport, taskReportdec, "assets/svg/clipboard.svg",
+                '$webBaseURL$taskUrl?perno=$sapCode'),
+            lineWidget(),
             detailWidget(
-                about, aboutdec, "assets/svg/restaurant.svg", '$webBaseURL$canteenUrl?perno=$sapCode'),
-            const SizedBox(
-              height: 5,
-            ),
-            lineWidget(),
-            detailWidget(gatePass, gatePassdec, "assets/svg/clipboard.svg",  '$webBaseURL$gatePassUrl?perno=$sapCode'),
-            const SizedBox(
-              height: 5,
-            ),
-            lineWidget(),
-            detailWidget(taskReport, taskReportdec, "assets/svg/clipboard.svg",  '$webBaseURL$taskUrl?perno=$sapCode'),
-            lineWidget(),
-            detailWidget(emphierarchy, emhierarchydec, "assets/svg/hierarchy.svg",   '$webBaseURL$emphierarchyUrl?perno=$sapCode'),
+                emphierarchy,
+                emhierarchydec,
+                "assets/svg/hierarchy.svg",
+                '$webBaseURL$emphierarchyUrl?perno=$sapCode'),
           ],
         ),
       ),
     );
   }
-
 
   lineWidget() {
     return Container(
@@ -111,8 +109,12 @@ class _WebScreenState extends State<WebReport> {
           );*/
           print('Url11111=====>${url}');
           Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => WebPage(title: title, url: url,)),
-                  (route) => true);
+              MaterialPageRoute(
+                  builder: (context) => WebPage(
+                        title: title,
+                        url: url,
+                      )),
+              (route) => true);
         }
       },
       child: Container(
@@ -165,8 +167,7 @@ class _WebScreenState extends State<WebReport> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     setState(() {
-      sapCode = sharedPreferences.getString(userID).toString() ;
+      sapCode = sharedPreferences.getString(userID).toString();
     });
   }
-
 }

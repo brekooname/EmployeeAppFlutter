@@ -43,7 +43,6 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
         isTimerStart = true;
         currentSeconds = timer.tick;
         if (timer.tick >= timerMaxSeconds){
-          print('TimerStopped====>${timer.tick}');
           isTimerStart = false;
           timer.cancel();}
 
@@ -55,10 +54,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
   @override
   void initState() {
     startTimeout();
-    print("widget.mobile");
-
-    print(widget.mobile);
-    super.initState();
+   super.initState();
   }
 
   @override
@@ -235,7 +231,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
         } else {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (BuildContext context) =>  ResetPasswordPage()),
+                  builder: (BuildContext context) =>  const ResetPasswordPage()),
                   (Route<dynamic> route) => true);
           // loginAPI();
         }
@@ -250,7 +246,6 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
     return Container(
       height: 45,
       margin: const EdgeInsets.all(10),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -259,7 +254,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   robotoTextWidget(textval: resendOtpMess, colorval:  Colors.grey, sizeval: 12, fontWeight: FontWeight.normal),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   InkWell(
@@ -267,26 +262,24 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                     onTap: (){
                       Random random = Random();
                       widget.otp = random.nextInt(9999 - 1000 )+1000;
-                      print("Number===>${widget.otp.toString()}");
-
                       startTimeout();
                       sendOtpAPI();
                     },
                   ),
 
                 ],
-              ):SizedBox(),
-          isTimerStart!=null && isTimerStart==true?Row(
+              ):const SizedBox(),
+          isTimerStart==true?Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Icon(Icons.timer, color: AppColor.themeColor),
-              SizedBox(
+              const Icon(Icons.timer, color: AppColor.themeColor),
+              const SizedBox(
                 width: 5,
               ),
               robotoTextWidget(textval: timerText, colorval: AppColor.themeColor, sizeval: 12, fontWeight: FontWeight.normal),
 
             ],
-          ):SizedBox(),
+          ):const SizedBox(),
         ],
       )
     );
@@ -301,25 +294,20 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
     dynamic response = await HTTP.get(sendOTPAPI(widget.mobile,widget.otp));
     print(response.statusCode);
     if (response != null && response.statusCode == 200) {
-      print("response==============>${response.body.toString()}");
       setState(() {
         isLoading = false;
       });
-
       jsonData = convert.jsonDecode(response.body);
-
       OtpResponse otpResponse = OtpResponse.fromJson(jsonData);
-
       if (otpResponse.status.compareTo("Success") == 0 ) {
-        Utility().showToast("OTP Send SuccessFully");
-
+        Utility().showToast(otpMessg);
       } else {
         Utility().showInSnackBar(value: otpResponse.description, context: context);
         Utility().showToast(otpResponse.description);
       }
     } else {
       if (!mounted) return;
-      Utility().showInSnackBar(value: 'Unable To Login', context: context);
+      Utility().showInSnackBar(value: unableLogin, context: context);
     }
   }
 }

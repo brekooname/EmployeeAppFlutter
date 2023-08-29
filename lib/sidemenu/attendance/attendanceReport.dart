@@ -1,22 +1,21 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
+import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 
 class AttendanceReport extends StatefulWidget {
   List<Attendanceemp> attendenceList = [];
 
-   AttendanceReport({Key? key, required this.attendenceList}) : super(key: key);
+  AttendanceReport({Key? key, required this.attendenceList}) : super(key: key);
 
   @override
   State<AttendanceReport> createState() => _AttendanceReportState();
 }
 
 class _AttendanceReportState extends State<AttendanceReport> {
-
   final ScrollController _horizontal = ScrollController(),
       _vertical = ScrollController();
 
@@ -30,38 +29,37 @@ class _AttendanceReportState extends State<AttendanceReport> {
   Widget build(BuildContext context) {
     // TODO: implement build
 
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
-            textval: "Attendance Table",
+        title:   robotoTextWidget(
+            textval: AttendanceTable,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: AppColor.whiteColor,
+            ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
-        ),
-        iconTheme: IconThemeData(color: Colors.white),
-
+              Navigator.of(context).pop();
+            }),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        decoration:  BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/shaktiLogo.png'),
             fit: BoxFit.contain,
             opacity: 0.3,
           ),
         ),
-        child:  _buildTable(context),
+        child: _buildTable(context),
       ),
     );
   }
@@ -69,8 +67,8 @@ class _AttendanceReportState extends State<AttendanceReport> {
   _buildTable(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: MediaQuery.of(context).size.height/1.13,
-      child:  Scrollbar(
+      height: MediaQuery.of(context).size.height / 1.13,
+      child: Scrollbar(
           controller: _vertical,
           thumbVisibility: true,
           trackVisibility: true,
@@ -87,8 +85,9 @@ class _AttendanceReportState extends State<AttendanceReport> {
                       child: DataTable(
                           columns: <DataColumn>[
                             DataColumn(
-                              label: Center( child: setTitle("Date")),
-                              numeric: false,),
+                              label: Center(child: setTitle("Date")),
+                              numeric: false,
+                            ),
                             DataColumn(
                                 label: Center(child: setTitle("In Time")),
                                 numeric: true),
@@ -106,23 +105,24 @@ class _AttendanceReportState extends State<AttendanceReport> {
                                 numeric: true),
                           ],
                           rows: widget.attendenceList
-                              .map((attendenceList) => DataRow(
-                            cells: [
-                              DataCell(
-                                  setValue(attendenceList.begdat ?? "")),
-                              DataCell(setValue(
-                                  attendenceList.indz ?? "")),
-                              DataCell(setValue(
-                                  attendenceList.iodz ?? "")),
-                              DataCell(setValue(
-                                  attendenceList.totdz ?? "")),
-                              DataCell(setValue(
-                                  attendenceList.atnStatus ?? "")),
-                              DataCell(setValue(
-                                  attendenceList.leaveTyp ?? "")),
-                            ],
-                          ),
-                          )
+                              .map(
+                                (attendenceList) => DataRow(
+                                  cells: [
+                                    DataCell(
+                                        setValue(attendenceList.begdat ?? "")),
+                                    DataCell(
+                                        setValue(attendenceList.indz ?? "")),
+                                    DataCell(
+                                        setValue(attendenceList.iodz ?? "")),
+                                    DataCell(
+                                        setValue(attendenceList.totdz ?? "")),
+                                    DataCell(setValue(
+                                        attendenceList.atnStatus ?? "")),
+                                    DataCell(setValue(
+                                        attendenceList.leaveTyp ?? "")),
+                                  ],
+                                ),
+                              )
                               .toList()))))),
     );
   }
@@ -142,6 +142,4 @@ class _AttendanceReportState extends State<AttendanceReport> {
         sizeval: 12,
         fontWeight: FontWeight.w600);
   }
-
-
 }

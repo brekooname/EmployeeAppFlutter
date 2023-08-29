@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
-
 import '../../theme/string.dart';
 import '../../webservice/constant.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SalarySlip extends StatefulWidget {
   const SalarySlip({Key? key}) : super(key: key);
@@ -19,7 +16,7 @@ class SalarySlip extends StatefulWidget {
 
 class _SalarySlipState extends State<SalarySlip> {
 
-  String? yearSpinner= "Select Year", monthSpinner = "Select Month";
+  String? yearSpinner , monthSpinner ;
   bool isLoading = false;
   var yearList = [
     'Select Year',
@@ -57,30 +54,32 @@ class _SalarySlipState extends State<SalarySlip> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
-            textval: ""
-                "Download Salary Slip ",
+        title:   robotoTextWidget(
+            textval: downloadSalary,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
-      body: Container(
-
-        child: SingleChildScrollView(
-          child: Column(
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.only(left: 10,right: 10),
+          child:  Column(
             children: [
-
+              SizedBox(
+                height: 10,
+              ),
               yearSpinnerWidget(),
+              SizedBox(
+                height: 10,
+              ),
               monthSpinnerWidget(),
               downloadWidget(),
             ],
@@ -91,78 +90,71 @@ class _SalarySlipState extends State<SalarySlip> {
   }
 
   yearSpinnerWidget() {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
-      ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
-      child:   Center(
-        child: DropdownButton(
-          // Initial Value
-          underline: SizedBox(height: 0,),
+    return SizedBox(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: selectLeaveType,
+              fillColor: Colors.white),
           value: yearSpinner,
-          icon: Icon(
-            Icons.arrow_drop_down,
-            color: AppColor.themeColor, // <-- SEE HERE
-          ),
-          // Array list of items
-          items: yearList.map((String year) {
-            return DropdownMenuItem(
-              value: year,
-              child: Center(child: robotoTextWidget(textval: year, colorval: AppColor.themeColor, sizeval: 20, fontWeight: FontWeight.w400)),
-            );
-          }).toList(),
-          // After selecting the desired option,it will
-          // change button value to selected value
-          onChanged: (String? newValue) {
+          validator: (value) =>
+          value == null || value.isEmpty ? selectLeaveType : "",
+          items: yearList.map((leaveType) => DropdownMenuItem(
+              value: leaveType ,
+              child: robotoTextWidget(
+                  textval: leaveType ,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold))).toList(),
+          onChanged: (Object? value) {
             setState(() {
-              yearSpinner = newValue!;
+              yearSpinner = value.toString();
             });
           },
-        ),
-      ),);
+        ));
   }
 
   monthSpinnerWidget() {
-    return  Container(
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColor.themeColor),
-        borderRadius:
-        const BorderRadius.all(Radius.circular(10)),
-      ),
-      margin: EdgeInsets.only(left: 10,right: 10,bottom: 6,top: 10),
-      child:   Center(
-        child: DropdownButton(
-          // Initial Value
-          underline: SizedBox(height: 0,),
+    return SizedBox(
+        height: 55,
+        width: MediaQuery.of(context).size.width,
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: selectLeaveType,
+              fillColor: Colors.white),
           value: monthSpinner,
-          icon: Icon(
-            Icons.arrow_drop_down,
-            color: AppColor.themeColor, // <-- SEE HERE
-          ),
-          // Array list of items
-          items: monthList.map((String items) {
-            return DropdownMenuItem(
-              value: items,
-              child: Center(child: robotoTextWidget(textval: items, colorval: AppColor.themeColor, sizeval: 20, fontWeight: FontWeight.w400)),
-            );
-          }).toList(),
-          // After selecting the desired option,it will
-          // change button value to selected value
-          onChanged: (String? newValue) {
+          validator: (value) =>
+          value == null || value.isEmpty ? selectLeaveType : "",
+          items: monthList.map((leaveType) => DropdownMenuItem(
+              value: leaveType ,
+              child: robotoTextWidget(
+                  textval: leaveType ,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.bold))).toList(),
+          onChanged: (Object? value) {
             setState(() {
-              monthSpinner = newValue!;
+              monthSpinner = value.toString();
             });
           },
-        ),
-      ),
-    );
+        ));
   }
 
   downloadWidget()  {
@@ -172,23 +164,22 @@ class _SalarySlipState extends State<SalarySlip> {
         },
         child: Container(
           height: 50,
-          margin: const EdgeInsets.symmetric(
-              horizontal: 50),
+         margin: EdgeInsets.all(10),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),
           child: Center(
             child: isLoading
-                ? Container(
+                ? const SizedBox(
               height: 30,
               width: 30,
               child:
-              const CircularProgressIndicator(
+              CircularProgressIndicator(
                 color: AppColor.whiteColor,
               ),
             )
-                : robotoTextWidget(
-                textval: "Download Salary Slip",
+                :   robotoTextWidget(
+                textval: downloadSalary,
                 colorval: Colors.white,
                 sizeval: 14,
                 fontWeight: FontWeight.bold),
@@ -200,13 +191,16 @@ class _SalarySlipState extends State<SalarySlip> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
+    yearSpinner ??= "";
+    monthSpinner ??= "";
+
     String sapCode =  sharedPreferences.getString(userID).toString() ;
-    if(yearSpinner == "Select Year"){
-      Utility().showToast("Please select year");
-    } else if(monthSpinner == "Select Month"){
-      Utility().showToast("Please select Month");
+    if(yearSpinner!.isEmpty){
+      Utility().showToast(pselectYear);
+    } else if(monthSpinner!.isEmpty){
+      Utility().showToast(pselectMonth);
     }else{
-      _launchUrl('https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_1/employee_payslip.htm?id=${sapCode}&yr=${yearSpinner}&mo=${monthSpinner}');
+      _launchUrl('$salarySlipUrl?id=$sapCode&yr=$yearSpinner&mo=$monthSpinner');
 
     }
 
@@ -217,12 +211,14 @@ class _SalarySlipState extends State<SalarySlip> {
     setState(() {
       isLoading = true;
     });
-    /*launchUrl(
-      Uri.parse(_url),
-      mode: LaunchMode.externalApplication,
-    );*/
+
+    print("url====>${Uri.parse(_url)}");
+    if (!await launchUrl(Uri.parse(_url) ,mode: LaunchMode.externalApplication,)) {
+      throw Exception('Could not launch $_url');
+    }
+
     setState(() {
-      isLoading = true;
+      isLoading = false;
     });
   }
 }

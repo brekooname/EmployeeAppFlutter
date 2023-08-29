@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
-const productionUrl = 'https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/';
+import 'constant.dart';
 
-userLogin(String sapCode, String password ) {
-  return Uri.parse('${productionUrl}login.htm?pernr=${sapCode}&pass=${password}');
+const productionUrl = 'https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/';
+const googleDistanceMatrixAPI = 'https://maps.googleapis.com/maps/api/distancematrix/';
+const dashboardAppUrl ='https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zshakti_dash/';
+
+
+userLogin(String sapCode, String password, String api_version,  String api, String app_version, String imei , String os, String fcm_token) {
+  return Uri.parse('${productionUrl}login.htm?pernr=${sapCode}&pass=${password}&api_version=${api_version}&api=${api}&app_version=${app_version}&imei=${imei}&os=${os}&fcm_token=${fcm_token}');
 }
+
 
 forgotpasword(String sapCode ,String moile, String DOB){
   return Uri.parse('${productionUrl}forgot_password.htm?pernr=${sapCode}&mobno=${moile}&dob=${DOB}');
@@ -17,17 +23,26 @@ sendOTPAPI(String mobile, int otp){
 SyncAndroidToSapAPI(String pernr){
   return Uri.parse('${productionUrl}sync_android_to_sap.htm?pernr=${pernr}');
 }
+getDistanceAPI(String origin,String destination){
+  return Uri.parse('${googleDistanceMatrixAPI}json?origins=$origin&destinations=$destination&key=$googleApiKey');
+}
 
-createLeaveAPI(String sapCode, String leavetype, String leaveDuration, String from, String To, String reason, String pInC1,String pInC2,String pInC3,String pInC4){
-  return Uri.parse('${productionUrl}leave_create.htm?app_pernr=${sapCode}&app_leave_type=${leavetype}&app_leave_duration=${leaveDuration}&app_leave_from=${from}&app_leave_to=${To}&app_leave_reason=${reason}&app_per_chrg1=${pInC1}&app_per_chrg2=${pInC2}&app_per_chrg3=${pInC3}&app_per_chrg4=${pInC4}');
+createLeaveAPI(String sapCode, String leavetype, String leaveDuration, String fromDate, String toDate,
+    String fromTime, String toTime, String reason, String pInC1,String pInC2,String pInC3,String pInC4){
+  return Uri.parse('${productionUrl}leave_create.htm?app_pernr=${sapCode}&app_leave_type=${leavetype}'
+      '&app_leave_duration=${leaveDuration}&app_leave_from=${fromDate}&app_leave_to=${toDate}&tim_fr=${fromTime}&tim_to=${toTime}&app_leave_reason=${reason}'
+      '&app_per_chrg1=${pInC1}&app_per_chrg2=${pInC2}&app_per_chrg3=${pInC3}&app_per_chrg4=${pInC4}');
 }
 
 createTaskAPI(String value){
   return Uri.parse('${productionUrl}sync_offline_data.htm?TASK_CREATED=${value}');
 }
 
-createODAPI(String app_pernr, String atnds_status, String app_od_from, String app_od_to , String app_od_visitplace, String app_od_workplace, String st_od_purpose1, String st_od_purpose2, String st_od_purpose3, String st_od_remark , String st_od_charge){
-  return Uri.parse('${productionUrl}od_create.htm?app_pernr=${app_pernr}&atnds_status=${atnds_status}&app_od_from=${app_od_from}&app_od_to=${app_od_to}&app_od_visitplace=${app_od_visitplace}&app_od_workplace=${app_od_workplace}&app_od_purpose1=${st_od_purpose1}&app_od_purpose2=${st_od_purpose2}&app_od_purpose3=${st_od_purpose3}&app_od_remark=${st_od_remark}&app_od_charge=${st_od_charge}');
+createODAPI(String app_pernr, String atnds_status, String app_od_from, String app_od_to , String app_od_visitplace, String app_od_workplace, String st_od_purpose1, String st_od_purpose2, String st_od_purpose3, String st_od_remark , String st_od_charge, String fromTime){
+  return Uri.parse('${productionUrl}od_create.htm?app_pernr=${app_pernr}&atnds_status=${atnds_status}'
+      '&app_od_from=${app_od_from}&app_od_to=${app_od_to}&app_od_visitplace=${app_od_visitplace}'
+      '&app_od_workplace=${app_od_workplace}&app_od_purpose1=${st_od_purpose1}&app_od_purpose2=${st_od_purpose2}'
+      '&app_od_purpose3=${st_od_purpose3}&app_od_remark=${st_od_remark}&app_od_charge=${st_od_charge}&Frm_tim=${fromTime}');
 }
 
 approveODAPI(String drno, String sapcode, String pass){
@@ -58,7 +73,7 @@ pendingGatePass(String sapCode){
   return Uri.parse('${productionUrl}gatepass_approval_pending.htm?app_pernr=${sapCode}');
 }
 
-approveGatePassAPI(int prner,int drno,  String sapcode,  String status){
+approveGatePassAPI(String prner,String drno,  String sapcode,  String status){
   return Uri.parse('${productionUrl}gatepass_approva_rejectl.htm?pernr=${prner}&gp_no=${drno}&app_pernr=${sapcode}&status=${status}');
 }
 
@@ -68,4 +83,28 @@ rejectLeaveAPI(int drno, String sapcode, String pass){
 
 vendorNameAPI(String value){
   return Uri.parse('${productionUrl}vendor_details_all.htm?name=${value}');
+}
+
+syncLocalConveyanceAPI(String value){
+  return Uri.parse('${productionUrl}start_end_location.htm?travel_distance=${value}');
+}
+
+vendorOpenGatepass(String sapCode){
+  return Uri.parse('${productionUrl}vendor_open_gatepass.htm?pernr=$sapCode');
+}
+
+DailyReportAPI(String value){
+  return Uri.parse('${productionUrl}mom_daily_reportinf.htm?final=${value}');
+}
+
+getDepartment() {
+  return Uri.parse('${dashboardAppUrl}dept_api.htm');
+}
+getTotalTaskCountList(String DeptCode, String empCode, String fromDate, String toDate) {
+  return Uri.parse(
+      '${dashboardAppUrl}task_api.htm?depart=$DeptCode&emp=$empCode&date1=$fromDate&date2=$toDate');
+}
+
+getTaskList(String subDeptCode, String empCode, String fromDate, String toDate, String type) {
+  return Uri.parse('${dashboardAppUrl}task_list.htm?depart=$subDeptCode&emp=$empCode&date1=$fromDate&date2=$toDate&type=$type');
 }

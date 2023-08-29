@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../gatepass/model/PendingGatePassResponse.dart';
 import '../home/model/personalindoresponse.dart';
@@ -62,43 +63,47 @@ class Utility {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
   }
-  /*void saveArrayList(List<String> list, int position) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    switch (position) {
-      case 0:
-        String jsonstring = json.encode(list);
-        print('jsonstring=========>$jsonstring');
-        preferences.setString(leaveBalanceLists, jsonstring);
-        break;
-      case 1:
-        preferences.setStringList(activeEmployeeLists, list);
-        break;
-      case 2:
-        preferences.setStringList(attendenceLists, list);
-        break;
-      case 3:
-        preferences.setStringList(odEmpLists, list);
-        break;
-      case 4:
-        preferences.setStringList(leaveEmpLists, list);
-        break;
-      case 5:
-        preferences.setStringList(pendingTaskLists, list);
-        break;
-      case 6:
-        preferences.setStringList(pendingLeaveLists, list);
-        break;
-      case 7:
-        preferences.setStringList(pendindOdLists, list);
-        break;
-      case 8:
-        preferences.setStringList(personalInfos, list);
-        break;
-      case 9:
-        preferences.setStringList(gatePassLists, list);
-        break;
-    }
-  }*/
 
+  String formatAddress(String address) {
+    var formated = address
+        .replaceAllMapped(
+        new RegExp(r'[A-Za-z0-9]+\+[A-Za-z0-9]+,(.*)', caseSensitive: false),
+            (Match m) => "${m[1]}")
+        .replaceAllMapped(
+        new RegExp(r'(^.*).*karnataka[+ \n\t\r\f]*,*.*',
+            caseSensitive: false),
+            (Match m) => "${m[1]}")
+        .replaceAllMapped(
+        new RegExp(r'(^.*).*india[ \n\t\r\f]*,*.*', caseSensitive: false),
+            (Match m) => "${m[1]}")
+        .replaceAll(new RegExp("[0-9]{6}"), '') //pincode
+        .replaceAll(new RegExp("[+ \n\t\r\f],"), '')
+        .replaceAll(new RegExp("[+ \n\t\r\f,]\$"), '')
+        .replaceAll(new RegExp("[+ \n\t\r\f]"), ' ')
+        .replaceAll(new RegExp("^[,]"), '')
+        .replaceAll(new RegExp("[,]\$"), '');
+
+    return formated;
+  }
+
+  Future<void> deleteDatabase(String path) =>
+      databaseFactory.deleteDatabase(path);
+
+  static String getBase64FormateFile(String path) {
+    File file = File(path);
+    print('File is = ' + file.toString());
+    List<int> fileInByte = file.readAsBytesSync();
+    String fileInBase64 = base64Encode(fileInByte);
+    return fileInBase64;
+  }
+
+  static String convertDateFormat(String dateTimeString, String oldFormat, String
+  newFormat) {
+    print('dateTimeString$dateTimeString');
+    DateFormat newDateFormat = DateFormat(newFormat);
+    DateTime dateTime = DateFormat(oldFormat).parse(dateTimeString);
+    String selectedDate = newDateFormat.format(dateTime);
+    return selectedDate;
+  }
 
 }

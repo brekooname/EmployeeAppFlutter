@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
+import 'package:shakti_employee_app/home/home_page.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
+
+import '../../theme/string.dart';
 
 class OficialDutyReport extends StatefulWidget {
   List<Odemp> odEmpList = [];
@@ -33,26 +35,24 @@ class _OficialDutyReportState extends State<OficialDutyReport> {
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
-        title: robotoTextWidget(
-            textval: "Official Duty Table",
+        title:   robotoTextWidget(
+            textval: officialDuty,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
         leading: IconButton(
-            icon: new Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+            icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) =>  HomePage()),
-              );}
+              Navigator.of(context).pop();
+            }
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
 
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        decoration:  BoxDecoration(
+        decoration:  const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/shaktiLogo.png'),
             fit: BoxFit.contain,

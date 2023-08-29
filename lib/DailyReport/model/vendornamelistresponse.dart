@@ -70,4 +70,5 @@ class Response {
     "telf1": telf1,
     "add": add,
   };
+
 }

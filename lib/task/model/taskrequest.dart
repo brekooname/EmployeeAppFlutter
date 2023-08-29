@@ -16,7 +16,6 @@ class TaskRequest {
   String assignTo;
   String dateFrom;
   String dateTo;
-  String mrcType;
   String department;
 
   TaskRequest({
@@ -27,7 +26,6 @@ class TaskRequest {
     required this.assignTo,
     required this.dateFrom,
     required this.dateTo,
-    required this.mrcType,
     required this.department,
   });
 
@@ -39,7 +37,6 @@ class TaskRequest {
     assignTo: json["assign_to"],
     dateFrom: json["date_from"],
     dateTo: json["date_to"],
-    mrcType: json["mrc_type"],
     department: json["department"],
   );
 
@@ -51,7 +48,6 @@ class TaskRequest {
     "assign_to": assignTo,
     "date_from": dateFrom,
     "date_to": dateTo,
-    "mrc_type": mrcType,
     "department": department,
   };
 }

@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/home/HomePage.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/officialDuty/model/odApproveResponse.dart';
 import 'package:shakti_employee_app/officialDuty/model/odRejectResponse.dart';
@@ -12,43 +11,54 @@ import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../theme/string.dart';import 'dart:convert' as convert;
+import '../../theme/string.dart';
+import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
 import '../../webservice/constant.dart';
 
 class InDirect extends StatefulWidget {
-    String Status;
-    List<Pendingod> pendindOdList = [];
-   InDirect({Key? key, required this.Status , required this.pendindOdList}) : super(key: key);
+  String Status;
+  List<Pendingod> pendindOdList = [];
+
+  InDirect({Key? key, required this.Status, required this.pendindOdList})
+      : super(key: key);
 
   @override
   State<InDirect> createState() => InDirectState();
 }
 
 class InDirectState extends State<InDirect> {
-
   bool isLoading = false;
   late int selectedIndex;
-
+  late SharedPreferences sharedPreferences;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: _buildPosts(context),
+      body: Stack(
+        children: [
+          _buildPosts(context),
+          Center(
+            child: isLoading == true
+                ? const CircularProgressIndicator(
+                    color: Colors.indigo,
+                  )
+                : const SizedBox(),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildPosts(BuildContext context) {
-
-    if ( widget.pendindOdList.isEmpty) {
+    if (widget.pendindOdList.isEmpty) {
       return NoDataFound();
     }
     return Container(
@@ -82,79 +92,90 @@ class InDirectState extends State<InDirect> {
               padding: const EdgeInsets.all(5),
               child: Stack(children: <Widget>[
                 Row(
-                    children: [
+                  children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailWidget("Document No",widget.pendindOdList[index].odno),
-                        SizedBox(
+                        detailWidget(docNo, widget.pendindOdList[index].odno),
+                        const SizedBox(
                           height: 2,
                         ),
-                        detailWidget("Name",widget.pendindOdList[index].ename),
-                        SizedBox(
+                        detailWidget(
+                            nametxt, widget.pendindOdList[index].ename),
+                        const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
-                            datedetailWidget( "OD Start",widget.pendindOdList[index].odstdateC),
-                            SizedBox(
+                            datedetailWidget(
+                                odStart, widget.pendindOdList[index].odstdateC),
+                            const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( "OD End",widget.pendindOdList[index].odedateC),
+                            datedetailWidget(
+                                odEnd, widget.pendindOdList[index].odedateC),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "Visit Place",widget.pendindOdList[index].vplace),
-                        SizedBox(
+                        detailWidget(
+                            visitPlace, widget.pendindOdList[index].vplace),
+                        const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "Visit Purpose",widget.pendindOdList[index].purpose1),
-                        SizedBox(
+                        detailWidget(
+                            visitPurpose, widget.pendindOdList[index].purpose1),
+                        const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( "No of Days",widget.pendindOdList[index].horo),
-
-                        Row(children: [
-                          Container(
-                            width:  MediaQuery.of(context).size.width/2.2,
-                            height: 40,
-                            padding: EdgeInsets.only(left: 30),
-
-                            child: InkWell(
-                              onTap: (){
-                                selectedIndex = index;
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context, widget.pendindOdList[index].odno, 0),
-                                );
-
-                              },
-                              child: IconWidget('assets/svg/delete.svg' ,"Reject"),
+                        detailWidget(noOfDay, widget.pendindOdList[index].horo),
+                        Row(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.2,
+                              height: 40,
+                              padding: const EdgeInsets.only(left: 30),
+                              child: InkWell(
+                                onTap: () {
+                                  selectedIndex = index;
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        dialogue_removeDevice(
+                                            context,
+                                            widget.pendindOdList[index].odno,
+                                            0),
+                                  );
+                                },
+                                child: IconWidget(
+                                    'assets/svg/delete.svg', rejecttxt),
+                              ),
                             ),
-                          ),
-                          Container(
-                            width:  MediaQuery.of(context).size.width/2.2,
-                            height: 40,
-                            padding: EdgeInsets.only(left: 30),
-                            child: InkWell(
-                              onTap: (){
-                                selectedIndex = index;
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context, widget.pendindOdList[index].odno, 1),
-                                );
-
-                              },
-                              child: IconWidget('assets/svg/checkmark.svg' ,"Approve"),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.2,
+                              height: 40,
+                              padding: const EdgeInsets.only(left: 30),
+                              child: InkWell(
+                                onTap: () {
+                                  selectedIndex = index;
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        dialogue_removeDevice(
+                                            context,
+                                            widget.pendindOdList[index].odno,
+                                            1),
+                                  );
+                                },
+                                child: IconWidget(
+                                    'assets/svg/checkmark.svg', approvetxt),
+                              ),
                             ),
-                          ),
-                        ],),
-
+                          ],
+                        ),
                       ],
                     ),
-
                   ],
                 ),
               ]))),
@@ -169,112 +190,116 @@ class InDirectState extends State<InDirect> {
           width: 32,
           height: 32,
         ),
-        const SizedBox(width: 5,),
-        robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
+        const SizedBox(
+          width: 5,
+        ),
+        robotoTextWidget(
+            textval: txt,
+            colorval: Colors.black,
+            sizeval: 16,
+            fontWeight: FontWeight.w600)
       ],
     );
   }
 
   Widget dialogue_removeDevice(BuildContext context, String odno, var status) {
-
     return AlertDialog(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
-        content: Container(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(
-                appName,
-                style: const TextStyle(
-                    color: AppColor.themeColor,
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              status==0?reject:confirmation,
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              appName,
               style: const TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.w600,
-                  fontSize: 12),
+                  fontSize: 14),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Flexible(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // <-- Radius
-                      ), backgroundColor: AppColor.whiteColor,
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            status == 0 ? reject : confirmation,
+            style: const TextStyle(
+                color: AppColor.themeColor,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w600,
+                fontSize: 12),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
                     ),
-                    child: robotoTextWidget(
-                      textval: cancel,
-                      colorval: AppColor.darkGrey,
-                      sizeval: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    backgroundColor: AppColor.whiteColor,
+                  ),
+                  child: robotoTextWidget(
+                    textval: cancel,
+                    colorval: AppColor.darkGrey,
+                    sizeval: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                Flexible(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      if (status == 0){
-                        rejectOD(odno);
-                      }else {
-                          confirmOD(odno);
-                        }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.themeColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12), // <-- Radius
-                      ),
-                    ),
-                    child: robotoTextWidget(
-                      textval: confirm,
-                      colorval: AppColor.whiteColor,
-                      sizeval: 14,
-                      fontWeight: FontWeight.w600,
+              ),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (status == 0) {
+                      rejectOD(odno);
+                    } else {
+                      confirmOD(odno);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.themeColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
                     ),
                   ),
+                  child: robotoTextWidget(
+                    textval: confirm,
+                    colorval: AppColor.whiteColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ],
-            )
-          ]),
-        ));
+              ),
+            ],
+          )
+        ]));
   }
 
   detailWidget(String title, String value) {
-    return Container(
-      width:MediaQuery.of(context).size.width/1.1,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 1.1,
       height: 30,
       child: Row(
         children: [
           robotoTextWidget(
-            textval: title ,
+            textval: title,
             colorval: AppColor.blackColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
-            textval: value ,
+            textval: value,
             colorval: AppColor.themeColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -285,52 +310,51 @@ class InDirectState extends State<InDirect> {
   }
 
   SizedBox NoDataFound() {
-
     return SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Center(
             child: Container(
-              height: MediaQuery.of(context).size.height / 10,
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 20, right: 20),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Color.fromRGBO(30, 136, 229, .5),
-                        blurRadius: 20,
-                        offset: Offset(0, 10))
-                  ]),
-              child: Align(
-                alignment: Alignment.center,
-                child: robotoTextWidget(
-                    textval: noDataFound,
-                    colorval: AppColor.themeColor,
-                    sizeval: 14,
-                    fontWeight: FontWeight.bold),
-              ),
-            )));
+          height: MediaQuery.of(context).size.height / 10,
+          width: MediaQuery.of(context).size.width,
+          margin: const EdgeInsets.only(left: 20, right: 20),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: const [
+                BoxShadow(
+                    color: Color.fromRGBO(30, 136, 229, .5),
+                    blurRadius: 20,
+                    offset: Offset(0, 10))
+              ]),
+          child: Align(
+            alignment: Alignment.center,
+            child: robotoTextWidget(
+                textval: noDataFound,
+                colorval: AppColor.themeColor,
+                sizeval: 14,
+                fontWeight: FontWeight.bold),
+          ),
+        )));
   }
 
   datedetailWidget(String title, String value) {
-    return Container(
-      width:MediaQuery.of(context).size.width/2.2,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 2.2,
       height: 30,
       child: Row(
         children: [
           robotoTextWidget(
-            textval: title ,
+            textval: title,
             colorval: AppColor.blackColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           robotoTextWidget(
-            textval: value ,
+            textval: value,
             colorval: AppColor.themeColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -341,66 +365,79 @@ class InDirectState extends State<InDirect> {
   }
 
   Future<void> confirmOD(String odno) async {
+    setState(() {
+      isLoading = true;
+    });
+    sharedPreferences = await SharedPreferences.getInstance();
+    dynamic response = await HTTP.get(approveODAPI(
+        odno,
+        sharedPreferences.getString(userID).toString(),
+        sharedPreferences.getString(password).toString()));
+    if (response != null && response.statusCode == 200) {
+      var jsonData = convert.jsonDecode(response.body);
+      OdApproveResponse odResponse = OdApproveResponse.fromJson(jsonData);
 
-
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-
-    dynamic response = await HTTP.get(approveODAPI(odno,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()));
-    if (response != null && response.statusCode == 200)  {
-
-      print("response======>${response.toString()}");
-      Iterable l = convert.json.decode(response.body);
-      List<OdApproveResponse> odResponse = List<OdApproveResponse>.from(l.map((model)=> OdApproveResponse.fromJson(model)));
-      print("response======>${odResponse[0].type}");
-
-      if(odResponse[0].type.compareTo("S") == 0){
-
-        Utility().showToast("OD Approved Successfully");
-
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
-
-      }else{
-        Utility().showToast(odResponse[0].msg);
+      if (odResponse.type.compareTo("S") == 0) {
+        updateSharedPreference("0");
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        Utility().showToast(odResponse.msg);
       }
+    } else {
+      Utility().showToast(somethingWentWrong);
     }
-
   }
 
   Future<void> rejectOD(String odno) async {
+    setState(() {
+      isLoading = true;
+    });
+    sharedPreferences = await SharedPreferences.getInstance();
+    dynamic response = await HTTP.get(rejectODAPI(
+        odno,
+        sharedPreferences.getString(userID) as String,
+        sharedPreferences.getString(password) as String));
+    if (response != null && response.statusCode == 200) {
+      var jsonData = convert.jsonDecode(response.body);
+      OdRejectResponse odResponse = OdRejectResponse.fromJson(jsonData);
 
-
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-
-    dynamic response = await HTTP.get(rejectODAPI(odno,sharedPreferences.getString(userID) as String ,sharedPreferences.getString(password) as String ));
-    if (response != null && response.statusCode == 200)  {
-
-      print("response======>${response.toString()}");
-      Iterable l = convert.json.decode(response.body);
-      List<OdRejectResponse> odResponse = List<OdRejectResponse>.from(l.map((model)=> OdRejectResponse.fromJson(model)));
-      print("response======>${odResponse[0].status}");
-
-      if(odResponse[0].status.compareTo("true") == 0){
-
-        Utility().showToast("OD Rejected Successfully");
-
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage()),
-                (route) => true);
-
-      }else{
-        Utility().showToast(odResponse[0].message);
+      if (odResponse.status.compareTo("true") == 0) {
+        updateSharedPreference("1");
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        Utility().showToast(odResponse.message);
       }
+    } else {
+      Utility().showToast(somethingWentWrong);
     }
-
   }
 
+  updateSharedPreference(String value) async {
+    dynamic response = await HTTP.get(
+        SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
+    if (response != null && response.statusCode == 200) {
+      setState(() {
+        isLoading = false;
+        Utility()
+            .setSharedPreference(syncSapResponse, response.body.toString());
+      });
 
+      if (value == "0") {
+        Utility().showToast(odApprovedSuccess);
+      } else {
+        Utility().showToast(odRejectSuccess);
+      }
+
+      Navigator.of(context).pop();
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      Utility().showToast(somethingWentWrong);
+    }
+  }
 }
