@@ -28,7 +28,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   bool isLoading = false;
   late int selectedIndex;
   String rejectStatus = 'reject',approveStatus = 'approve';
-
+  late SharedPreferences sharedPreferences;
   @override
   void initState() {
     // TODO: implement initState
@@ -361,22 +361,14 @@ class _GatePassApprovedState extends State<GatePassApproved> {
     setState(() {
       isLoading  = true;
     });
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(approveGatePassAPI(prner,leaveNo,sharedPreferences.getString(userID).toString() ,status));
     if (response != null && response.statusCode == 200)  {
       Iterable l = convert.json.decode(response.body);
       List<GatePassResponse> gatePassResponse = List<GatePassResponse>.from(l.map((model)=> GatePassResponse.fromJson(model)));
 
       if(gatePassResponse[0].msgtyp.compareTo("S") == 0){
-        setState(() {
-          isLoading  = false;
-        });
-        if(status== approveStatus){
-          Utility().showToast(gatePassSuccess);
-        } else if(status== rejectStatus){
-          Utility().showToast(gateRejectPassSuccess);
-        }
-        Navigator.of(context).pop();
+        updateSharedPreference(status);
       }else{
         setState(() {
           isLoading  = false;
@@ -388,5 +380,29 @@ class _GatePassApprovedState extends State<GatePassApproved> {
     }
 
   }
+
+  updateSharedPreference(String value) async {
+    dynamic response = await HTTP
+        .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
+    if (response != null && response.statusCode == 200) {
+      setState(() {
+        isLoading  = false;
+        Utility().setSharedPreference(gatePassDatail, response.body.toString());
+      });
+
+      if(status== approveStatus){
+        Utility().showToast(gatePassSuccess);
+      } else if(status== rejectStatus){
+        Utility().showToast(gateRejectPassSuccess);
+      }
+      Navigator.of(context).pop();
+    }else{
+      setState(() {
+        isLoading  = false;
+      });
+      Utility().showToast(somethingWentWrong);
+    }
+  }
+
   
 }

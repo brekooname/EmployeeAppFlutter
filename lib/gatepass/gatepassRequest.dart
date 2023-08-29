@@ -269,6 +269,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
         if(fromTimeController.text.toString().isEmpty){
           Utility().showToast("Please select from time");
         }else {
+          toTimeController.text = '00:00:00';
           gatePassRequestAPI();
         }
       }
