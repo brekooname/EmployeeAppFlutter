@@ -396,7 +396,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                       hintText: fromTO,
-                      hintStyle: const TextStyle(color: Colors.grey),
+                      hintStyle: const TextStyle(color: Colors.grey,fontFamily: 'Roboto',fontSize: 12),
                       border: InputBorder.none),
                   style: const TextStyle(
                       fontSize: 12,
