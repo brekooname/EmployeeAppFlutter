@@ -92,7 +92,16 @@ class _LoginPageState extends State<LoginPage> {
     // TODO: implement initState
     super.initState();
 
-    retrieveFCMToken();
+
+    Utility().checkInternetConnection().then((connectionResult) {
+      if (connectionResult) {
+        retrieveFCMToken();
+      } else {
+        Utility()
+            .showInSnackBar(value: checkInternetConnection, context: context);
+      }
+    });
+
   }
 
 

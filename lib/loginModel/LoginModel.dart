@@ -28,13 +28,13 @@ class LoginModelResponse {
   });
 
   factory LoginModelResponse.fromJson(Map<String, dynamic> json) => LoginModelResponse(
-    objs: json["objs"],
-    persno: json["persno"],
-    pass: json["pass"],
-    name: json["name"],
-    mobAtnd: json["mobAtnd"],
-    travel: json["travel"],
-    hod: json["hod"],
+    objs: json["objs"]??"",
+    persno: json["persno"]??"",
+    pass: json["pass"]??"",
+    name: json["name"]??"",
+    mobAtnd: json["mobAtnd"]??"",
+    travel: json["travel"]??"",
+    hod: json["hod"]??"",
   );
 
   Map<String, dynamic> toJson() => {
