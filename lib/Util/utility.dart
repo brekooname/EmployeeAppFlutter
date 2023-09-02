@@ -97,6 +97,13 @@ class Utility {
     return fileInBase64;
   }
 
-
+  static String convertDateFormat(String dateTimeString, String oldFormat, String
+  newFormat) {
+    print('dateTimeString$dateTimeString');
+    DateFormat newDateFormat = DateFormat(newFormat);
+    DateTime dateTime = DateFormat(oldFormat).parse(dateTimeString);
+    String selectedDate = newDateFormat.format(dateTime);
+    return selectedDate;
+  }
 
 }

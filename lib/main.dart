@@ -18,6 +18,7 @@ import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'all_task/my_task_list.dart';
 import 'forgot_password/forgot_password_page.dart';
 import 'home/home_page.dart';
 import 'notificationService/local_notification_service.dart';
@@ -83,7 +84,6 @@ class _LoginPageState extends State<LoginPage> {
   String platform ='',appVersion='',fcmToken='',imeiNumber='',apiNumber='',platformVersion='';
   TextEditingController sapCodeController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   bool getPermission = false;
 
 
@@ -341,8 +341,6 @@ class _LoginPageState extends State<LoginPage> {
     } else if (Platform.isIOS) {
       platform = "IOS";
     }
-    print('LoginURL=====>${userLogin(
-        sapCodeController.text.toString(), passwordController.text.toString(),platformVersion!,apiNumber!,appVersion!,imeiNumber!,platform!,fcmToken!)}');
 
    dynamic response = await HTTP.get(userLogin(
         sapCodeController.text.toString(), passwordController.text.toString(),platformVersion!,apiNumber!,appVersion!,imeiNumber!,platform!,fcmToken!));

@@ -28,6 +28,8 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   bool isLoading = false;
   late int selectedIndex;
   String rejectStatus = 'reject',approveStatus = 'approve';
+  late SharedPreferences sharedPreferences;
+  String dateTimeOldFormat ='dd.MM.yyyy HH:mm:SS',dateTimeNewFormat ="dd MMM yyyy HH:mm a";
 
   @override
   void initState() {
@@ -98,45 +100,30 @@ class _GatePassApprovedState extends State<GatePassApproved> {
               color: AppColor.whiteColor,
               padding: const EdgeInsets.all(5),
               child: Stack(children: <Widget>[
-                Row(
-                  children: [
+
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         detailWidget(gatePassNo, widget.gatePassList[index].gpno.toString()),
-                        const SizedBox(
-                          height: 2,
-                        ),
+
                         detailWidget(nametxt,widget.gatePassList[index].ename),
-                        const SizedBox(
-                          height: 2,
-                        ),
+
                         detailWidget(gatePassType,widget.gatePassList[index].gptypeTxt ),
-                        const SizedBox(
-                          height: 2,
-                        ),
+
                         detailWidget(requiredType,widget.gatePassList[index].reqtypeTxt),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        Row(
-                          children: [
-                            datedetailWidget(from, widget.gatePassList[index].gpdat.toString()),
-                            const SizedBox(
-                              width: 4,
-                            ),
-                            datedetailWidget( to,widget.gatePassList[index].closedDate.toString()),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
+
+                       datedetailWidget(from, Utility.convertDateFormat('${widget.gatePassList[index].gpdat.toString()} ${widget.gatePassList[index].gptime.toString()}',dateTimeOldFormat,dateTimeNewFormat)),
+
+                        widget.gatePassList[index].eindat.toString()!= '00.00.0000' && widget.gatePassList[index].eintime.toString()!='00:00:00'?  datedetailWidget( to,Utility.convertDateFormat('${widget.gatePassList[index].eindat.toString()} '
+                            '${widget.gatePassList[index].eintime.toString()}',dateTimeOldFormat,dateTimeNewFormat)):Container(),
+
                         detailWidget(visitPlace,widget.gatePassList[index].vplace),
                         const SizedBox(
                           height: 2,
                         ),
 
-                        Row(children: [
+                        Row(
+                          children: [
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
                             height: 40,
@@ -174,8 +161,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                       ],
                     ),
 
-                  ],
-                ),
+
               ]))),
     ]);
   }
@@ -212,7 +198,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
 
   datedetailWidget(String title, String value) {
     return SizedBox(
-      width:MediaQuery.of(context).size.width/2.2,
+      width:MediaQuery.of(context).size.width,
       height: 30,
       child: Row(
         children: [
@@ -237,7 +223,8 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   }
 
   detailWidget(String title, var value) {
-    return SizedBox(
+    return Container(
+      margin: EdgeInsets.only(top: 2),
       width:MediaQuery.of(context).size.width/1.1,
       height: 26,
       child: Row(
@@ -361,22 +348,14 @@ class _GatePassApprovedState extends State<GatePassApproved> {
     setState(() {
       isLoading  = true;
     });
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences = await SharedPreferences.getInstance();
     dynamic response = await HTTP.get(approveGatePassAPI(prner,leaveNo,sharedPreferences.getString(userID).toString() ,status));
     if (response != null && response.statusCode == 200)  {
       Iterable l = convert.json.decode(response.body);
       List<GatePassResponse> gatePassResponse = List<GatePassResponse>.from(l.map((model)=> GatePassResponse.fromJson(model)));
 
       if(gatePassResponse[0].msgtyp.compareTo("S") == 0){
-        setState(() {
-          isLoading  = false;
-        });
-        if(status== approveStatus){
-          Utility().showToast(gatePassSuccess);
-        } else if(status== rejectStatus){
-          Utility().showToast(gateRejectPassSuccess);
-        }
-        Navigator.of(context).pop();
+        updateSharedPreference(status);
       }else{
         setState(() {
           isLoading  = false;
@@ -388,5 +367,29 @@ class _GatePassApprovedState extends State<GatePassApproved> {
     }
 
   }
+
+  updateSharedPreference(String value) async {
+    dynamic response = await HTTP
+        .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
+    if (response != null && response.statusCode == 200) {
+      setState(() {
+        isLoading  = false;
+        Utility().setSharedPreference(gatePassDatail, response.body.toString());
+      });
+
+      if(status== approveStatus){
+        Utility().showToast(gatePassSuccess);
+      } else if(status== rejectStatus){
+        Utility().showToast(gateRejectPassSuccess);
+      }
+      Navigator.of(context).pop();
+    }else{
+      setState(() {
+        isLoading  = false;
+      });
+      Utility().showToast(somethingWentWrong);
+    }
+  }
+
   
 }

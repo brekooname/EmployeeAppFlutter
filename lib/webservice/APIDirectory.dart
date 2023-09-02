@@ -4,6 +4,7 @@ import 'constant.dart';
 
 const productionUrl = 'https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/';
 const googleDistanceMatrixAPI = 'https://maps.googleapis.com/maps/api/distancematrix/';
+const dashboardAppUrl ='https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zshakti_dash/';
 
 
 userLogin(String sapCode, String password, String api_version,  String api, String app_version, String imei , String os, String fcm_token) {
@@ -37,8 +38,11 @@ createTaskAPI(String value){
   return Uri.parse('${productionUrl}sync_offline_data.htm?TASK_CREATED=${value}');
 }
 
-createODAPI(String app_pernr, String atnds_status, String app_od_from, String app_od_to , String app_od_visitplace, String app_od_workplace, String st_od_purpose1, String st_od_purpose2, String st_od_purpose3, String st_od_remark , String st_od_charge){
-  return Uri.parse('${productionUrl}od_create.htm?app_pernr=${app_pernr}&atnds_status=${atnds_status}&app_od_from=${app_od_from}&app_od_to=${app_od_to}&app_od_visitplace=${app_od_visitplace}&app_od_workplace=${app_od_workplace}&app_od_purpose1=${st_od_purpose1}&app_od_purpose2=${st_od_purpose2}&app_od_purpose3=${st_od_purpose3}&app_od_remark=${st_od_remark}&app_od_charge=${st_od_charge}');
+createODAPI(String app_pernr, String atnds_status, String app_od_from, String app_od_to , String app_od_visitplace, String app_od_workplace, String st_od_purpose1, String st_od_purpose2, String st_od_purpose3, String st_od_remark , String st_od_charge, String fromTime){
+  return Uri.parse('${productionUrl}od_create.htm?app_pernr=${app_pernr}&atnds_status=${atnds_status}'
+      '&app_od_from=${app_od_from}&app_od_to=${app_od_to}&app_od_visitplace=${app_od_visitplace}'
+      '&app_od_workplace=${app_od_workplace}&app_od_purpose1=${st_od_purpose1}&app_od_purpose2=${st_od_purpose2}'
+      '&app_od_purpose3=${st_od_purpose3}&app_od_remark=${st_od_remark}&app_od_charge=${st_od_charge}&Frm_tim=${fromTime}');
 }
 
 approveODAPI(String drno, String sapcode, String pass){
@@ -86,7 +90,7 @@ syncLocalConveyanceAPI(String value){
 }
 
 vendorOpenGatepass(String sapCode){
-  return Uri.parse('${productionUrl}vendor_open_gatepass.htm?pernr=4897');
+  return Uri.parse('${productionUrl}vendor_open_gatepass.htm?pernr=$sapCode');
 }
 
 DailyReportAPI(String value){
@@ -94,5 +98,13 @@ DailyReportAPI(String value){
 }
 
 getDepartment() {
-  return Uri.parse('https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zshakti_dash/dept_api.htm');
+  return Uri.parse('${dashboardAppUrl}dept_api.htm');
+}
+getTotalTaskCountList(String DeptCode, String empCode, String fromDate, String toDate) {
+  return Uri.parse(
+      '${dashboardAppUrl}task_api.htm?depart=$DeptCode&emp=$empCode&date1=$fromDate&date2=$toDate');
+}
+
+getTaskList(String subDeptCode, String empCode, String fromDate, String toDate, String type) {
+  return Uri.parse('${dashboardAppUrl}task_list.htm?depart=$subDeptCode&emp=$empCode&date1=$fromDate&date2=$toDate&type=$type');
 }
