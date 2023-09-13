@@ -103,15 +103,15 @@ class _SalarySlipState extends State<SalarySlip> {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: selectLeaveType,
+              hintText: selectYear,
               fillColor: Colors.white),
           value: yearSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? selectLeaveType : "",
-          items: yearList.map((leaveType) => DropdownMenuItem(
-              value: leaveType ,
+          value == null || value.isEmpty ? selectYear : "",
+          items: yearList.map((year) => DropdownMenuItem(
+              value: year ,
               child: robotoTextWidget(
-                  textval: leaveType ,
+                  textval: year ,
                   colorval: AppColor.themeColor,
                   sizeval: 12,
                   fontWeight: FontWeight.bold))).toList(),
@@ -137,15 +137,15 @@ class _SalarySlipState extends State<SalarySlip> {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: selectLeaveType,
+              hintText: selectMonth,
               fillColor: Colors.white),
           value: monthSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? selectLeaveType : "",
-          items: monthList.map((leaveType) => DropdownMenuItem(
-              value: leaveType ,
+          value == null || value.isEmpty ? selectMonth : "",
+          items: monthList.map((month) => DropdownMenuItem(
+              value: month ,
               child: robotoTextWidget(
-                  textval: leaveType ,
+                  textval: month ,
                   colorval: AppColor.themeColor,
                   sizeval: 12,
                   fontWeight: FontWeight.bold))).toList(),
