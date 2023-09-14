@@ -186,8 +186,14 @@ class _HomePageState extends State<HomePage> {
             onSelected: (value) {
               // if value 1 show dialog
               if (value == 1) {
-                downloadingData();
-                // if value 2 show dialog
+                Utility().checkInternetConnection().then((connectionResult) {
+                  if (connectionResult) {
+                   downloadingData();
+                  } else {
+                    Utility()
+                        .showInSnackBar(value: checkInternetConnection, context: context);
+                  }
+                });
               }
             },
           ),
@@ -445,12 +451,26 @@ class _HomePageState extends State<HomePage> {
     if (sharedPreferences.getString(currentDate) != null) {
       if (formattedDate !=
           sharedPreferences.getString(currentDate).toString()) {
-        downloadingData();
+        Utility().checkInternetConnection().then((connectionResult) {
+          if (connectionResult) {
+            downloadingData();
+          } else {
+            Utility()
+                .showInSnackBar(value: checkInternetConnection, context: context);
+          }
+        });
       } else {
         getSPArrayList();
       }
     } else {
-      downloadingData();
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
+          downloadingData();
+        } else {
+          Utility()
+              .showInSnackBar(value: checkInternetConnection, context: context);
+        }
+      });
     }
   }
   void readNotifier() {

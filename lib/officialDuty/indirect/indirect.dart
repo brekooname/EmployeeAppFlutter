@@ -258,11 +258,20 @@ class InDirectState extends State<InDirect> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    if (status == 0) {
-                      rejectOD(odno);
-                    } else {
-                      confirmOD(odno);
-                    }
+
+                    Utility().checkInternetConnection().then((connectionResult) {
+                      if (connectionResult) {
+                        if (status == 0) {
+                          rejectOD(odno);
+                        } else {
+                          confirmOD(odno);
+                        }
+                      } else {
+                        Utility()
+                            .showInSnackBar(value: checkInternetConnection, context: context);
+                      }
+                    });
+
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.themeColor,

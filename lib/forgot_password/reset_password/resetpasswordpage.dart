@@ -243,7 +243,6 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
            Utility().showInSnackBar(value: sapcodeempty, context: context);
          } else {
           updatePassword();
-          // loginAPI();
         }
       } else {
         Utility()

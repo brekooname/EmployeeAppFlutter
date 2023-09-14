@@ -498,10 +498,24 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         } else if (toTimeController.text.toString().isEmpty) {
           Utility().showToast(selectToTime);
         } else {
-          applyLeave();
+          Utility().checkInternetConnection().then((connectionResult) {
+            if (connectionResult) {
+              applyLeave();
+            } else {
+              Utility()
+                  .showInSnackBar(value: checkInternetConnection, context: context);
+            }
+          });
         }
       } else {
-        applyLeave();
+        Utility().checkInternetConnection().then((connectionResult) {
+          if (connectionResult) {
+            applyLeave();
+          } else {
+            Utility()
+                .showInSnackBar(value: checkInternetConnection, context: context);
+          }
+        });
       }
     }
   }
