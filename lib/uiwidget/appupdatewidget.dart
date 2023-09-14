@@ -3,6 +3,7 @@ import 'package:shakti_employee_app/home/model/firestoredatamodel.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../Util/utility.dart';
 import '../theme/color.dart';
 import '../theme/string.dart';
 
@@ -53,6 +54,14 @@ class _AppUpdateWidgetPageState extends State<AppUpdateWidget> {
   okBtnWidget() {
     return GestureDetector(
       onTap: () {
+        Utility().checkInternetConnection().then((connectionResult) {
+          if (connectionResult) {
+            _launchUrl(widget.appUrl);
+          } else {
+            Utility()
+                .showInSnackBar(value: checkInternetConnection, context: context);
+          }
+        });
         _launchUrl(widget.appUrl);
       },
       child: Container(

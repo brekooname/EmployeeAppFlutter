@@ -20,7 +20,6 @@ class _WebPageState extends State<WebPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print('Url222222=====>${widget.url}');
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
