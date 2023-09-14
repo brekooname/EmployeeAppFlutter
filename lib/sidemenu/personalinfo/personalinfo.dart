@@ -51,21 +51,19 @@ class PersonalInfoState extends State<PersonalInfo> {
         iconTheme: const IconThemeData(color: Colors.white),
 
       ),
-      body: Container(
-        child: Column(
-          children: [
-            detailWidget(sapcode, nameValue!),
-            detailWidget(nametxt, widget.personalInfo[0].pernr),
-            detailWidget(department, widget.personalInfo[0].btrtlTxt),
-            detailWidget(designation,  widget.personalInfo[0].perskTxt),
-            detailWidget(reportingManger,  widget.personalInfo[0].hodEname),
-            detailWidget(mobile,  widget.personalInfo[0].telnr),
-            detailWidget(emailtxt,  widget.personalInfo[0].emailShkt),
-            detailWidget(addresstxt,  widget.personalInfo[0].address),
-            detailWidget(dobtxt,  widget.personalInfo[0].birth),
-          ],
-        ),
-      ),
+      body: widget.personalInfo.isNotEmpty?Column(
+        children: [
+          detailWidget(sapcode, nameValue!),
+          detailWidget(nametxt, widget.personalInfo[0].pernr),
+          detailWidget(department, widget.personalInfo[0].btrtlTxt),
+          detailWidget(designation,  widget.personalInfo[0].perskTxt),
+          detailWidget(reportingManger,  widget.personalInfo[0].hodEname),
+          detailWidget(mobile,  widget.personalInfo[0].telnr),
+          detailWidget(emailtxt,  widget.personalInfo[0].emailShkt),
+          detailWidget(addresstxt,  widget.personalInfo[0].address),
+          detailWidget(dobtxt,  widget.personalInfo[0].birth),
+        ],
+      ):Container(),
     );
   }
 

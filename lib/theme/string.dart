@@ -260,3 +260,4 @@ var checkedByPerson = "Checked by person";
 var request = "Request";
 var approve = "Approve";
 var close = "Close";
+var appUpdateMsg = "App latest version are available\n please update first and enjoy";

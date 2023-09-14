@@ -291,15 +291,24 @@ class _TaskApprovedState extends State<TaskApproved> {
   submitWidget(String dno, String srno) {
     return InkWell(
         onTap: () {
-          completeTaskData.clear();
-          completeTaskData.add(CompleteTaskRequest(
-              dno: dno,
-              srno: srno,
-              checker: selectedAssginTo.toString(),
-              remark: ""));
 
-          String value = convert.jsonEncode(completeTaskData).toString();
-          closeCompleteTask(value);
+          Utility().checkInternetConnection().then((connectionResult) {
+            if (connectionResult) {
+              completeTaskData.clear();
+              completeTaskData.add(CompleteTaskRequest(
+                  dno: dno,
+                  srno: srno,
+                  checker: selectedAssginTo.toString(),
+                  remark: ""));
+
+              String value = convert.jsonEncode(completeTaskData).toString();
+              closeCompleteTask(value);
+            } else {
+              Utility()
+                  .showInSnackBar(value: checkInternetConnection, context: context);
+            }
+          });
+
         },
         child: Container(
           height: 50,

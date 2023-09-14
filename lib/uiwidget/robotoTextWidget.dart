@@ -21,6 +21,7 @@ class robotoTextWidget extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
       maxLines: 2,
       style: TextStyle(
+          decoration: TextDecoration.none,
           fontSize: sizeval,
           color: colorval,
           fontWeight: fontWeight,

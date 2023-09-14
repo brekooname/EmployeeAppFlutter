@@ -477,7 +477,15 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     }else  if(purpose1.text.toString().isEmpty){
       Utility().showToast(vaildPurpose);
     }else {
-      createOD();
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
+          createOD();
+        } else {
+          Utility()
+              .showInSnackBar(value: checkInternetConnection, context: context);
+        }
+      });
+
     }
   }
 

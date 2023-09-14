@@ -297,7 +297,15 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
   }
 
   Future<void> confirmotp(BuildContext context) async {
-    sendOtpAPI();
+
+    Utility().checkInternetConnection().then((connectionResult) {
+      if (connectionResult) {
+        sendOtpAPI();
+      } else {
+        Utility()
+            .showInSnackBar(value: checkInternetConnection, context: context);
+      }
+    });
   }
 
   Future<void> sendOtpAPI() async {
