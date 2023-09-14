@@ -62,7 +62,6 @@ class _AppUpdateWidgetPageState extends State<AppUpdateWidget> {
                 .showInSnackBar(value: checkInternetConnection, context: context);
           }
         });
-        _launchUrl(widget.appUrl);
       },
       child: Container(
         height: 50,
