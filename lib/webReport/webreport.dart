@@ -5,6 +5,7 @@ import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/webReport/webpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Util/utility.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/constant.dart';
 
@@ -103,18 +104,21 @@ class _WebScreenState extends State<WebReport> {
     return InkWell(
       onTap: () {
         if (url.isNotEmpty) {
-          /*launchUrl(
-            Uri.parse(url),
-            mode: LaunchMode.externalApplication,
-          );*/
-          print('Url11111=====>${url}');
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) => WebPage(
+          Utility().checkInternetConnection().then((connectionResult) {
+            if (connectionResult) {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => WebPage(
                         title: title,
                         url: url,
                       )),
-              (route) => true);
+                      (route) => true);
+            } else {
+              Utility()
+                  .showInSnackBar(value: checkInternetConnection, context: context);
+            }
+          });
+
         }
       },
       child: Container(

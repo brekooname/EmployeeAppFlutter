@@ -200,7 +200,15 @@ class _SalarySlipState extends State<SalarySlip> {
     } else if(monthSpinner!.isEmpty){
       Utility().showToast(pselectMonth);
     }else{
-      _launchUrl('$salarySlipUrl?id=$sapCode&yr=$yearSpinner&mo=$monthSpinner');
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
+          _launchUrl('$salarySlipUrl?id=$sapCode&yr=$yearSpinner&mo=$monthSpinner');
+        } else {
+          Utility()
+              .showInSnackBar(value: checkInternetConnection, context: context);
+        }
+      });
+
 
     }
 
