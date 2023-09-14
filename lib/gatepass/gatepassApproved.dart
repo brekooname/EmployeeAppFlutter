@@ -319,11 +319,20 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    if (i == 0){
-                      confirmGatePass(perner,leaveNo,rejectStatus);
-                    }else {
-                      confirmGatePass(perner,leaveNo,approveStatus);
-                    }
+                    Utility().checkInternetConnection().then((connectionResult) {
+                      if (connectionResult) {
+                        if (i == 0){
+                          confirmGatePass(perner,leaveNo,rejectStatus);
+                        }else {
+                          confirmGatePass(perner,leaveNo,approveStatus);
+                        }
+                      } else {
+                        Utility()
+                            .showInSnackBar(value: checkInternetConnection, context: context);
+                      }
+                    });
+
+
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.themeColor,
@@ -355,7 +364,9 @@ class _GatePassApprovedState extends State<GatePassApproved> {
       List<GatePassResponse> gatePassResponse = List<GatePassResponse>.from(l.map((model)=> GatePassResponse.fromJson(model)));
 
       if(gatePassResponse[0].msgtyp.compareTo("S") == 0){
+
         updateSharedPreference(status);
+
       }else{
         setState(() {
           isLoading  = false;
