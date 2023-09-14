@@ -1,5 +1,8 @@
 import 'dart:convert' as convert;
+import 'dart:convert';
 import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,13 +10,17 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
-import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'as vendorGatePassPrefix;
+import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
+    as vendorGatePassPrefix;
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
 import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
 import 'package:shakti_employee_app/gatepass/model/PendingGatePassResponse.dart';
+import 'package:shakti_employee_app/home/model/FirestoreDataModel.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/home/model/distance_calculate_model.dart'
     as distancePrefix;
@@ -21,6 +28,7 @@ import 'package:shakti_employee_app/home/model/personalindoresponse.dart';
 import 'package:shakti_employee_app/leave/LeaveRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officalRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officialApprove.dart';
+import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
 import 'package:shakti_employee_app/task/taskApprove.dart';
 import 'package:shakti_employee_app/task/taskRequest.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -34,6 +42,7 @@ import '../database/database_helper.dart';
 import '../leave/LeaveApprove.dart';
 import '../notificationService/local_notification_service.dart';
 import '../theme/string.dart';
+import '../uiwidget/appupdatewidget.dart';
 import '../webservice/constant.dart';
 import 'model/local_convence_model.dart';
 import 'model/travelmodel.dart';
@@ -59,7 +68,9 @@ class _HomePageState extends State<HomePage> {
       placeName = "",
       isoId = "",
       journeyStart = "",
-      allLatLng = "",UserID ="";
+      allLatLng = "",
+      UserID = "",
+      appVersionCode = "";
   bool isLoading = false;
   late SharedPreferences sharedPreferences;
   List<Leavebalance> leaveBalanceList = [];
@@ -79,22 +90,24 @@ class _HomePageState extends State<HomePage> {
   PersonalInfoResponse? personInfo;
   PendingGatePassResponse? gatePassResponse;
   vendorGatePassPrefix.VendorGatePassModel? vendorGatePassModel;
-
   TextEditingController travelModeController = TextEditingController();
+  FirestoreDataModel? fireStoreDataModel;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     journeyStart = widget.journeyStart;
+
     _handleLocationPermission();
     getNameValue();
     receiveNotification();
   }
 
+
   void receiveNotification() {
     FirebaseMessaging.instance.getInitialMessage().then(
-          (message) {
+      (message) {
         print("FirebaseMessaging.instance.getInitialMessage");
         if (message != null) {
           print("New Notification");
@@ -104,21 +117,20 @@ class _HomePageState extends State<HomePage> {
 
     // 2. This method only call when App in forground it mean app must be opened
     FirebaseMessaging.onMessage.listen(
-          (message) {
+      (message) {
         print("FirebaseMessaging.onMessage.listen");
         if (message.notification != null) {
           print(message.notification!.title);
           print(message.notification!.body);
           print("message.data11 ${message.data}");
           LocalNotificationService.createanddisplaynotification(message);
-
         }
       },
     );
 
     // 3. This method only call when App in background and not terminated(not closed)
     FirebaseMessaging.onMessageOpenedApp.listen(
-          (message) {
+      (message) {
         print("FirebaseMessaging.onMessageOpenedApp.listen");
         if (message.notification != null) {
           print(message.notification!.title);
@@ -131,7 +143,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -182,34 +193,52 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Container(
-              margin: const EdgeInsets.only(left: 10, right: 10),
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  detailWidget(leave),
-                  detailWidget(officialDuty),
-                  detailWidget(gatePasstxt),
-                  detailWidget(task),
-                  localConvenience(),
-                  dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
-                  dailyAndWebReport(webReport, "assets/svg/report.svg"),
-                ],
+      body: Consumer<firestoreAppUpdateNofifier>(
+          builder: (context, value, child) {
+        if (value.fireStoreData != null && value.fireStoreData!.minEmployeeAppVersion !=
+            value.appVersionCode) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => AppUpdateWidget(
+                          appUrl:
+                              value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+
+          });
+        } else {
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                child: Container(
+                  margin: const EdgeInsets.only(left: 10, right: 10),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    children: [
+                      detailWidget(leave),
+                      detailWidget(officialDuty),
+                      detailWidget(gatePasstxt),
+                      detailWidget(task),
+                      localConvenience(),
+                      dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
+                      dailyAndWebReport(webReport, "assets/svg/report.svg"),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-          Center(
-            child: isLoading == true
-                ? const CircularProgressIndicator(
-                    color: Colors.indigo,
-                  )
-                : const SizedBox(),
-          ),
-        ],
-      ),
+              Center(
+                child: isLoading == true
+                    ? const CircularProgressIndicator(
+                        color: Colors.indigo,
+                      )
+                    : const SizedBox(),
+              ),
+            ],
+          );
+        }
+        return Container(
+        );
+      }),
       drawer: Drawer(
           backgroundColor: AppColor.whiteColor,
           child: NavigationDrawerWidget(
@@ -257,7 +286,8 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   imageTextWidget("assets/svg/request.svg", request, title),
                   dividerWidget(),
-                  imageTextWidget("assets/svg/approved.svg", title == task?close:approve, title)
+                  imageTextWidget("assets/svg/approved.svg",
+                      title == task ? close : approve, title)
                 ],
               ),
             )
@@ -349,7 +379,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.w600),
               ),
               Container(
-                margin: const EdgeInsets.only(bottom: 10,top: 10),
+                margin: const EdgeInsets.only(bottom: 10, top: 10),
                 child: imageTextWidget(svg, title, title),
               )
             ],
@@ -376,7 +406,9 @@ class _HomePageState extends State<HomePage> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      Utility().showInSnackBar(value: 'Location services are disabled. Please enable the services', context: context);
+      Utility().showInSnackBar(
+          value: 'Location services are disabled. Please enable the services',
+          context: context);
 
       return false;
     }
@@ -384,12 +416,16 @@ class _HomePageState extends State<HomePage> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        Utility().showInSnackBar(value: 'Location permissions are denied', context: context);
+        Utility().showInSnackBar(
+            value: 'Location permissions are denied', context: context);
         return false;
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      Utility().showInSnackBar(value: 'Location permissions are permanently denied, we cannot request permissions.', context: context);
+      Utility().showInSnackBar(
+          value:
+              'Location permissions are permanently denied, we cannot request permissions.',
+          context: context);
       return false;
     }
     return true;
@@ -405,6 +441,7 @@ class _HomePageState extends State<HomePage> {
       nameValue = sharedPreferences.getString(name)!;
       UserID = sharedPreferences.getString(userID)!;
     });
+   readNotifier();
     if (sharedPreferences.getString(currentDate) != null) {
       if (formattedDate !=
           sharedPreferences.getString(currentDate).toString()) {
@@ -416,7 +453,9 @@ class _HomePageState extends State<HomePage> {
       downloadingData();
     }
   }
-
+  void readNotifier() {
+    context.read<firestoreAppUpdateNofifier>().listenToLiveUpdateStream();
+  }
   void getSPArrayList() async {
     if (sharedPreferences.getString(syncSapResponse) != null &&
         sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
@@ -427,14 +466,15 @@ class _HomePageState extends State<HomePage> {
       setListData();
     }
 
-    if (sharedPreferences.getString(userInfo) != null ) {
+    if (sharedPreferences.getString(userInfo) != null) {
       var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
       personInfo = PersonalInfoResponse.fromJson(jsonData);
       setpersonData();
     }
 
-    if (sharedPreferences.getString(gatePassDatail) != null ) {
-      var jsonData = convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+    if (sharedPreferences.getString(gatePassDatail) != null) {
+      var jsonData =
+          convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
       setgatePassData();
     }
@@ -443,12 +483,11 @@ class _HomePageState extends State<HomePage> {
     if (sharedPreferences.getString(vendorGatePas) != null &&
         sharedPreferences.getString(vendorGatePas).toString().isNotEmpty) {
       var jsonData =
-      convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
-      vendorGatePassModel = vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData);
+          convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
+      vendorGatePassModel =
+          vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData);
       setVendorgatePassData();
     }
-
-
   }
 
   imageTextWidget(String svg, String msg, String title) {
@@ -476,7 +515,10 @@ class _HomePageState extends State<HomePage> {
           case "Daily Report":
             {
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) =>  DailyReport(vendorGatePassLists: vendorGatePassList,)),
+                  MaterialPageRoute(
+                      builder: (context) => DailyReport(
+                            vendorGatePassLists: vendorGatePassList,
+                          )),
                   (route) => true);
             }
             break;
@@ -489,11 +531,13 @@ class _HomePageState extends State<HomePage> {
             break;
           case "Close":
             {
-              Navigator.of(context).push(MaterialPageRoute(builder:(context)=>TaskApproved(
-                pendingTaskList: pendingTaskList,
-                activeemployeeList: activeEmployeeList,
-              )))
-                  .then((value)=>{ getSPArrayList()});
+              Navigator.of(context)
+                  .push(MaterialPageRoute(
+                      builder: (context) => TaskApproved(
+                            pendingTaskList: pendingTaskList,
+                            activeemployeeList: activeEmployeeList,
+                          )))
+                  .then((value) => {getSPArrayList()});
             }
             break;
         }
@@ -511,7 +555,7 @@ class _HomePageState extends State<HomePage> {
                     height: 50,
                   ),
                 ),
-                badgeWidget(msg,title),
+                badgeWidget(msg, title),
               ],
             ),
           ),
@@ -576,24 +620,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   badgeWidget(String msg, String title) {
-
     if (title == "Leave") {
       return Visibility(
-        visible: pendingLeaveList.isEmpty? false : true ,
+        visible: pendingLeaveList.isEmpty ? false : true,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
-          child:  Container(
+          child: Container(
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: AppColor.themeColor,
             ),
-            width: msg == "Request"? 0:20,
-            height: msg == "Request"? 0:20,
-            child:  Center(
-              child: robotoTextWidget( textval: pendingLeaveList.length.toString(),
-                  colorval:  Colors.white,
-                  sizeval: 12, fontWeight: FontWeight.normal),
+            width: msg == "Request" ? 0 : 20,
+            height: msg == "Request" ? 0 : 20,
+            child: Center(
+              child: robotoTextWidget(
+                  textval: pendingLeaveList.length.toString(),
+                  colorval: Colors.white,
+                  sizeval: 12,
+                  fontWeight: FontWeight.normal),
             ),
           ),
         ),
@@ -601,20 +646,23 @@ class _HomePageState extends State<HomePage> {
     }
     if (title == "Official Duty") {
       return Visibility(
-        visible: pendindOdList.isEmpty? false:true ,
+        visible: pendindOdList.isEmpty ? false : true,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColor.themeColor,),
-            width: msg == "Request"? 0:20,
-            height: msg == "Request"? 0:20,
+              color: AppColor.themeColor,
+            ),
+            width: msg == "Request" ? 0 : 20,
+            height: msg == "Request" ? 0 : 20,
             child: Center(
-              child: robotoTextWidget(textval: pendindOdList.length.toString(),
-                  colorval:  Colors.white,
-                  sizeval: 12, fontWeight: FontWeight.normal),
+              child: robotoTextWidget(
+                  textval: pendindOdList.length.toString(),
+                  colorval: Colors.white,
+                  sizeval: 12,
+                  fontWeight: FontWeight.normal),
             ),
           ),
         ),
@@ -622,20 +670,23 @@ class _HomePageState extends State<HomePage> {
     }
     if (title == "Gate Pass") {
       return Visibility(
-        visible: gatePassList.isEmpty? false:true ,
+        visible: gatePassList.isEmpty ? false : true,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color:  AppColor.themeColor,),
-            width: msg == "Request"? 0:20,
-            height: msg == "Request"? 0:20,
+              color: AppColor.themeColor,
+            ),
+            width: msg == "Request" ? 0 : 20,
+            height: msg == "Request" ? 0 : 20,
             child: Center(
-              child: robotoTextWidget(textval: gatePassList.length.toString(),
-                  colorval:  Colors.white,
-                  sizeval: 12, fontWeight: FontWeight.normal),
+              child: robotoTextWidget(
+                  textval: gatePassList.length.toString(),
+                  colorval: Colors.white,
+                  sizeval: 12,
+                  fontWeight: FontWeight.normal),
             ),
           ),
         ),
@@ -644,20 +695,23 @@ class _HomePageState extends State<HomePage> {
 
     if (title == "Task") {
       return Visibility(
-        visible: pendingTaskList.isEmpty? false:true ,
+        visible: pendingTaskList.isEmpty ? false : true,
         child: Positioned(
           left: 30.0,
           bottom: 30.0,
           child: Container(
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color:  AppColor.themeColor,),
-            width: msg == "Request"? 0:20,
-            height: msg == "Request"? 0:20,
+              color: AppColor.themeColor,
+            ),
+            width: msg == "Request" ? 0 : 20,
+            height: msg == "Request" ? 0 : 20,
             child: Center(
-              child: robotoTextWidget(textval: pendingTaskList.length.toString(),
-                  colorval:  Colors.white,
-                  sizeval: 12, fontWeight: FontWeight.normal),
+              child: robotoTextWidget(
+                  textval: pendingTaskList.length.toString(),
+                  colorval: Colors.white,
+                  sizeval: 12,
+                  fontWeight: FontWeight.normal),
             ),
           ),
         ),
@@ -749,7 +803,8 @@ class _HomePageState extends State<HomePage> {
 
       if (mounted) {
         setState(() {
-          Address = '${place.street},  ${place.subAdministrativeArea},  ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}';
+          Address =
+              '${place.street},  ${place.subAdministrativeArea},  ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}';
         });
         setState(() {
           isLoading = false;
@@ -782,12 +837,13 @@ class _HomePageState extends State<HomePage> {
       listMap.forEach(
           (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
       if (localConveyanceList.isNotEmpty) {
-       Utility().checkInternetConnection().then((connectionResult) {
+        Utility().checkInternetConnection().then((connectionResult) {
           if (connectionResult) {
             calculateDistance(
                 localConveyanceList[localConveyanceList.length - 1]);
           } else {
-            savedOfflineLocalConvance(localConveyanceList[localConveyanceList.length - 1]);
+            savedOfflineLocalConvance(
+                localConveyanceList[localConveyanceList.length - 1]);
           }
         });
       }
@@ -856,20 +912,20 @@ class _HomePageState extends State<HomePage> {
                             DateFormat('HHmmss').format(DateTime.now());
                         LocalConveyanceModel localConveyance =
                             LocalConveyanceModel(
-                                empId: int.parse(sharedPreferences
-                                    .getString(userID)
-                                    .toString()),
-                                userId: UserID,
-                                fromLatitude: latlong!.latitude.toString(),
-                                fromLongitude: latlong!.longitude.toString(),
-                                toLatitude: '',
-                                toLongitude: '',
-                                fromAddress: Address,
-                                toAddress: '',
-                                createDate: currentDate,
-                                createTime: currentTime,
-                                endDate: '',
-                                endTime: '', );
+                          empId: int.parse(
+                              sharedPreferences.getString(userID).toString()),
+                          userId: UserID,
+                          fromLatitude: latlong!.latitude.toString(),
+                          fromLongitude: latlong!.longitude.toString(),
+                          toLatitude: '',
+                          toLongitude: '',
+                          fromAddress: Address,
+                          toAddress: '',
+                          createDate: currentDate,
+                          createTime: currentTime,
+                          endDate: '',
+                          endTime: '',
+                        );
 
                         setState(() {
                           journeyStart = True;
@@ -910,7 +966,7 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         content: SingleChildScrollView(
             child: Container(
-                height: MediaQuery.of(context).size.height / 1.7  ,
+                height: MediaQuery.of(context).size.height / 1.7,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -976,17 +1032,21 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                Utility().checkInternetConnection().then((connectionResult) {
+                                Utility()
+                                    .checkInternetConnection()
+                                    .then((connectionResult) {
                                   if (connectionResult) {
                                     setState(() {
                                       isLoading = true;
-                                      syncTravelDataAPI(localConveyanceList,distanceCalculateModel);
+                                      syncTravelDataAPI(localConveyanceList,
+                                          distanceCalculateModel);
                                     });
                                   } else {
-                                    Utility().showInSnackBar(value: checkInternetConnection, context: context);
+                                    Utility().showInSnackBar(
+                                        value: checkInternetConnection,
+                                        context: context);
                                   }
                                 });
-
                               },
                               style: ElevatedButton.styleFrom(
                                 primary: AppColor.themeColor,
@@ -1105,32 +1165,30 @@ class _HomePageState extends State<HomePage> {
       jsonData1 = convert.jsonDecode(response2.body);
       PendingGatePassResponse pendingGatePassResponse =
           PendingGatePassResponse.fromJson(jsonData1);
-        setState(() {
-          gatePassList = pendingGatePassResponse.data;
-          gatePassResponse = pendingGatePassResponse;
-          isLoading = false;
-          Utility()
-              .setSharedPreference(gatePassDatail, response2.body.toString());
-        });
-        setgatePassData();
-
+      setState(() {
+        gatePassList = pendingGatePassResponse.data;
+        gatePassResponse = pendingGatePassResponse;
+        isLoading = false;
+        Utility()
+            .setSharedPreference(gatePassDatail, response2.body.toString());
+      });
+      setgatePassData();
     }
 
-    dynamic response3 = await HTTP
-        .get(vendorOpenGatepass(sharedPreferences.getString(userID).toString()));
+    dynamic response3 = await HTTP.get(
+        vendorOpenGatepass(sharedPreferences.getString(userID).toString()));
     if (response3 != null && response3.statusCode == 200) {
       jsonData1 = convert.jsonDecode(response3.body);
-       vendorGatePassPrefix.VendorGatePassModel vendorGatePass =
-      vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData1);
-       setState(() {
-          vendorGatePassList = vendorGatePass.response;
-          vendorGatePassModel = vendorGatePass;
-          isLoading = false;
-          Utility().setSharedPreference(vendorGatePas, response3.body.toString());
-        });
-        setVendorgatePassData();
-      }
-
+      vendorGatePassPrefix.VendorGatePassModel vendorGatePass =
+          vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData1);
+      setState(() {
+        vendorGatePassList = vendorGatePass.response;
+        vendorGatePassModel = vendorGatePass;
+        isLoading = false;
+        Utility().setSharedPreference(vendorGatePas, response3.body.toString());
+      });
+      setVendorgatePassData();
+    }
   }
 
   void setListData() {
@@ -1168,8 +1226,10 @@ class _HomePageState extends State<HomePage> {
       print("DataUpdate2=======>true");
     }
   }
+
   void setVendorgatePassData() {
-    if (vendorGatePassModel != null && vendorGatePassModel!.response.isNotEmpty) {
+    if (vendorGatePassModel != null &&
+        vendorGatePassModel!.response.isNotEmpty) {
       setState(() {
         vendorGatePassList = vendorGatePassModel!.response;
       });
@@ -1187,7 +1247,6 @@ class _HomePageState extends State<HomePage> {
                         activeEmpList: activeEmployeeList,
                       )),
               (route) => true);
-
         }
         break;
       case "Official Duty":
@@ -1227,24 +1286,30 @@ class _HomePageState extends State<HomePage> {
     switch (title) {
       case "Leave":
         {
-
-          Navigator.of(context).push(MaterialPageRoute(builder:(context)=>LeaveApproved(
-            pendingLeaveList: pendingLeaveList,
-          )))
-              .then((value)=>{ getSPArrayList()});
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+                  builder: (context) => LeaveApproved(
+                        pendingLeaveList: pendingLeaveList,
+                      )))
+              .then((value) => {getSPArrayList()});
         }
         break;
       case "Official Duty":
         {
-          Navigator.of(context).push(MaterialPageRoute(builder:(context)=>OfficialApproved(pendindOdList: pendindOdList)))
-              .then((value)=>{ getSPArrayList()});
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+                  builder: (context) =>
+                      OfficialApproved(pendindOdList: pendindOdList)))
+              .then((value) => {getSPArrayList()});
         }
         break;
       case "Gate Pass":
         {
-
-          Navigator.of(context).push(MaterialPageRoute(builder:(context)=>GatePassApproved(gatePassList: gatePassList)))
-              .then((value)=>{ getSPArrayList()});
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+                  builder: (context) =>
+                      GatePassApproved(gatePassList: gatePassList)))
+              .then((value) => {getSPArrayList()});
         }
         break;
     }
@@ -1282,10 +1347,8 @@ class _HomePageState extends State<HomePage> {
     LocalConveyanceModel LocalConveyance,
     distancePrefix.DistanceCalculateModel distanceCalculateModel,
   ) async {
-    String currentDate =
-    DateFormat('yyyyMMdd').format(DateTime.now());
-    String currentTime =
-    DateFormat('HHmmss').format(DateTime.now());
+    String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
+    String currentTime = DateFormat('HHmmss').format(DateTime.now());
     allLatLng = '${LocalConveyance.fromLatitude},'
         '${LocalConveyance.fromLongitude},'
         '${LocalConveyance.toLatitude},'
@@ -1297,9 +1360,9 @@ class _HomePageState extends State<HomePage> {
         startTime: LocalConveyance.createTime,
         endTime: currentTime,
         startLat: LocalConveyance.fromLatitude,
-        endLat:  latlong!.latitude.toString(),
+        endLat: latlong!.latitude.toString(),
         startLong: LocalConveyance.fromLongitude,
-        endLong:  latlong!.longitude.toString(),
+        endLong: latlong!.longitude.toString(),
         latLong111: allLatLng,
         startLocation: distanceCalculateModel.originAddresses[0],
         endLocation: distanceCalculateModel.destinationAddresses[0],
@@ -1347,13 +1410,11 @@ class _HomePageState extends State<HomePage> {
         endTime: currentTime);
 
     setState(() {
-        journeyStart = False;
-        Utility().setSharedPreference(localConveyanceJourneyStart, False);
-        Utility().showInSnackBar(value: dataSavedOffline, context: context);
+      journeyStart = False;
+      Utility().setSharedPreference(localConveyanceJourneyStart, False);
+      Utility().showInSnackBar(value: dataSavedOffline, context: context);
       DatabaseHelper.instance
           .updateLocalConveyance(localConveyance.toMapWithoutId());
     });
   }
-
-
 }

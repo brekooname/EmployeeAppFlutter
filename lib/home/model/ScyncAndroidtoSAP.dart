@@ -58,8 +58,7 @@ class SyncAndroidToSapResponse {
         attendanceemp: List<Attendanceemp>.from(
             json["attendanceemp"].map((x) => Attendanceemp.fromJson(x))),
         pendingleave: List<Pendingleave>.from(json["pendingleave"].map((x) => Pendingleave.fromJson(x))),
-        leaveemp: List<Leaveemp>.from(
-            json["leaveemp"].map((x) => Leaveemp.fromJson(x))),
+        leaveemp: List<Leaveemp>.from(json["leaveemp"].map((x) => Leaveemp.fromJson(x))),
         pendingod: List<Pendingod>.from(json["pendingod"].map((x) => Pendingod.fromJson(x))),
         odemp: List<Odemp>.from(json["odemp"].map((x) => Odemp.fromJson(x))),
         pendingtask: List<PendingTask>.from(
@@ -81,8 +80,7 @@ class SyncAndroidToSapResponse {
       );
 
   Map<String, dynamic> toJson() => {
-        "activeemployee":
-            List<dynamic>.from(activeemployee.map((x) => x.toJson())),
+        "activeemployee": List<dynamic>.from(activeemployee.map((x) => x.toJson())),
         "leavebalance": List<dynamic>.from(leavebalance.map((x) => x.toJson())),
         "attendanceemp": List<dynamic>.from(attendanceemp.map((x) => x.toJson())),
         "pendingleave": List<dynamic>.from(pendingleave.map((x) => x.toJson())),
@@ -447,7 +445,6 @@ class PendingTask {
       };
 }
 
-
 class Pendingleave {
   int leavNo;
   String horo;
@@ -729,7 +726,6 @@ class Attendanceemp {
       };
 }
 
-
 class Country {
   String land1;
   String landx;
@@ -917,8 +913,6 @@ class Leaveemp {
     return '{leavNo: $leavNo, horo: $horo, levFrm: $levFrm, levTo: $levTo, dedQuta1: $dedQuta1, levTyp: $levTyp, apphod: $apphod, dele: $dele, reason: $reason}';
   }
 }
-
-
 
 class Odemp {
   String odno;

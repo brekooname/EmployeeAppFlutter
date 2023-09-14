@@ -70,11 +70,11 @@ class _HomePageState extends State<NavigationDrawerWidget> {
               ),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: AppColor.whiteColor,
-                child: robotoTextWidget(
+                child: widget.name.isNotEmpty?robotoTextWidget(
                     textval: widget.name[0],
                     colorval: AppColor.themeColor,
                     sizeval: 22,
-                    fontWeight: FontWeight.w600),
+                    fontWeight: FontWeight.w600):Container(),
               ),
             ),
             navigationItemWidget(0, Icons.home, hometxt),
