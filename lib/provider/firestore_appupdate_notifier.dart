@@ -14,26 +14,32 @@ class firestoreAppUpdateNofifier extends ChangeNotifier {
   Future<void> listenToLiveUpdateStream() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     try {
-      FirebaseFirestore.instance
-          .collection("Setting")
-          .doc("AppConfig")
-          .snapshots()
-          .listen((event) {
-          var jsonObj = event.data();
-          var encodedJson = json.encode(jsonObj, toEncodable: Utility().myEncode);
-          var jsonData = json.decode(encodedJson);
-          print("tripdata========> $jsonData");
-          print('Document data: ${event.data()}');
-          if(jsonData!=null && jsonData.toString().isNotEmpty) {
-            fireStoreData = FirestoreDataModel.fromJson(jsonData);
-            appVersionCode = packageInfo.buildNumber;
-          } else {
-            fireStoreData = null;
-            appVersionCode = "";
-          }
 
-        notifyListeners();
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
+          FirebaseFirestore.instance
+              .collection("Setting")
+              .doc("AppConfig")
+              .snapshots()
+              .listen((event) {
+            var jsonObj = event.data();
+            var encodedJson = json.encode(jsonObj, toEncodable: Utility().myEncode);
+            var jsonData = json.decode(encodedJson);
+            print("tripdata========> $jsonData");
+            print('Document data: ${event.data()}');
+            if(jsonData!=null && jsonData.toString().isNotEmpty) {
+              fireStoreData = FirestoreDataModel.fromJson(jsonData);
+              appVersionCode = packageInfo.buildNumber;
+            } else {
+              fireStoreData = null;
+              appVersionCode = "";
+            }
+
+            notifyListeners();
+          });
+        }
       });
+
     } catch (e) {
       debugPrint("ERROR - $e");
       return null;
