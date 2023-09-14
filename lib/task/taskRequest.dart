@@ -49,7 +49,15 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getDepartmentList();
+    Utility().checkInternetConnection().then((connectionResult) {
+      if (connectionResult) {
+        getDepartmentList();
+      } else {
+        Utility()
+            .showInSnackBar(value: checkInternetConnection, context: context);
+      }
+    });
+
     setState(() {
       currentDate = DateFormat("dd.MM.yyyy").format(DateTime.now());
       currentTime = DateFormat("hh:mm:ss").format(DateTime.now());
@@ -179,20 +187,28 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
     } else if (selectedAssginTo!.isEmpty) {
       Utility().showToast(pleaseEnterPersonCharge);
     } else {
-      SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
-      taskData.add(TaskRequest(
-          pernr: sharedPreferences.getString(userID).toString(),
-          budat: currentDate!,
-          time: currentTime!,
-          description: taskDes.text.toString(),
-          assignTo: selectedAssginTo.toString(),
-          dateFrom: fromDateController.text.toString(),
-          dateTo: toDateController.text.toString(),
-          department: selectedDepartmentCode.toString()));
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
 
-      String value = convert.jsonEncode(taskData).toString();
-      createTask(value);
+          taskData.add(TaskRequest(
+              pernr: sharedPreferences.getString(userID).toString(),
+              budat: currentDate!,
+              time: currentTime!,
+              description: taskDes.text.toString(),
+              assignTo: selectedAssginTo.toString(),
+              dateFrom: fromDateController.text.toString(),
+              dateTo: toDateController.text.toString(),
+              department: selectedDepartmentCode.toString()));
+
+          String value = convert.jsonEncode(taskData).toString();
+          createTask(value);
+        } else {
+          Utility()
+              .showInSnackBar(value: checkInternetConnection, context: context);
+        }
+      });
+
     }
   }
 

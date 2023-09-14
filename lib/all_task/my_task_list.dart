@@ -43,8 +43,16 @@ class _MyTaskListWidgetState extends State<MyTaskListWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getDepartmentList();
-    getEmployyeCode();
+    Utility().checkInternetConnection().then((connectionResult) {
+      if (connectionResult) {
+        getDepartmentList();
+        getEmployyeCode();
+      } else {
+        Utility()
+            .showInSnackBar(value: checkInternetConnection, context: context);
+      }
+    });
+
     setState(() {
       selectedFromDate = DateFormat('yyyyMMdd').format(DateTime.now());
       selectedToDate = DateFormat('yyyyMMdd').format(DateTime.now());

@@ -263,7 +263,16 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                       Random random = Random();
                       widget.otp = random.nextInt(9999 - 1000 )+1000;
                       startTimeout();
-                      sendOtpAPI();
+
+                      Utility().checkInternetConnection().then((connectionResult) {
+                        if (connectionResult) {
+                          sendOtpAPI();
+                        } else {
+                          Utility()
+                              .showInSnackBar(value: checkInternetConnection, context: context);
+                        }
+                      });
+
                     },
                   ),
 

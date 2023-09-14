@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -10,17 +11,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/loginModel/LoginModel.dart';
+import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
 import 'package:shakti_employee_app/theme/color.dart';
+import 'package:shakti_employee_app/uiwidget/appupdatewidget.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'all_task/my_task_list.dart';
+
 import 'forgot_password/forgot_password_page.dart';
 import 'home/home_page.dart';
+import 'home/model/firestoredatamodel.dart';
 import 'notificationService/local_notification_service.dart';
 import 'theme/string.dart';
 
@@ -28,6 +33,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   print(message.data.toString());
   print(message.notification!.title);
 }
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -48,26 +54,40 @@ Future<void> main() async {
   };
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  String? isLoggedIn = (sharedPreferences.getString(userID) == null) ? False : True;
-  String? journeyStarts = (sharedPreferences.getString(localConveyanceJourneyStart) == null) ? False : sharedPreferences.getString(localConveyanceJourneyStart);
-  runApp(MyApp(isLoggedIn: isLoggedIn,journStar: journeyStarts,));
+  String? isLoggedIn =
+      (sharedPreferences.getString(userID) == null) ? False : True;
+  String? journeyStarts =
+      (sharedPreferences.getString(localConveyanceJourneyStart) == null)
+          ? False
+          : sharedPreferences.getString(localConveyanceJourneyStart);
+  runApp(MyApp(
+    isLoggedIn: isLoggedIn,
+    journStar: journeyStarts,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  String? isLoggedIn,journStar;
+  String? isLoggedIn, journStar;
 
-  MyApp({Key? key, required this.isLoggedIn,required this.journStar}) : super(key: key);
+  MyApp({Key? key, required this.isLoggedIn, required this.journStar})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: appName,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColor.themeColor),
-      ),
-      home: isLoggedIn == True ? HomePage(journeyStart: journStar!,) : const LoginPage(),
-    );
+    return  ChangeNotifierProvider(
+        create: (context) => firestoreAppUpdateNofifier(),
+        child:MaterialApp(
+          title: appName,
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: AppColor.themeColor),
+          ),
+          home: isLoggedIn == True
+              ? HomePage(
+                  journeyStart: journStar!,
+                )
+              : const LoginPage(),
+        ));
   }
 }
 
@@ -81,17 +101,22 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool isLoading = false, isScreenVisible = false;
   bool isPasswordVisible = false;
-  String platform ='',appVersion='',fcmToken='',imeiNumber='',apiNumber='',platformVersion='';
+  String platform = '',
+      appVersion = '',
+      appVersionCode = '',
+      fcmToken = '',
+      imeiNumber = '',
+      apiNumber = '',
+      platformVersion = '';
   TextEditingController sapCodeController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool getPermission = false;
+  FirestoreDataModel? fireStoreDataModel;
 
-
-@override
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
 
     Utility().checkInternetConnection().then((connectionResult) {
       if (connectionResult) {
@@ -101,100 +126,114 @@ class _LoginPageState extends State<LoginPage> {
             .showInSnackBar(value: checkInternetConnection, context: context);
       }
     });
-
   }
-
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SizedBox(
-      child: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(color: AppColor.whiteColor),
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBox(
-                  height: 80,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      "assets/svg/applogo.svg",
-                      width: 150,
-                      height: 150,
+   return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+      if (value.fireStoreData != null && value.fireStoreData!.minEmployeeAppVersion !=
+          value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                      appUrl:
+                      value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+
+        });
+      } else {
+        return Scaffold(
+          body: Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(color: AppColor.whiteColor),
+            child: Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const SizedBox(
+                      height: 80,
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 30,
-                        right: 30,
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          "assets/svg/applogo.svg",
+                          width: 150,
+                          height: 150,
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                           robotoTextWidget(
-                              textval: Login,
-                              colorval: AppColor.themeColor,
-                              sizeval: 30,
-                              fontWeight: FontWeight.bold),
-                          const SizedBox(
-                            height:10,
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 30,
+                            right: 30,
                           ),
-                          emailPasswordWidget(),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          forgotPasswordWidget(),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              signIn();
-                            },
-                            child: Container(
-                              height: 50,
-                              margin:
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              robotoTextWidget(
+                                  textval: Login,
+                                  colorval: AppColor.themeColor,
+                                  sizeval: 30,
+                                  fontWeight: FontWeight.bold),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              emailPasswordWidget(),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              forgotPasswordWidget(),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  signIn();
+                                },
+                                child: Container(
+                                  height: 50,
+                                  margin:
                                   const EdgeInsets.symmetric(horizontal: 50),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(50),
-                                  color: AppColor.themeColor),
-                              child: Center(
-                                child: isLoading
-                                    ? const SizedBox(
-                                        height: 30,
-                                        width: 30,
-                                        child: CircularProgressIndicator(
-                                          color: AppColor.whiteColor,
-                                        ),
-                                      )
-                                    : robotoTextWidget(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50),
+                                      color: AppColor.themeColor),
+                                  child: Center(
+                                    child: isLoading
+                                        ? const SizedBox(
+                                      height: 30,
+                                      width: 30,
+                                      child: CircularProgressIndicator(
+                                        color: AppColor.whiteColor,
+                                      ),
+                                    )
+                                        : robotoTextWidget(
                                         textval: login,
                                         colorval: Colors.white,
                                         sizeval: 14,
                                         fontWeight: FontWeight.bold),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                )
+                    )
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
-      ),
-    ));
+          ),
+        );
+      } return Container(
+      );
+        });
   }
 
   Column emailPasswordWidget() {
@@ -223,7 +262,9 @@ class _LoginPageState extends State<LoginPage> {
             keyboardType: TextInputType.number,
           ),
         ),
-        const SizedBox(height: 10,),
+        const SizedBox(
+          height: 10,
+        ),
         Container(
           decoration: BoxDecoration(
             border: Border.all(color: AppColor.themeColor),
@@ -249,9 +290,10 @@ class _LoginPageState extends State<LoginPage> {
                     color: AppColor.themeColor,
                   )),
               suffixIcon: IconButton(
-                icon: Icon(isPasswordVisible
-                    ? Icons.visibility
-                    : Icons.visibility_off,color: AppColor.themeColor,),
+                icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  color: AppColor.themeColor,
+                ),
                 onPressed: () {
                   setState(
                     () {
@@ -268,7 +310,6 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
   }
-
 
   forgotPasswordWidget() {
     return InkWell(
@@ -342,22 +383,31 @@ class _LoginPageState extends State<LoginPage> {
       platform = "IOS";
     }
 
-   dynamic response = await HTTP.get(userLogin(
-        sapCodeController.text.toString(), passwordController.text.toString(),platformVersion!,apiNumber!,appVersion!,imeiNumber!,platform!,fcmToken!));
-
+    dynamic response = await HTTP.get(userLogin(
+        sapCodeController.text.toString(),
+        passwordController.text.toString(),
+        platformVersion,
+        apiNumber,
+        appVersion,
+        imeiNumber,
+        platform,
+        fcmToken));
 
     if (response != null && response.statusCode == 200) {
-       Iterable l = json.decode(response.body);
+      Iterable l = json.decode(response.body);
       List<LoginModelResponse> loginResponse = List<LoginModelResponse>.from(
           l.map((model) => LoginModelResponse.fromJson(model)));
 
       if (loginResponse[0].name.isNotEmpty) {
         Utility().setSharedPreference(name, loginResponse[0].name);
-        Utility().setSharedPreference(localConveyanceJourneyStart,'false');
+        Utility().setSharedPreference(localConveyanceJourneyStart, 'false');
         Utility().showToast(welcome + loginResponse[0].name);
         // ignore: use_build_context_synchronously
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => HomePage(journeyStart: False,)),
+            MaterialPageRoute(
+                builder: (context) => HomePage(
+                      journeyStart: False,
+                    )),
             (route) => false);
 
         setState(() {
@@ -369,7 +419,7 @@ class _LoginPageState extends State<LoginPage> {
           isLoading = false;
         });
       }
-    }else {
+    } else {
       Utility().showToast(somethingWentWrong);
       setState(() {
         isLoading = false;
@@ -377,48 +427,47 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-
-
   Future<void> retrieveFCMToken() async {
     FirebaseMessaging.instance.getToken().then((token) {
       final tokenStr = token.toString();
       // do whatever you want with the token here
       fcmToken = tokenStr;
       print('tokenStr==========>$tokenStr');
-    }
-    );
-
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-    if (!mounted) return;
-    setState(() {
-      appVersion = packageInfo.version;
     });
+    readNotifier();
     _deviceDetails();
   }
-  Future<void>_deviceDetails() async{
+  void readNotifier() {
+    context.read<firestoreAppUpdateNofifier>().listenToLiveUpdateStream();
+  }
+  Future<void> _deviceDetails() async {
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     try {
       if (Platform.isAndroid) {
         var build = await deviceInfoPlugin.androidInfo;
         setState(() {
-          apiNumber  = build.version.sdkInt.toString();
+          apiNumber = build.version.sdkInt.toString();
           platformVersion = build.version.release;
-         imeiNumber =  build.id;
+          imeiNumber = build.id;
+          appVersion = packageInfo.version;
+          appVersionCode = packageInfo.buildNumber;
         });
         //UUID for Android
       } else if (Platform.isIOS) {
         var data = await deviceInfoPlugin.iosInfo;
         setState(() {
-          apiNumber  = data.utsname.version;
+          apiNumber = data.utsname.version;
           platformVersion = data.systemVersion;
-          imeiNumber  = data.identifierForVendor!;
-        });//UUID for iOS
+          imeiNumber = data.identifierForVendor!;
+          appVersion = packageInfo.version;
+          appVersionCode = packageInfo.buildNumber;
+        }); //UUID for iOS
       }
     } on PlatformException {
       print('Failed to get platform version');
     }
-
   }
+
 
 }

@@ -240,12 +240,20 @@ class InDirectLeaveState extends State<InDirectLeave> {
              Flexible(
                 child: ElevatedButton(
                   onPressed: () {
+
                     Navigator.pop(context);
-                    if (i == 0){
-                      rejectLeave(leaveNo);
-                    }else {
-                      confirmLeave(leaveNo);
-                    }
+                    Utility().checkInternetConnection().then((connectionResult) {
+                      if (connectionResult) {
+                        if (i == 0){
+                          rejectLeave(leaveNo);
+                        }else {
+                          confirmLeave(leaveNo);
+                        }
+                      } else {
+                        Utility()
+                            .showInSnackBar(value: checkInternetConnection, context: context);
+                      }
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.themeColor,

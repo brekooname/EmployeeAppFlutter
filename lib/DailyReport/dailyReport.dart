@@ -267,7 +267,15 @@ class _DailyReportState extends State<DailyReport> {
             ),
             onSearchTextChanged: (serachValue) {
               if (serachValue.length > 2) {
-                vendorNameListAPI(serachValue);
+                Utility().checkInternetConnection().then((connectionResult) {
+                  if (connectionResult) {
+                    vendorNameListAPI(serachValue);
+                  } else {
+                    Utility()
+                        .showInSnackBar(value: checkInternetConnection, context: context);
+                  }
+                });
+
               }
               return null;
             },
@@ -405,6 +413,7 @@ class _DailyReportState extends State<DailyReport> {
   }
 
   Future<void> vendorNameListAPI(String value) async {
+
     var jsonData = null;
     dynamic response = await HTTP.get(vendorNameAPI(value));
     if (response != null && response.statusCode == 200) {
@@ -882,6 +891,8 @@ class _DailyReportState extends State<DailyReport> {
     return GestureDetector(
         onTap: () {
           submitDailyReport();
+
+
         },
         child: Container(
             height: 50,
@@ -969,8 +980,15 @@ class _DailyReportState extends State<DailyReport> {
                 widget.vendorGatePassLists[selectedPassIndex!].stras;
           }
         }
+        Utility().checkInternetConnection().then((connectionResult) {
+          if (connectionResult) {
+            SubmitDailyReportAPI();
+          } else {
+            Utility()
+                .showInSnackBar(value: checkInternetConnection, context: context);
+          }
+        });
 
-        SubmitDailyReportAPI();
       });
     }
   }

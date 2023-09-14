@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -51,7 +52,12 @@ class Utility {
         timeInSecForIosWeb: 9);
   }
 
-
+  dynamic myEncode(dynamic item) {
+    if (item is Timestamp) {
+      return item.toString();
+    }
+    return item;
+  }
 
 
   setSharedPreference(String key, String value) async {
