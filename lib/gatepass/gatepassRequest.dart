@@ -263,7 +263,14 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
               else if(toTimeController.text.toString().isEmpty){
                 Utility().showToast("Please select to time");
               }else{
-                gatePassRequestAPI();
+                Utility().checkInternetConnection().then((connectionResult) {
+                  if (connectionResult) {
+                    gatePassRequestAPI();
+                  } else {
+                    Utility()
+                        .showInSnackBar(value: checkInternetConnection, context: context);
+                  }
+                });
               }
 
 
@@ -271,8 +278,16 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
         if(fromTimeController.text.toString().isEmpty){
           Utility().showToast("Please select from time");
         }else {
-          toTimeController.text = '00:00:00';
-          gatePassRequestAPI();
+
+          Utility().checkInternetConnection().then((connectionResult) {
+            if (connectionResult) {
+              toTimeController.text = '00:00:00';
+              gatePassRequestAPI();
+            } else {
+              Utility()
+                  .showInSnackBar(value: checkInternetConnection, context: context);
+            }
+          });
         }
       }
     }
