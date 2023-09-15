@@ -28,21 +28,20 @@ class TaskRequestScreen extends StatefulWidget {
 }
 
 class _TaskRequestScreenState extends State<TaskRequestScreen> {
-  bool isLoading = false;
+  bool isLoading = false,isLoading1 = false;
   List<TaskRequest> taskData = [];
   TextEditingController taskDes = TextEditingController();
+  TextEditingController selectedAssginTo = TextEditingController();
+
   String? currentDate, currentTime;
   DateTime datefrom = DateTime.now(), dateto = DateTime.now();
-  String? selectedAssginTo;
+
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
   DateTime? pickedDate;
   String? taskSpinner, selectedDepartmentCode, dateTimeFormat = "dd.MM.yyyy";
   List<Response> departmentList = [];
   String returnableSpinner = 'DRC-Daily Review Committee (YTT)';
-
-
-
   String? selectedFromDate, selectedToDate;
 
   @override
@@ -93,31 +92,39 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
             }),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Container(
-        margin: const EdgeInsets.only(left: 10, right: 10,top: 10),
-        height: double.infinity,
-        width: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              departmentDropdown(),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  datePickerWidget(selectedFromDate!, fromDateController, "0"),
-                  datePickerWidget(selectedToDate!, toDateController, "1")
-                ],
-              ),
-              textFeildWidget(taskDesc, taskDes),
-              assginToSpinnerWidget(context, widget.activeemployeeList),
-              submitWidget(),
-            ],
+      body: Stack(children: [
+        Container(
+          margin: const EdgeInsets.only(left: 10, right: 10,top: 10),
+          height: double.infinity,
+          width: double.infinity,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                departmentDropdown(),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    datePickerWidget(selectedFromDate!, fromDateController, "0"),
+                    datePickerWidget(selectedToDate!, toDateController, "1")
+                  ],
+                ),
+                textFeildWidget(taskDesc, taskDes),
+                assginToSpinnerWidget(context, widget.activeemployeeList),
+                submitWidget(),
+              ],
+            ),
           ),
         ),
-      ),
+        Center(
+          child: isLoading1 ? const CircularProgressIndicator(
+            color: Colors.indigo,
+          )
+              : const SizedBox(),
+        ),
+      ],)
     );
   }
 
@@ -184,7 +191,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
       Utility().showToast(pleaseSelectDepartment);
     } else if (taskDes.text.toString().isEmpty) {
       Utility().showToast(pleaseEnterTask);
-    } else if (selectedAssginTo!.isEmpty) {
+    } else if (selectedAssginTo.text.toString().isEmpty) {
       Utility().showToast(pleaseEnterPersonCharge);
     } else {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -196,12 +203,13 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
               budat: currentDate!,
               time: currentTime!,
               description: taskDes.text.toString(),
-              assignTo: selectedAssginTo.toString(),
+              assignTo: selectedAssginTo.text.toString(),
               dateFrom: fromDateController.text.toString(),
               dateTo: toDateController.text.toString(),
               department: selectedDepartmentCode.toString()));
 
           String value = convert.jsonEncode(taskData).toString();
+          print("Parameter Value===>${value.toString()}");
           createTask(value);
         } else {
           Utility()
@@ -211,7 +219,6 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
 
     }
   }
-
 
   departmentDropdown() {
     return SizedBox(
@@ -343,22 +350,27 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: SearchField<List<Activeemployee>>(
+        controller: selectedAssginTo,
         suggestions: activeemployee
             .map(
               (activeemployee) => SearchFieldListItem<List<Activeemployee>>(
                 activeemployee.ename,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    activeemployee.ename,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: AppColor.themeColor),
-                  ),
+                  child: robotoTextWidget(
+                      textval: activeemployee.ename,
+                      colorval: AppColor.themeColor,
+                      sizeval: 12,
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             )
             .toList(),
+        searchStyle: const TextStyle(
+            fontSize: 12,
+            color: AppColor.themeColor,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w600),
         searchInputDecoration: InputDecoration(
           hintText: assginCharge,
           hintStyle: const TextStyle(
@@ -374,7 +386,7 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
         ),
         onSubmit: (String value) {
           setState(() {
-            selectedAssginTo = value.toString();
+            selectedAssginTo.text = value.toString();
           });
         },
       ),
@@ -409,6 +421,10 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
   }
 
   getDepartmentList() async {
+
+    setState(() {
+      isLoading1 = true;
+    });
     dynamic res = await HTTP.get(getDepartment());
     var jsonData = null;
     departmentList = [];
@@ -419,7 +435,16 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
         setState(() {
           departmentList = departmentModel.response;
         });
+
+        setState(() {
+          isLoading1 =false;
+        });
       }
+    }else{
+
+      setState(() {
+        isLoading1 =false;
+      });
     }
   }
 }

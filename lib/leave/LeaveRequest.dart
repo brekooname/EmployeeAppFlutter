@@ -32,11 +32,12 @@ class LeaveRequestScreen extends StatefulWidget {
 class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
   bool isLoading = false;
   TextEditingController reason = TextEditingController();
-  String perInCharge1 = "",
-      perInCharge2 = "",
-      perInCharge3 = "",
-      perInCharge4 = "",
-      dateFormat = "dd/MM/yyyy",
+  TextEditingController person1 = TextEditingController();
+  TextEditingController person2 = TextEditingController();
+  TextEditingController person3 = TextEditingController();
+  TextEditingController person4 = TextEditingController();
+
+  String dateFormat = "dd/MM/yyyy",
       timeFormat = "HH:mm:ss";
 
   String? selectedLeaveType,
@@ -91,47 +92,52 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
             }),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Container(
-        margin: const EdgeInsets.all(10),
-        height: double.infinity,
-        width: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              leaveTypeSpinnerWidget(),
-              dayTypeSpinnerWidget(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Stack(
+        children: [
+          Container(
+            margin: const EdgeInsets.all(10),
+            height: double.infinity,
+            width: double.infinity,
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  datePickerWidget(selectedFromDate!, fromDateController, "0"),
-                  datePickerWidget(selectedToDate!, toDateController, "1")
+                  leaveTypeSpinnerWidget(),
+                  dayTypeSpinnerWidget(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      datePickerWidget(selectedFromDate!, fromDateController, "0"),
+                      datePickerWidget(selectedToDate!, toDateController, "1")
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  dayTypeSpinner == "Half Day"
+                      ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      timePickerWidget(
+                          selectFromTime, fromTimeController, "0"),
+                      timePickerWidget(selectToTime, toTimeController, "1")
+                    ],
+                  )
+                      : Container(),
+                  reasonForLeave(),
+                  assginToSpinnerWidget(context, widget.activeEmpList, "0"),
+                  assginToSpinnerWidget(context, widget.activeEmpList, "1"),
+                  assginToSpinnerWidget1(context, widget.activeEmpList, "2"),
+                  assginToSpinnerWidget1(context, widget.activeEmpList, "3"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  submitWidget(),
                 ],
               ),
-              SizedBox(
-                height: 10,
-              ),
-              dayTypeSpinner == "Half Day"
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        timePickerWidget(
-                            selectFromTime, fromTimeController, "0"),
-                        timePickerWidget(selectToTime, toTimeController, "1")
-                      ],
-                    )
-                  : Container(),
-              reasonForLeave(),
-              assginToSpinnerWidget(context, widget.activeEmpList, "0"),
-              assginToSpinnerWidget(context, widget.activeEmpList, "1"),
-              assginToSpinnerWidget(context, widget.activeEmpList, "2"),
-              assginToSpinnerWidget(context, widget.activeEmpList, "3"),
-              const SizedBox(
-                height: 10,
-              ),
-              submitWidget(),
-            ],
+            ),
           ),
-        ),
+
+        ],
       ),
     );
   }
@@ -163,6 +169,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
                   colorval: AppColor.themeColor,
                   sizeval: 12,
                   fontWeight: FontWeight.bold))).toList(),
+
           onChanged: (Object? value) {
             setState(() {
               selectedLeaveType = value.toString();
@@ -398,6 +405,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: SearchField<List<Activeemployee>>(
+        controller: perInCharge == "0" ? person1:person2,
         suggestions: activeemployee
             .map(
               (activeemployee) => SearchFieldListItem<List<Activeemployee>>(
@@ -431,16 +439,71 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
           ),
           border: InputBorder.none,
         ),
+
         onSubmit: (String value) {
           setState(() {
             if (perInCharge == "0") {
-              perInCharge1 = value;
+              person1.text = value;
             } else if (perInCharge == "1") {
-              perInCharge2 = value;
-            } else if (perInCharge == "2") {
-              perInCharge3 = value;
+              person2.text = value;
+            }
+          });
+        },
+      ),
+    );
+  }
+
+  Widget assginToSpinnerWidget1(BuildContext context,
+      List<Activeemployee> activeemployee, String perInCharge) {
+    return Container(
+      height: 50,
+      margin: const EdgeInsets.only(top: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColor.themeColor),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      ),
+      child: SearchField<List<Activeemployee>>(
+        controller: perInCharge == "2" ? person3:person4,
+        suggestions: activeemployee
+            .map(
+              (activeemployee) => SearchFieldListItem<List<Activeemployee>>(
+            activeemployee.ename,
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: robotoTextWidget(
+                  textval: activeemployee.ename,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.w600),
+            ),
+          ),
+        )
+            .toList(),
+        searchStyle: const TextStyle(
+            fontSize: 12,
+            color: AppColor.themeColor,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w600),
+        searchInputDecoration: InputDecoration(
+          hintText: assginCharge,
+          hintStyle: const TextStyle(
+              color: AppColor.themeColor,
+              fontWeight: FontWeight.normal,
+              fontSize: 12),
+          prefixIcon: const Icon(
+            Icons.person,
+            color: AppColor.themeColor,
+            size: 20,
+          ),
+          border: InputBorder.none,
+        ),
+
+        onSubmit: (String value) {
+          setState(() {
+            if (perInCharge == "2") {
+              person3.text = value;
             } else if (perInCharge == "3") {
-              perInCharge4 = value;
+              person4.text = value;
             }
           });
         },
@@ -452,6 +515,11 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     return GestureDetector(
         onTap: () {
           Validation();
+
+          print("person1===>${person1.text.toString()}");
+          print("person2===>${person2.text.toString()}");
+          print("person3===>${person3.text.toString()}");
+          print("person4===>${person4.text.toString()}");
         },
         child: Container(
           height: 50,
@@ -487,11 +555,12 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       Utility().showToast(vaildLeaveDateTO);
     } else if (reason.text.toString().isEmpty) {
       Utility().showToast(vaildRaseon);
-    } else if (perInCharge1.isEmpty) {
+    } else if (person1.text.toString().isEmpty) {
       Utility().showToast(vaildPerson1);
-    } else if (perInCharge2.isEmpty) {
+    } else if (person2.text.toString().isEmpty) {
       Utility().showToast(vaildPerson2);
-    } else {
+    }
+    else {
       if (dayTypeSpinner == "Half Day") {
         if (fromTimeController.text.toString().isEmpty) {
           Utility().showToast(selectFromTime);
@@ -535,10 +604,10 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         fromTimeController.text.toString().isEmpty?"08:30:00":fromTimeController.text.toString(),
         toTimeController.text.toString().isEmpty?"17:00:00":toTimeController.text.toString(),
         reason.text.toString(),
-        perInCharge1.toString(),
-        perInCharge2.toString(),
-        perInCharge3.toString(),
-        perInCharge4.toString())}');
+        person1.text.toString(),
+        person2.text.toString(),
+        person3.text.toString(),
+        person4.text.toString())}');
   dynamic response = await HTTP.get(createLeaveAPI(
         sharedPreferences.getString(userID).toString(),
         selectedLeaveType.toString(),
@@ -548,10 +617,10 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         fromTimeController.text.toString().isEmpty?"08:30:00":fromTimeController.text.toString(),
         toTimeController.text.toString().isEmpty?"17:00:00":toTimeController.text.toString(),
         reason.text.toString(),
-        perInCharge1.toString(),
-        perInCharge2.toString(),
-        perInCharge3.toString(),
-        perInCharge4.toString()));
+        person1.text.toString(),
+        person2.text.toString(),
+        person3.text.toString(),
+        person4.text.toString()));
     if (response != null && response.statusCode == 200) {
       Iterable l = json.decode(response.body);
       List<LeaveRequestModelResponse> leave =
@@ -573,4 +642,19 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       Utility().showToast(somethingWentWrong);
     }
   }
+
+/*  TextEditingController setControllerValue(String perInCharge) {
+    setState(() {
+      if (perInCharge == "0") {
+        perInCharge1 = value;
+      } else if (perInCharge == "1") {
+        perInCharge2 = value;
+      } else if (perInCharge == "2") {
+        perInCharge3 = value;
+      } else if (perInCharge == "3") {
+        perInCharge4 = value;
+      }
+    });
+  }*/
+
 }
