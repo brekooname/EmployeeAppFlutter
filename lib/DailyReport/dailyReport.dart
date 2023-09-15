@@ -241,6 +241,7 @@ class _DailyReportState extends State<DailyReport> {
             borderRadius: const BorderRadius.all(Radius.circular(10)),
           ),
           child: SearchField<List<VenderList.Response>>(
+            controller: vendoreName,
             suggestions: vendorNameList
                 .map(
                   (vendornamelist) =>
@@ -257,6 +258,11 @@ class _DailyReportState extends State<DailyReport> {
                   ),
                 )
                 .toList(),
+            searchStyle: const TextStyle(
+                fontSize: 12,
+                color: AppColor.themeColor,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w600),
             searchInputDecoration: InputDecoration(
               hintText: hinttxt,
               hintStyle: const TextStyle(
