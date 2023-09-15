@@ -32,7 +32,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
   TextEditingController visitPlace = TextEditingController();
   TextEditingController purpose = TextEditingController();
 
-  String? selectedAssginTo;
+  TextEditingController selectedAssginTo  = TextEditingController();
   String dateTimeFormat = "dd/MM/yyyy", timeFormate = "HH:mm:ss";
 
   // List of items in our dropdown menu
@@ -154,22 +154,27 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: SearchField<List<Activeemployee>>(
+        controller: selectedAssginTo,
         suggestions: activeemployee
             .map(
               (activeemployee) => SearchFieldListItem<List<Activeemployee>>(
                 activeemployee.ename,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    activeemployee.ename,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: AppColor.themeColor),
-                  ),
+                  child: robotoTextWidget(
+                      textval: activeemployee.ename,
+                      colorval: AppColor.themeColor,
+                      sizeval: 12,
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             )
             .toList(),
+        searchStyle: const TextStyle(
+            fontSize: 12,
+            color: AppColor.themeColor,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w600),
         searchInputDecoration: const InputDecoration(
           hintText: "Assign Charge To",
           hintStyle: TextStyle(
@@ -185,7 +190,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
         ),
         onSubmit: (String value) {
           setState(() {
-            selectedAssginTo = value.toString();
+            selectedAssginTo.text = value.toString();
           });
         },
       ),
@@ -548,7 +553,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
         toTimeController.text.toString(),
         visitPlace.text.toString(),
         purpose.text.toString(),
-        selectedAssginTo.toString()));
+        selectedAssginTo.text.toString()));
     if (response != null && response.statusCode == 200) {
       Iterable l = convert.json.decode(response.body);
       List<GatePassResponse> odResponse = List<GatePassResponse>.from(

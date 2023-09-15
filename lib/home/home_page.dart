@@ -2,7 +2,6 @@ import 'dart:convert' as convert;
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -158,7 +157,7 @@ class _HomePageState extends State<HomePage> {
           PopupMenuButton<int>(
             itemBuilder: (context) => [
               // PopupMenuItem 1
-              const PopupMenuItem(
+                PopupMenuItem(
                 value: 1,
                 // row with 2 children
                 child: Row(
@@ -171,7 +170,7 @@ class _HomePageState extends State<HomePage> {
                       width: 10,
                     ),
                     robotoTextWidget(
-                        textval: 'Downloading Data',
+                        textval: downloadingDataTxt,
                         colorval: AppColor.themeColor,
                         sizeval: 16,
                         fontWeight: FontWeight.w600)
@@ -516,16 +515,22 @@ class _HomePageState extends State<HomePage> {
         switch (msg) {
           case "Request":
             {
-              requestMethod(title);
+              if(!isLoading){
+                requestMethod(title);
+              }
+
             }
             break;
           case "Approve":
             {
-              approvedMethod(title);
+              if(!isLoading){
+                approvedMethod(title);
+              }
+
             }
             break;
           case "Offline":
-            {
+            if(!isLoading) {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                       builder: (context) => const OfflineLocalConveyance()),
@@ -533,7 +538,7 @@ class _HomePageState extends State<HomePage> {
             }
             break;
           case "Daily Report":
-            {
+            if(!isLoading) {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                       builder: (context) => DailyReport(
@@ -543,13 +548,14 @@ class _HomePageState extends State<HomePage> {
             }
             break;
           case "Web Report":
-            {
+            if(!isLoading)  {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const WebReport()),
                   (route) => true);
             }
             break;
           case "Close":
+          if(!isLoading)
             {
               Navigator.of(context)
                   .push(MaterialPageRoute(
@@ -597,7 +603,7 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         switch (msg) {
           case "Start":
-            {
+            if(!isLoading)  {
               if (journeyStart == False) {
                 getCurrentLocation();
                 setState(() {
@@ -607,7 +613,7 @@ class _HomePageState extends State<HomePage> {
             }
             break;
           case "End":
-            {
+            if(!isLoading)   {
               if (journeyStart == True) {
                 getCurrentLocation();
                 setState(() {

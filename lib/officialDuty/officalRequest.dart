@@ -9,7 +9,6 @@ import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../home/home_page.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/constant.dart';
@@ -35,7 +34,8 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   TextEditingController toDateController = TextEditingController();
   TextEditingController fromTimeController = TextEditingController();
   TextEditingController toTimeController = TextEditingController();
-  String?  selectedAssginTo;
+  TextEditingController selectedAssginTo = TextEditingController();
+
   String?  dutyTypeSpinner, workPlaceSpinner,selectedFromDate, selectedToDate;
 
   String  dateFormat ="dd/MM/yyyy",timeFormat = "HH:mm:ss";
@@ -160,16 +160,26 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         const BorderRadius.all(Radius.circular(10)),
       ),
       child: SearchField< List<Activeemployee>>(
+        controller: selectedAssginTo,
         suggestions: activeemployee
             .map(
               (activeemployee) => SearchFieldListItem< List<Activeemployee>>(
             activeemployee.ename,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child:  Text(activeemployee.ename, style: const TextStyle(fontWeight: FontWeight.normal, color: AppColor.themeColor ),),
+              child: robotoTextWidget(
+                  textval: activeemployee.ename,
+                  colorval: AppColor.themeColor,
+                  sizeval: 12,
+                  fontWeight: FontWeight.w600),
             ),
           ),
         ).toList(),
+        searchStyle: const TextStyle(
+            fontSize: 12,
+            color: AppColor.themeColor,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w600),
         searchInputDecoration:   InputDecoration(
           hintText: assginCharge,
           hintStyle: const TextStyle(color: AppColor.themeColor, fontSize: 12, fontWeight: FontWeight.normal),
@@ -178,7 +188,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         ),
         onSubmit: (String value) {
           setState(() {
-            selectedAssginTo = value.toString();
+            selectedAssginTo.text = value.toString();
           });
           },
       ),
@@ -509,7 +519,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         purpose2.text.toString(),
         '',
         '',
-        selectedAssginTo.toString(),
+        selectedAssginTo.text.toString(),
         fromTimeController.text.toString()));
     if (response != null && response.statusCode == 200){
       setState(() {
