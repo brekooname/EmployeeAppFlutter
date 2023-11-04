@@ -1,5 +1,5 @@
 import 'dart:convert' as convert;
-import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -9,7 +9,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
@@ -31,6 +31,9 @@ import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
 import 'package:shakti_employee_app/task/taskApprove.dart';
 import 'package:shakti_employee_app/task/taskRequest.dart';
 import 'package:shakti_employee_app/theme/color.dart';
+import 'package:shakti_employee_app/travelrequest/model/travelrequestlist.dart'as TR;
+import 'package:shakti_employee_app/travelrequest/travelApprove.dart';
+import 'package:shakti_employee_app/travelrequest/travelrequest.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webReport/webreport.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
@@ -82,6 +85,7 @@ class _HomePageState extends State<HomePage> {
   List<Pendingod> pendindOdList = [];
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
+  List<TR.Response> travelReqList = [];
   List<vendorGatePassPrefix.Response> vendorGatePassList = [];
   List<TravelModel> travelList = [];
   List<LocalConveyanceModel> localConveyanceList = [];
@@ -89,6 +93,7 @@ class _HomePageState extends State<HomePage> {
   PersonalInfoResponse? personInfo;
   PendingGatePassResponse? gatePassResponse;
   vendorGatePassPrefix.VendorGatePassModel? vendorGatePassModel;
+  TR.TravelRequestList? travelRequestList;
   TextEditingController travelModeController = TextEditingController();
   FirestoreDataModel? fireStoreDataModel;
 
@@ -224,6 +229,7 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(officialDuty),
                       detailWidget(gatePasstxt),
                       detailWidget(task),
+                      detailWidget(travel),
                       localConvenience(),
                       dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
@@ -498,6 +504,13 @@ class _HomePageState extends State<HomePage> {
       setgatePassData();
     }
 
+    if (sharedPreferences.getString(travelRequest) != null) {
+      var jsonData =
+      convert.jsonDecode(sharedPreferences.getString(travelRequest)!);
+      travelRequestList = TR.TravelRequestList.fromJson(jsonData);
+      setTravelData();
+    }
+
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.getString(vendorGatePas) != null &&
         sharedPreferences.getString(vendorGatePas).toString().isNotEmpty) {
@@ -507,6 +520,8 @@ class _HomePageState extends State<HomePage> {
           vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData);
       setVendorgatePassData();
     }
+
+
   }
 
   imageTextWidget(String svg, String msg, String title) {
@@ -735,6 +750,31 @@ class _HomePageState extends State<HomePage> {
             child: Center(
               child: robotoTextWidget(
                   textval: pendingTaskList.length.toString(),
+                  colorval: Colors.white,
+                  sizeval: 12,
+                  fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (title == "Travel Request") {
+      return Visibility(
+        visible: travelReqList.isEmpty ? false : true,
+        child: Positioned(
+          left: 30.0,
+          bottom: 30.0,
+          child: Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColor.themeColor,
+            ),
+            width: msg == "Request" ? 0 : 20,
+            height: msg == "Request" ? 0 : 20,
+            child: Center(
+              child: robotoTextWidget(
+                  textval: travelReqList.length.toString(),
                   colorval: Colors.white,
                   sizeval: 12,
                   fontWeight: FontWeight.normal),
@@ -1151,7 +1191,7 @@ class _HomePageState extends State<HomePage> {
     });
 
     var jsonData;
-    var jsonData1;
+    var jsonData1,jsonData2;
 
     dynamic response = await HTTP.get(
         SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
@@ -1215,6 +1255,23 @@ class _HomePageState extends State<HomePage> {
       });
       setVendorgatePassData();
     }
+
+    dynamic response4 = await HTTP.get(
+        getTravelRequestAPIList(sharedPreferences.getString(userID).toString()));
+    if (response4 != null && response4.statusCode == 200) {
+      jsonData2 = convert.jsonDecode(response4.body);
+      TR.TravelRequestList travelList =
+      TR.TravelRequestList.fromJson(jsonData2);
+      if(travelList.status.compareTo("true") == 0){
+        travelRequestList = travelList;
+        travelReqList = travelList.response;
+        Utility().setSharedPreference(travelRequest, response4.body.toString());
+        setState(() {
+          isLoading = false;
+        });
+      }
+      setTravelData();
+    }
   }
 
   void setListData() {
@@ -1262,6 +1319,15 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void setTravelData() {
+    if (travelRequestList != null &&
+        travelRequestList!.response.isNotEmpty) {
+      setState(() {
+        travelReqList = travelRequestList!.response;
+      });
+    }
+  }
+
   void requestMethod(String title) {
     switch (title) {
       case "Leave":
@@ -1305,6 +1371,15 @@ class _HomePageState extends State<HomePage> {
               (route) => true);
         }
         break;
+
+      case "Travel Request":
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (context) => TravelRequestScreen(
+
+                )),
+                (route) => true);
+        break;
     }
   }
 
@@ -1335,6 +1410,16 @@ class _HomePageState extends State<HomePage> {
               .push(MaterialPageRoute(
                   builder: (context) =>
                       GatePassApproved(gatePassList: gatePassList)))
+              .then((value) => {getSPArrayList()});
+        }
+        break;
+      case "Travel Request":
+        {
+
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+              builder: (context) =>
+                  TravelApproved(allTravelReqList: travelReqList, )))
               .then((value) => {getSPArrayList()});
         }
         break;

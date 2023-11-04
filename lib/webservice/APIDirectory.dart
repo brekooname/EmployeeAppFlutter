@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shakti_employee_app/theme/string.dart';
 
 import 'constant.dart';
 
@@ -107,4 +108,28 @@ getTotalTaskCountList(String DeptCode, String empCode, String fromDate, String t
 
 getTaskList(String subDeptCode, String empCode, String fromDate, String toDate, String type) {
   return Uri.parse('${dashboardAppUrl}task_list.htm?depart=$subDeptCode&emp=$empCode&date1=$fromDate&date2=$toDate&type=$type');
+}
+
+getCountryListAPI(){
+  return Uri.parse('${productionUrl}country.htm');
+}
+
+getStateListAPI(String county){
+  return Uri.parse('${productionUrl}state.htm?land1=${county}');
+}
+
+getCityListAPI(String county, String state){
+  return Uri.parse('${productionUrl}dictrict.htm?land1=${county}&regio=${state}');
+}
+
+getTravelRequestAPI(String value){
+  return Uri.parse('${productionUrl}savetraveldata.htm?final=${value}');
+}
+
+getTravelRequestAPIList(String sapCode){
+  return Uri.parse('${productionUrl}travel_approval_list.htm?pernr=${sapCode}');
+}
+
+sendTravelRequestStatus (String docNo, String hodPernr, String perner ,String Status){
+  return Uri.parse('${productionUrl}save_approve_reject.htm?hod_pernr=${hodPernr}&pernr=${perner}&status=${Status}&docno=${docNo}');
 }
