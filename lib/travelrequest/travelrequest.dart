@@ -866,6 +866,13 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
       countryToCodeSpinner = countryCodeSpinner;
       stateToCodeSpinner = stateCodeSpinner;
       cityToCodeSpinner = cityCodeSpinner;
+
+      for(var i = 0 ; i<cityList.length ; i++){
+        if(cityToCodeSpinner == cityList[i].cityc){
+          toCity =  cityList[i].bezei;
+          fromCity = cityList[i].bezei;
+        }
+      }
     }
 
     if(nameController.text.toString().isEmpty){
