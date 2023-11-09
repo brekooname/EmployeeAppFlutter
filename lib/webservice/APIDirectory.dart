@@ -133,3 +133,7 @@ getTravelRequestAPIList(String sapCode){
 sendTravelRequestStatus (String docNo, String hodPernr, String perner ,String Status){
   return Uri.parse('${productionUrl}save_approve_reject.htm?hod_pernr=${hodPernr}&pernr=${perner}&status=${Status}&docno=${docNo}');
 }
+
+getTravelListResponseAPI(String sapCode , String fromDate, String toDate){
+  return Uri.parse('${productionUrl}report_travel.htm?from=${fromDate}&to=${toDate}&pernr=${sapCode}');
+}

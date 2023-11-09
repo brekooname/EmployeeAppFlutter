@@ -795,7 +795,6 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
             setState(() {
               print('value=====>$value');
 
-
               stateToCodeSpinner = value.toString();
               cityToCodeSpinner = null;
 
