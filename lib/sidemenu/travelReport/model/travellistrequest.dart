@@ -34,6 +34,7 @@ class TravelListResponse {
 
 class Response {
   String docno;
+  String mob;
   String pernr;
   String btrtl;
   String bookingType;
@@ -61,6 +62,7 @@ class Response {
 
   Response({
     required this.docno,
+    required this.mob,
     required this.pernr,
     required this.btrtl,
     required this.bookingType,
@@ -89,6 +91,7 @@ class Response {
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
     docno: json["docno"],
+    mob: json["mob"],
     pernr: json["pernr"],
     btrtl: json["btrtl"],
     bookingType: json["booking_type"],
@@ -117,6 +120,7 @@ class Response {
 
   Map<String, dynamic> toJson() => {
     "docno": docno,
+    "mob": mob,
     "pernr": pernr,
     "btrtl": btrtl,
     "booking_type": bookingType,

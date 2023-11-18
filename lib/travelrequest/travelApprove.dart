@@ -147,6 +147,10 @@ class _TravelApprovedState extends State<TravelApproved> {
                           height: 2,
                         ),
 
+                        detailWidget(remarktxt,travelReqList[index].suggested),
+                        const SizedBox(
+                          height: 2,
+                        ),
                         Row(children: [
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,

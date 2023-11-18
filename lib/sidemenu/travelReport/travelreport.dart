@@ -303,6 +303,8 @@ class _TravelReportScreenState extends State<TravelReportScreen> {
                     detailWidget(dateTo, displayList[index].travelDateTo ),
                     detailWidget(status, setValue(displayList[index].status) ),
                     detailWidget(travelMode, setBookingValue(displayList[index].bookingType) ),
+                    detailWidget(remarktxt, displayList[index].suggested ),
+                    detailWidget(mobile, displayList[index].mob ),
                   ],
                 ),
               ],
