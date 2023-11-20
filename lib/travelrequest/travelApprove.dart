@@ -1,66 +1,82 @@
-// ignore_for_file: must_be_immutable, non_constant_identifier_names
-
+// ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
- import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
-import 'package:shakti_employee_app/leave/model/leaveResponse.dart';
 import 'package:shakti_employee_app/theme/color.dart';
+import 'package:shakti_employee_app/travelrequest/model/approveStatus.dart';
+import 'package:shakti_employee_app/travelrequest/model/travelrequestlist.dart'as TR;
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../theme/string.dart';
-import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+import 'package:shakti_employee_app/webservice/constant.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert' as convert;
 
-import '../webservice/constant.dart';
-import 'model/leaverejectResponse.dart';
+import '../theme/string.dart';
 
-class InDirectLeave extends StatefulWidget {
-  String Status;
-  List<Pendingleave> pendindLeaveList = [];
-  InDirectLeave({Key? key, required this.Status , required this.pendindLeaveList}) : super(key: key);
 
+class TravelApproved extends StatefulWidget {
+  TravelApproved({Key? key , required this.allTravelReqList }) : super(key: key);
+  List<TR.Response> allTravelReqList = [];
   @override
-  State<InDirectLeave> createState() => InDirectLeaveState();
+  State<TravelApproved> createState() => _TravelApprovedState();
 }
 
-class InDirectLeaveState extends State<InDirectLeave> {
+class _TravelApprovedState extends State<TravelApproved> {
 
-  bool isLoading = false;
-  late int selectedIndex;
+  List<TR.Response> travelReqList = [];
   late SharedPreferences sharedPreferences;
+  late int selectedIndex;
+  bool isDataLoading = false,isLoading =false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-   Init();
+
+    travelReqList = widget.allTravelReqList;
+    Init();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildPosts(context),
-          Center(
-            child: isLoading == true
-                ? const CircularProgressIndicator(
-              color: Colors.indigo,
-            )
-                : const SizedBox(),
-          ),
-        ],
-      ),
+    // TODO: implement build
 
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar:  AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            backgroundColor: AppColor.themeColor,
+            title: robotoTextWidget(textval: TravelApprove, colorval: AppColor.whiteColor,
+                sizeval: 18, fontWeight: FontWeight.normal),
+
+        ),
+        body:   Stack(
+          children: [
+            _buildPosts(context),
+            Center(
+              child: isDataLoading == true
+                  ? const CircularProgressIndicator(
+                color: Colors.indigo,
+              )
+                  : const SizedBox(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
+
+
+
   Widget _buildPosts(BuildContext context) {
 
-    if ( widget.pendindLeaveList.isEmpty) {
+    if ( travelReqList.isEmpty) {
       return NoDataFound();
     }
     return Container(
@@ -70,7 +86,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
         itemBuilder: (context, index) {
           return ListItem(index);
         },
-        itemCount: widget.pendindLeaveList.length,
+        itemCount: travelReqList.length,
         padding: const EdgeInsets.all(5),
       ),
     );
@@ -98,35 +114,43 @@ class InDirectLeaveState extends State<InDirectLeave> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailWidget( leaveNo , widget.pendindLeaveList[index].leavNo.toString()),
+                        detailWidget( docNo , travelReqList[index].docno.toString()),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget(nametxt,widget.pendindLeaveList[index].name),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        detailWidget(leaveType ,widget.pendindLeaveList[index].horo + widget.pendindLeaveList[index].dedQuta1),
+                        detailWidget(nametxt,travelReqList[index].empName),
                         const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
-                            datedetailWidget(leaveFrom , widget.pendindLeaveList[index].levFr),
+                            datedetailWidget(dateFrom , travelReqList[index].travelDateFrom),
                             const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( leaveTo,widget.pendindLeaveList[index].levT),
+                            datedetailWidget( dateTo,travelReqList[index].travelDateTo),
                           ],
                         ),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget( visitPlace ,widget.pendindLeaveList[index].reason),
+                        Row(
+                          children: [
+                            datedetailWidget(from , travelReqList[index].travelFrom),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            datedetailWidget( to,travelReqList[index].travelTo),
+                          ],
+                        ),
                         const SizedBox(
                           height: 2,
                         ),
 
+                        detailWidget(remarktxt,travelReqList[index].suggested),
+                        const SizedBox(
+                          height: 2,
+                        ),
                         Row(children: [
                           Container(
                             width:  MediaQuery.of(context).size.width/2.2,
@@ -138,7 +162,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                                 selectedIndex = index;
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context, widget.pendindLeaveList[index].leavNo, 0),
+                                  builder: (BuildContext context) => dialogue_removeDevice(context, travelReqList[index].docno,travelReqList[index].pernr ,0),
                                 );
                               },
                               child: IconWidget('assets/svg/delete.svg' ,rejecttxt),
@@ -153,7 +177,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                                 selectedIndex = index;
                                 showDialog(
                                   context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context, widget.pendindLeaveList[index].leavNo,1),
+                                  builder: (BuildContext context) => dialogue_removeDevice(context, travelReqList[index].docno,travelReqList[index].pernr,1),
                                 );
 
                               },
@@ -180,12 +204,12 @@ class InDirectLeaveState extends State<InDirectLeave> {
           height: 32,
         ),
         const SizedBox(width: 5,),
-          robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
+        robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
       ],
     );
   }
 
-  Widget dialogue_removeDevice(BuildContext context, var leaveNo, int i) {
+  Widget dialogue_removeDevice(BuildContext context, String docNo, String sapCode, int i) {
 
     return AlertDialog(
         shape: const RoundedRectangleBorder(
@@ -206,7 +230,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
             height: 10,
           ),
           Text(
-            i == 0 ?  leaveReject:leaveConfirmation,
+            i == 0 ?  travelReject:travelConfirmation,
             style: const TextStyle(
                 color: AppColor.themeColor,
                 fontFamily: 'Roboto',
@@ -237,7 +261,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
                   ),
                 ),
               ),
-             Flexible(
+              Flexible(
                 child: ElevatedButton(
                   onPressed: () {
 
@@ -245,9 +269,9 @@ class InDirectLeaveState extends State<InDirectLeave> {
                     Utility().checkInternetConnection().then((connectionResult) {
                       if (connectionResult) {
                         if (i == 0){
-                          rejectLeave(leaveNo);
+                          rejectTravel(docNo,sapCode);
                         }else {
-                          confirmLeave(leaveNo);
+                          confirmTravel(docNo,sapCode);
                         }
                       } else {
                         Utility()
@@ -274,7 +298,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
         ]));
   }
 
-  detailWidget(String title, var value) {
+  detailWidget(String title, String value) {
     return Container(
       width:MediaQuery.of(context).size.width/1.1,
       height: 26,
@@ -305,28 +329,28 @@ class InDirectLeaveState extends State<InDirectLeave> {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Center(
-            child: Container(
-              height: MediaQuery.of(context).size.height / 10,
-              width: MediaQuery.of(context).size.width,
-              margin: const EdgeInsets.only(left: 20, right: 20),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Color.fromRGBO(30, 136, 229, .5),
-                        blurRadius: 20,
-                        offset: Offset(0, 10))
-                  ]),
-              child: Align(
-                alignment: Alignment.center,
-                child: robotoTextWidget(
-                    textval: noDataFound,
-                    colorval: AppColor.themeColor,
-                    sizeval: 14,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),)
+          child: Container(
+            height: MediaQuery.of(context).size.height / 10,
+            width: MediaQuery.of(context).size.width,
+            margin: const EdgeInsets.only(left: 20, right: 20),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Color.fromRGBO(30, 136, 229, .5),
+                      blurRadius: 20,
+                      offset: Offset(0, 10))
+                ]),
+            child: Align(
+              alignment: Alignment.center,
+              child: robotoTextWidget(
+                  textval: noDataFound,
+                  colorval: AppColor.themeColor,
+                  sizeval: 14,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),)
     );
   }
 
@@ -361,73 +385,86 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
   }
 
-  Future<void> confirmLeave(int leaveNo) async {
+  Future<void> confirmTravel(String docNo, String sapCode) async {
 
     setState(() {
       isLoading  = true;
     });
 
-    dynamic response = await HTTP.get(approveLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString()  ,sharedPreferences.getString(password).toString()  ));
-    if (response != null && response.statusCode == 200)  {
+    dynamic response = await HTTP.get(sendTravelRequestStatus(docNo,sharedPreferences.getString(userID).toString()  ,sapCode, "A"  ));
+    if (response != null && response.statusCode == 200)   {
+      var jsonData = convert.jsonDecode(response.body);
+      ApproveStatusResponse approveStatusResponse = ApproveStatusResponse.fromJson(jsonData);
 
-      Iterable l = convert.json.decode(response.body);
-      List<LeaveApproveResponse> leaveResponse = List<LeaveApproveResponse>.from(l.map((model)=> LeaveApproveResponse.fromJson(model)));
-
-      if(leaveResponse[0].type.compareTo("S") == 0){
-
-        updateSharedPreference("0");
-
-      } else{
-
-        Utility().showToast(leaveResponse[0].msg);
+      if(approveStatusResponse.status.compareTo("true") == 0){
+        updateSharedPreference("0",approveStatusResponse.message);
         setState(() {
           isLoading  = false;
         });
-      }
-    }
-
-  }
-
-  Future<void> rejectLeave(int leaveNo) async {
-
-    setState(() {
-      isLoading  = true;
-    });
-
-    dynamic response = await HTTP.get(rejectLeaveAPI(leaveNo,sharedPreferences.getString(userID).toString() ,sharedPreferences.getString(password).toString() ));
-    if (response != null && response.statusCode == 200)  {
-      var jsonData = convert.jsonDecode(response.body);
-      LeaveRejectResponse leaveResponse = LeaveRejectResponse.fromJson(jsonData);
-      if(leaveResponse.status.compareTo("true") == 0){
-
-        updateSharedPreference("1");
 
       }else{
+        Utility().showInSnackBar(value: approveStatusResponse.message, context: context);
+        setState(() {
+          isLoading  = false;
+        });
+      }
+
+    }else{
+      Utility().showToast(somethingWentWrong);
+      setState(() {
+        isLoading  = false;
+      });
+    }
+
+  }
+
+  Future<void> rejectTravel(String docNo, String sapCode) async {
+
+    setState(() {
+      isLoading  = true;
+    });
+
+    dynamic response = await HTTP.get(sendTravelRequestStatus(docNo,sharedPreferences.getString(userID).toString() ,sapCode, "R" ));
+    if (response != null && response.statusCode == 200)  {
+      var jsonData = convert.jsonDecode(response.body);
+      ApproveStatusResponse approveStatusResponse = ApproveStatusResponse.fromJson(jsonData);
+
+      if(approveStatusResponse.status.compareTo("true") == 0){
+        updateSharedPreference("1",approveStatusResponse.message);
+
         setState(() {
           isLoading  = false;
         });
 
-        Utility().showToast(leaveResponse.message);
+      }else{
+        Utility().showInSnackBar(value: approveStatusResponse.message, context: context);
+        setState(() {
+          isLoading  = false;
+        });
       }
+
     }else{
       Utility().showToast(somethingWentWrong);
+      setState(() {
+        isLoading  = false;
+      });
     }
   }
 
-  updateSharedPreference(String value) async {
+  updateSharedPreference(String value,String mess) async {
 
     dynamic response = await HTTP.get(
-        SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
+        getTravelRequestAPIList(sharedPreferences.getString(userID).toString()));
     if (response != null && response.statusCode == 200) {
       setState(() {
         isLoading  = false;
-        Utility().setSharedPreference(syncSapResponse, response.body.toString());
+        Utility().setSharedPreference(travelRequest, response.body.toString());
       });
 
       if(value=="0"){
-        Utility().showToast(leaveSuccessfully);
+        Utility().showToast(travelConfrimed);
       }else{
-        Utility().showToast(leaveRejectSuccessfully);
+        Utility().showToast(travelRejectSucc);
       }
       Navigator.of(context).pop();
     }else{
@@ -437,7 +474,5 @@ class InDirectLeaveState extends State<InDirectLeave> {
       Utility().showToast(somethingWentWrong);
     }
   }
-
-
-
+ 
 }

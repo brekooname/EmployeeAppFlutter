@@ -898,7 +898,6 @@ class _DailyReportState extends State<DailyReport> {
         onTap: () {
           submitDailyReport();
 
-
         },
         child: Container(
             height: 50,
