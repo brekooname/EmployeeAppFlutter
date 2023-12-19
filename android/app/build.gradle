@@ -61,7 +61,7 @@ android {
         applicationId "shakti.shakti_employee"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 20
+        minSdkVersion 21
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -102,4 +102,5 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
     implementation 'com.google.firebase:firebase-analytics'
     implementation "com.android.support:multidex:2.0.1"
+    implementation "com.google.android.gms:play-services-location:21.0.1"
 }

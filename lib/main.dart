@@ -14,6 +14,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/loginModel/LoginModel.dart';
+import 'package:shakti_employee_app/provider/BackgroundLocationService.dart';
 import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/appupdatewidget.dart';
@@ -74,13 +75,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  ChangeNotifierProvider(
-        create: (context) => firestoreAppUpdateNofifier(),
-        child:MaterialApp(
+    return  MultiProvider(
+        providers: [
+        /*  ChangeNotifierProvider.value(value: firestoreAppUpdateNofifier()),
+          ChangeNotifierProvider.value(value: BackgroundLocationService()),
+        */
+    ChangeNotifierProvider<firestoreAppUpdateNofifier>( create: (context) => firestoreAppUpdateNofifier()),
+    ChangeNotifierProvider<BackgroundLocationService>( create: (context) => BackgroundLocationService()),
+    ],
+        child: MaterialApp(
           title: appName,
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColor.themeColor),
+            primarySwatch: Colors.blue
           ),
           home: isLoggedIn == True
               ? HomePage(
