@@ -4,20 +4,36 @@
 
 import 'dart:convert';
 
-List<OdApproveResponse> odApproveResponseFromJson(String str) => List<OdApproveResponse>.from(json.decode(str).map((x) => OdApproveResponse.fromJson(x)));
+OdApproveResponse odApproveResponseFromJson(String str) => OdApproveResponse.fromJson(json.decode(str));
 
-String odApproveResponseToJson(List<OdApproveResponse> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String odApproveResponseToJson(OdApproveResponse data) => json.encode(data.toJson());
 
 class OdApproveResponse {
+  List<OdStatus> odStatus;
+
+  OdApproveResponse({
+    required this.odStatus,
+  });
+
+  factory OdApproveResponse.fromJson(Map<String, dynamic> json) => OdApproveResponse(
+    odStatus: List<OdStatus>.from(json["OD_status"].map((x) => OdStatus.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "OD_status": List<dynamic>.from(odStatus.map((x) => x.toJson())),
+  };
+}
+
+class OdStatus {
   String type;
   String msg;
 
-  OdApproveResponse({
+  OdStatus({
     required this.type,
     required this.msg,
   });
 
-  factory OdApproveResponse.fromJson(Map<String, dynamic> json) => OdApproveResponse(
+  factory OdStatus.fromJson(Map<String, dynamic> json) => OdStatus(
     type: json["type"],
     msg: json["msg"],
   );

@@ -1,5 +1,5 @@
 import 'dart:convert' as convert;
-import 'package:shakti_employee_app/home/home_page.dart';
+
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:flutter/material.dart';
@@ -102,34 +102,37 @@ class _TaskApprovedState extends State<TaskApproved> {
             ),
             borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
-          child: Stack(children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  displayWidget(docNo, widget.pendingTaskList[index].dno),
-                  displayWidget(mrcType, widget.pendingTaskList[index].mrct1),
-                  displayWidget(assigner, widget.pendingTaskList[index].asgnr1),
-                  taskDescWidget(desc, widget.pendingTaskList[index].agenda),
-                  Row(
-                    children: [
-                      displayWidget(
-                          dateFrom, widget.pendingTaskList[index].comDateFrom),
-                      const SizedBox(
-                        width: 35,
-                      ),
-                      displayWidget(
-                          dateTo, widget.pendingTaskList[index].comDateTo),
-                    ],
-                  ),
-                  assginToSpinnerWidget(context, widget.activeemployeeList),
-                  submitWidget(widget.pendingTaskList[index].dno,
-                      widget.pendingTaskList[index].srno),
-                ],
+          child: Container(
+            color: AppColor.whiteColor,
+            child: Stack(children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    displayWidget(docNo, widget.pendingTaskList[index].dno),
+                    displayWidget(mrcType, widget.pendingTaskList[index].mrct1),
+                    displayWidget(assigner, widget.pendingTaskList[index].asgnr1),
+                    taskDescWidget(desc, widget.pendingTaskList[index].agenda),
+                    Row(
+                      children: [
+                        displayWidget(
+                            dateFrom, widget.pendingTaskList[index].comDateFrom),
+                        const SizedBox(
+                          width: 25,
+                        ),
+                        displayWidget(
+                            dateTo, widget.pendingTaskList[index].comDateTo),
+                      ],
+                    ),
+                    assginToSpinnerWidget(context, widget.activeemployeeList),
+                    submitWidget(widget.pendingTaskList[index].dno,
+                        widget.pendingTaskList[index].srno),
+                  ],
+                ),
               ),
-            ),
-          ])),
+            ]),
+          )),
     ]);
   }
 
