@@ -391,7 +391,7 @@ class _LoginPageState extends State<LoginPage> {
 
     dynamic response = await HTTP.get(userLogin(
         sapCodeController.text.toString(),
-        passwordController.text.toString(),
+        passwordController.text.toString().toUpperCase(),
         platformVersion,
         apiNumber,
         appVersion,

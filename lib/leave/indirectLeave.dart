@@ -425,7 +425,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
       });
 
       if(value=="0"){
-        Utility().showToast(leaveSuccessfully);
+        Utility().showToast(leaveASuccessfully);
       }else{
         Utility().showToast(leaveRejectSuccessfully);
       }

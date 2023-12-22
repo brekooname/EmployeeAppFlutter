@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable, non_constant_identifier_names
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
@@ -386,13 +384,15 @@ class InDirectState extends State<InDirect> {
       var jsonData = convert.jsonDecode(response.body);
       OdApproveResponse odResponse = OdApproveResponse.fromJson(jsonData);
 
-      if (odResponse.type.compareTo("S") == 0) {
+      print('odResponse  ${odResponse.toString()}');
+
+      if (odResponse.odStatus[0].type.compareTo("S") == 0) {
         updateSharedPreference("0");
       } else {
         setState(() {
           isLoading = false;
         });
-        Utility().showToast(odResponse.msg);
+        Utility().showToast(odResponse.odStatus[0].msg);
       }
     } else {
       Utility().showToast(somethingWentWrong);

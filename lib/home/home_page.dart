@@ -283,32 +283,35 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20), topRight: Radius.circular(20)),
         ),
-        child: Column(
-          children: [
-            Container(
-              height: MediaQuery.of(context).size.height / 18,
-              color: AppColor.themeColor,
-              alignment: Alignment.center,
-              child: robotoTextWidget(
-                  textval: title,
-                  colorval: Colors.white,
-                  sizeval: 12,
-                  fontWeight: FontWeight.w600),
-            ),
-            Container(
-              margin: const EdgeInsets.only(bottom: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  imageTextWidget("assets/svg/request.svg", request, title),
-                  dividerWidget(),
-                  imageTextWidget("assets/svg/approved.svg",
-                      title == task ? close : approve, title)
-                ],
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height / 18,
+                color: AppColor.themeColor,
+                alignment: Alignment.center,
+                child: robotoTextWidget(
+                    textval: title,
+                    colorval: Colors.white,
+                    sizeval: 12,
+                    fontWeight: FontWeight.w600),
               ),
-            )
-          ],
+              Container(
+                margin: const EdgeInsets.only(bottom: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    imageTextWidget("assets/svg/request.svg", request, title),
+                    dividerWidget(),
+                    imageTextWidget("assets/svg/approved.svg",
+                        title == task ? close : approve, title)
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -329,32 +332,35 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20), topRight: Radius.circular(20)),
           ),
-          child: Column(
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height / 18,
-                color: AppColor.themeColor,
-                alignment: Alignment.center,
-                child: const robotoTextWidget(
-                    textval: 'Local Convenience',
-                    colorval: Colors.white,
-                    sizeval: 12,
-                    fontWeight: FontWeight.w600),
-              ),
-              Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    localConvenceWidget("assets/svg/start.svg", start, ""),
-                    dividerWidget(),
-                    localConvenceWidget("assets/svg/end.svg", end, ""),
-                    dividerWidget(),
-                    imageTextWidget("assets/svg/offline.svg", Offline, ""),
-                  ],
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height / 18,
+                  color: AppColor.themeColor,
+                  alignment: Alignment.center,
+                  child: const robotoTextWidget(
+                      textval: 'Local Convenience',
+                      colorval: Colors.white,
+                      sizeval: 12,
+                      fontWeight: FontWeight.w600),
                 ),
-              )
-            ],
+                Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      localConvenceWidget("assets/svg/start.svg", start, ""),
+                      dividerWidget(),
+                      localConvenceWidget("assets/svg/end.svg", end, ""),
+                      dividerWidget(),
+                      imageTextWidget("assets/svg/offline.svg", Offline, ""),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ));
   }
@@ -383,23 +389,26 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20), topRight: Radius.circular(20)),
           ),
-          child: Column(
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height / 18,
-                color: AppColor.themeColor,
-                alignment: Alignment.center,
-                child: robotoTextWidget(
-                    textval: title,
-                    colorval: Colors.white,
-                    sizeval: 12,
-                    fontWeight: FontWeight.w600),
-              ),
-              Container(
-                margin: const EdgeInsets.only(bottom: 10, top: 10),
-                child: imageTextWidget(svg, title, title),
-              )
-            ],
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                Container(
+                  height: MediaQuery.of(context).size.height / 18,
+                  color: AppColor.themeColor,
+                  alignment: Alignment.center,
+                  child: robotoTextWidget(
+                      textval: title,
+                      colorval: Colors.white,
+                      sizeval: 12,
+                      fontWeight: FontWeight.w600),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 10, top: 10),
+                  child: imageTextWidget(svg, title, title),
+                )
+              ],
+            ),
           ),
         ));
   }
