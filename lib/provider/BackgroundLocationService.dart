@@ -1,25 +1,35 @@
+import 'dart:async';
 import 'dart:developer';
-
+import 'dart:ffi';
 import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../Util/utility.dart';
+import '../database/database_helper.dart';
+import '../home/model/WayPointsModel.dart';
+import '../home/model/local_convence_model.dart';
+import '../webservice/constant.dart';
 
 class BackgroundLocationService extends ChangeNotifier {
   String latitude = 'waiting...';
   String longitude = 'waiting...';
-  String altitude = 'waiting...';
-  String accuracy = 'waiting...';
-  String bearing = 'waiting...';
-  String speed = 'waiting...';
-  String time = 'waiting...';
-  String address = 'waiting...';
+  String wayPoint ="";
   LatLng? latlong;
+  late SharedPreferences sharedPreferences;
+  List<WayPointsModel> wayPointList = [];
+  List<LocalConveyanceModel> localConveyanceList = [];
+  Timer? timer;
+  var MeterDistance = 30;
+
+
   BackgroundLocationService() {
-    log('Creating Singleton of BackgroundLocationService');
+    log('Creating Singleton of BackgroundLocationServiceSingleton');
   }
-  var _count = 0;
-  int get count => _count;
+
   Future<void> startLocationFetch() async {
     print('startLocationFetch=====>true');
     await BackgroundLocation.setAndroidNotification(
@@ -27,47 +37,83 @@ class BackgroundLocationService extends ChangeNotifier {
       message: 'Background location in progress',
       icon: '@mipmap/ic_launcher',
     );
-    //await BackgroundLocation.setAndroidConfiguration(1000);
-    await BackgroundLocation.startLocationService(
-        distanceFilter: 20);
-    BackgroundLocation.getLocationUpdates((location) async {
 
-        latitude = location.latitude.toString();
-        longitude = location.longitude.toString();
-        accuracy = location.accuracy.toString();
-        altitude = location.altitude.toString();
-        bearing = location.bearing.toString();
-        speed = location.speed.toString();
-        time = DateTime.fromMillisecondsSinceEpoch(
-            location.time!.toInt())
-            .toString();
+    timer = Timer.periodic(Duration(seconds: 15), (Timer t) => getLatLng());
 
-      print('''\n
-                        Latitude:  $latitude
-                        Longitude: $longitude
-                        Altitude: $altitude
-                        Accuracy: $accuracy
-                        Bearing:  $bearing
-                        Speed: $speed
-                        Time: $time
-                      ''');
-
-        latlong = LatLng(location.latitude!.toDouble(), location.longitude!.toDouble());
-        List<Placemark> placemarks = await placemarkFromCoordinates(
-            location.latitude!.toDouble(), location.longitude!.toDouble(),
-            localeIdentifier: 'en');
-        Placemark place = placemarks[0];
-        address =
-        '${place.street},  ${place.subAdministrativeArea},  ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.postalCode}';
-
-        print('address====>$address');
-    });
-
-    notifyListeners();
   }
 
   void stopLocationFetch() {
-    BackgroundLocation.stopLocationService();
+    timer?.cancel();
     notifyListeners();
   }
+
+  getLatLng() async {
+    print("MethodStart=====>true");
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    latitude = position.latitude.toString();
+    longitude = position.longitude.toString();
+    print('''\n
+                        Latitude:  $latitude
+                        Longitude: $longitude
+                       
+                      ''');
+
+    sharedPreferences = await SharedPreferences.getInstance();
+
+    print('''\n    Latitude:  $latitude  Longitude: $longitude    ''');
+    print('''\n    Latitude222:  ${sharedPreferences.getString(FromLatitude)}  Longitude2222: ${sharedPreferences.getString(FromLongitude)}    ''');
+
+    if(sharedPreferences.getString(FromLatitude)!=null && !sharedPreferences.getString(FromLatitude).toString().isEmpty
+        && sharedPreferences.getString(FromLatitude)!=latitude) {
+
+      print('calculateDistance========>${Utility().calculateDistance(double.parse(sharedPreferences.getString(FromLatitude).toString()),
+          double.parse(sharedPreferences.getString(FromLongitude).toString()),double.parse(latitude),double.parse(longitude))}');
+
+      var calculateDistance = Utility().calculateDistance(double.parse(sharedPreferences.getString(FromLatitude).toString()),
+          double.parse(sharedPreferences.getString(FromLongitude).toString()),double.parse(latitude),double.parse(longitude));
+
+     if(calculateDistance>MeterDistance){
+      List<Map<String, dynamic>> listMap =
+      await DatabaseHelper.instance.queryAllLocalConveyance();
+        listMap.forEach(
+                (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
+        if (localConveyanceList.isNotEmpty) {
+          List<Map<String, dynamic>> listMap =
+          await DatabaseHelper.instance.queryAllWaypoints(
+              localConveyanceList[localConveyanceList.length - 1]
+                  .toMapWithoutId());
+
+          listMap.forEach(
+                  (map) => wayPointList.add(WayPointsModel.fromMap(map)));
+
+          for (var j = 0; j < wayPointList.length; j++) {
+
+            wayPoint = wayPointList[j].latlng + "|" + "via:" + latitude + "," +
+                longitude;
+          }
+
+          print('wayPoint=======>$wayPoint');
+          if(!wayPointList.contains(wayPoint)) {
+            WayPointsModel waypoints = WayPointsModel(
+                userId: sharedPreferences.getString(userID).toString(),
+                latlng: wayPoint,
+                createDate: wayPointList[wayPointList.length - 1].createDate,
+                createTime: wayPointList[wayPointList.length - 1].createTime,
+                endDate: '',
+                endTime: '');
+            DatabaseHelper.instance.updateWaypoints(waypoints.toMapWithoutId());
+            Utility().setSharedPreference(
+                FromLatitude, latitude);
+            Utility().setSharedPreference(
+                FromLongitude, longitude);
+            print('DatabseUpdate=======>true');
+
+            notifyListeners();
+          }
+        }
+        }
+    }
+  }
 }
+

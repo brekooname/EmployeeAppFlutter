@@ -30,10 +30,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'dev.flutter.flutter-gradle-plugin'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 33
+    namespace "shakti.shakti_employee"
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
     signingConfigs {
         release {
@@ -62,36 +64,21 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
+
     }
 
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            shrinkResources false
-        }
-
-        dubug {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
-            minifyEnabled false
-            shrinkResources false
         }
-
     }
-    lintOptions {
-        checkReleaseBuilds false
     }
-    defaultConfig {
-        multiDexEnabled true
-    }
-}
 
 flutter {
     source '../..'
@@ -101,6 +88,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
     implementation 'com.google.firebase:firebase-analytics'
-    implementation "com.android.support:multidex:2.0.1"
-    implementation "com.google.android.gms:play-services-location:21.0.1"
+    implementation "com.android.support:multidex:2.0.1"/*
+    implementation "com.google.android.gms:play-services-location:21.0.1"*/
 }

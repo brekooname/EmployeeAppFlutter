@@ -13,6 +13,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
+import 'package:shakti_employee_app/firebase_options.dart';
 import 'package:shakti_employee_app/loginModel/LoginModel.dart';
 import 'package:shakti_employee_app/provider/BackgroundLocationService.dart';
 import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
@@ -30,6 +31,7 @@ import 'home/model/firestoredatamodel.dart';
 import 'notificationService/local_notification_service.dart';
 import 'theme/string.dart';
 
+
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(message.data.toString());
   print(message.notification!.title);
@@ -37,7 +39,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   LocalNotificationService.initialize();
   await Permission.notification.isDenied.then((value) {
@@ -75,14 +77,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MultiProvider(
+    return MultiProvider(
         providers: [
-        /*  ChangeNotifierProvider.value(value: firestoreAppUpdateNofifier()),
-          ChangeNotifierProvider.value(value: BackgroundLocationService()),
-        */
-    ChangeNotifierProvider<firestoreAppUpdateNofifier>( create: (context) => firestoreAppUpdateNofifier()),
-    ChangeNotifierProvider<BackgroundLocationService>( create: (context) => BackgroundLocationService()),
-    ],
+          ChangeNotifierProvider(create: (_) => firestoreAppUpdateNofifier()),
+          ChangeNotifierProvider(create: (_) => BackgroundLocationService()),
+        ],
         child: MaterialApp(
           title: appName,
           debugShowCheckedModeBanner: false,

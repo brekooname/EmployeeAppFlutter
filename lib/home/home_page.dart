@@ -21,12 +21,14 @@ import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
 import 'package:shakti_employee_app/gatepass/model/PendingGatePassResponse.dart';
 import 'package:shakti_employee_app/home/model/FirestoreDataModel.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
+import 'package:shakti_employee_app/home/model/WayPointsModel.dart';
 import 'package:shakti_employee_app/home/model/distance_calculate_model.dart'
     as distancePrefix;
 import 'package:shakti_employee_app/home/model/personalindoresponse.dart';
 import 'package:shakti_employee_app/leave/LeaveRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officalRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officialApprove.dart';
+import 'package:shakti_employee_app/provider/BackgroundLocationService.dart';
 import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
 import 'package:shakti_employee_app/task/taskApprove.dart';
 import 'package:shakti_employee_app/task/taskRequest.dart';
@@ -96,7 +98,7 @@ class _HomePageState extends State<HomePage> {
   TR.TravelRequestList? travelRequestList;
   TextEditingController travelModeController = TextEditingController();
   FirestoreDataModel? fireStoreDataModel;
-
+  BackgroundLocationService? backgroundLocationService;
   @override
   void initState() {
     // TODO: implement initState
@@ -147,6 +149,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+      backgroundLocationService = Provider.of<BackgroundLocationService>(context,listen: true);
+
+    // TODO: implement build
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -521,8 +527,12 @@ class _HomePageState extends State<HomePage> {
       setVendorgatePassData();
     }
 
+    if (journeyStart == True){
+      backgroundLocationService?.startLocationFetch();
+    }
 
-  }
+
+    }
 
   imageTextWidget(String svg, String msg, String title) {
     return GestureDetector(
@@ -619,22 +629,22 @@ class _HomePageState extends State<HomePage> {
         switch (msg) {
           case "Start":
             if(!isLoading)  {
-              if (journeyStart == False) {
+
                 getCurrentLocation();
                 setState(() {
                   isLoading = true;
                 });
-              }
+
             }
             break;
           case "End":
             if(!isLoading)   {
-              if (journeyStart == True) {
+
                 getCurrentLocation();
                 setState(() {
                   isLoading = true;
                 });
-              }
+
             }
             break;
         }
@@ -887,6 +897,7 @@ class _HomePageState extends State<HomePage> {
 
   void showJourneyDialogue() {
     if (journeyStart == False) {
+
       showDialog(
         context: context,
         builder: (BuildContext context) => startJourneyPopup(context),
@@ -972,6 +983,7 @@ class _HomePageState extends State<HomePage> {
                   Flexible(
                     child: ElevatedButton(
                       onPressed: () {
+                        backgroundLocationService?.startLocationFetch();
                         String currentDate =
                             DateFormat('yyyyMMdd').format(DateTime.now());
                         String currentTime =
@@ -993,12 +1005,27 @@ class _HomePageState extends State<HomePage> {
                           endTime: '',
                         );
 
+                        String latlng = "via:" + latlong!.latitude.toString() + "," + latlong!.longitude.toString();
+
+                        WayPointsModel waypoints = WayPointsModel(userId: sharedPreferences.getString(userID).toString(),
+                            latlng: latlng,
+                            createDate: currentDate,
+                            createTime: currentTime,
+                            endDate: '',
+                            endTime: '');
+
                         setState(() {
-                          journeyStart = True;
+                         journeyStart = True;
+                         DatabaseHelper.instance
+                             .insertWaypoints(waypoints.toMapWithoutId());
+                         DatabaseHelper.instance
+                             .insertLocalConveyance(localConveyance.toMapWithoutId());
                           Utility().setSharedPreference(
-                              localConveyanceJourneyStart, True);
-                          DatabaseHelper.instance.insertLocalConveyance(
-                              localConveyance.toMapWithoutId());
+                              FromLatitude, latlong!.latitude.toString());
+                         Utility().setSharedPreference(
+                             FromLongitude, latlong!.longitude.toString());
+                         Utility().setSharedPreference(
+                             localConveyanceJourneyStart, True);
                         });
                         Navigator.of(context).pop();
                       },
@@ -1102,6 +1129,7 @@ class _HomePageState extends State<HomePage> {
                                     .checkInternetConnection()
                                     .then((connectionResult) {
                                   if (connectionResult) {
+
                                     setState(() {
                                       isLoading = true;
                                       syncTravelDataAPI(localConveyanceList,
@@ -1199,12 +1227,14 @@ class _HomePageState extends State<HomePage> {
       jsonData = convert.jsonDecode(response.body);
       SyncAndroidToSapResponse androidToSapResponse =
           SyncAndroidToSapResponse.fromJson(jsonData);
-      setState(() {
-        syncAndroidToSapResponse = androidToSapResponse;
-        Utility()
-            .setSharedPreference(syncSapResponse, response.body.toString());
-        Utility().setSharedPreference(currentDate, formattedDate);
-      });
+      if(mounted) {
+        setState(() {
+          syncAndroidToSapResponse = androidToSapResponse;
+          Utility()
+              .setSharedPreference(syncSapResponse, response.body.toString());
+          Utility().setSharedPreference(currentDate, formattedDate);
+        });
+      }
       setListData();
     }
 
@@ -1488,6 +1518,7 @@ class _HomePageState extends State<HomePage> {
 
       print('jsonData=====>$jsonData');
       setState(() {
+        backgroundLocationService?.stopLocationFetch();
         journeyStart = False;
         Utility().setSharedPreference(localConveyanceJourneyStart, False);
         DatabaseHelper.instance

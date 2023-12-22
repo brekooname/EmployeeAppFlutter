@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 6.9.0+55
+version: 6.9.0+56
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -43,27 +43,27 @@ dependencies:
   fluttertoast: ^8.0.9
   permission_handler: ^10.0.0
   group_radio_button: ^1.2.0
-  geolocator: ^10.1.0
-  geocoding: ^2.1.1
   image_watermark: ^0.0.5
   image: ^3.2.2
   searchfield: ^0.8.3
   webview_flutter: ^4.2.2
   package_info_plus: ^3.0.3
-  google_maps_flutter: ^2.5.0
   sqflite: ^2.3.0
   path_provider: ^2.1.0
   url_launcher: ^6.1.12
   image_picker: ^1.0.2
-  firebase_auth: ^4.7.3
-  firebase_core: ^2.15.1
-  firebase_messaging: ^14.7.3
+  firebase_auth: ^4.15.3
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.9
   cloud_firestore: ^4.13.6
-  flutter_local_notifications: ^15.1.0+1
-  firebase_crashlytics: ^3.3.5
+  flutter_local_notifications: ^16.2.0
+  firebase_crashlytics: ^3.4.8
   device_info_plus: ^9.0.3
-  provider: ^6.0.5
   background_location: ^0.11.8
+  provider: ^6.1.1
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+  google_maps_flutter: ^2.5.0
 
 dev_dependencies:
   flutter_test:
