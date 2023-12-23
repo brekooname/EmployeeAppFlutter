@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Util/utility.dart';
@@ -21,6 +23,7 @@ class BackgroundLocationService extends ChangeNotifier {
   List<LocalConveyanceModel> localConveyanceList = [];
   Timer? timer;
   var MeterDistance = 30;
+  bool _serviceEnabled = false;
 
 
   BackgroundLocationService() {
@@ -28,9 +31,32 @@ class BackgroundLocationService extends ChangeNotifier {
   }
 
   Future<void> startLocationFetch() async {
-    print('startLocationFetch=====>true');
+    sharedPreferences = await SharedPreferences.getInstance();
 
-    timer = Timer.periodic(Duration(seconds: 15), (Timer t) => getLatLng());
+    Location location = new Location();
+    var _permissionGranted = await location.hasPermission();
+    _serviceEnabled = await location.serviceEnabled();
+    if (_permissionGranted != PermissionStatus.granted || !_serviceEnabled) {
+      _permissionGranted = await location.requestPermission();
+      _serviceEnabled = await location.requestService();
+    } else {
+      location.enableBackgroundMode(enable: true);
+      location.onLocationChanged.listen((LocationData currentLocation) {
+        // Use current location
+
+        if(currentLocation!=null && currentLocation.toString().isNotEmpty) {
+
+          if(sharedPreferences.getString(localConveyanceJourneyStart)==True) {
+            latitude = currentLocation.latitude.toString();
+            longitude = currentLocation.longitude.toString();
+
+            getLatLng();
+          }
+        }
+      });
+    }
+   // timer = Timer.periodic(Duration(seconds: 15), (Timer t) => getLatLng());
+
 
   }
 
@@ -41,17 +67,8 @@ class BackgroundLocationService extends ChangeNotifier {
 
   getLatLng() async {
     print("MethodStart=====>true");
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    latitude = position.latitude.toString();
-    longitude = position.longitude.toString();
-    print('''\n
-                        Latitude:  $latitude
-                        Longitude: $longitude
-                       
-                      ''');
 
-    sharedPreferences = await SharedPreferences.getInstance();
+
 
     print('''\n    Latitude:  $latitude  Longitude: $longitude    ''');
     print('''\n    Latitude222:  ${sharedPreferences.getString(FromLatitude)}  Longitude2222: ${sharedPreferences.getString(FromLongitude)}    ''');
