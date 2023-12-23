@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:ffi';
-import 'package:background_location/background_location.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Util/utility.dart';
@@ -32,11 +29,6 @@ class BackgroundLocationService extends ChangeNotifier {
 
   Future<void> startLocationFetch() async {
     print('startLocationFetch=====>true');
-    await BackgroundLocation.setAndroidNotification(
-      title: 'Background service is running',
-      message: 'Background location in progress',
-      icon: '@mipmap/ic_launcher',
-    );
 
     timer = Timer.periodic(Duration(seconds: 15), (Timer t) => getLatLng());
 

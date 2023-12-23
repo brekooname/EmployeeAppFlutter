@@ -59,7 +59,6 @@ dependencies:
   flutter_local_notifications: ^16.2.0
   firebase_crashlytics: ^3.4.8
   device_info_plus: ^9.0.3
-  background_location: ^0.11.8
   provider: ^6.1.1
   geolocator: ^10.1.0
   geocoding: ^2.1.1
