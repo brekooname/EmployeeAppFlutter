@@ -67,9 +67,6 @@ class BackgroundLocationService extends ChangeNotifier {
 
   getLatLng() async {
     print("MethodStart=====>true");
-
-
-
     print('''\n    Latitude:  $latitude  Longitude: $longitude    ''');
     print('''\n    Latitude222:  ${sharedPreferences.getString(FromLatitude)}  Longitude2222: ${sharedPreferences.getString(FromLongitude)}    ''');
 

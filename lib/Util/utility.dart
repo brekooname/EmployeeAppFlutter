@@ -122,4 +122,5 @@ class Utility {
     var Km = 12742 * asin(sqrt(a));
     return Km * 1000;
   }
-}
+
+ }
