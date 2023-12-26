@@ -166,7 +166,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
       print('list=====$list');
 
       if(list.length>20){
-     double  position = list.length/4;
+     double  position = list.length/15;
      int pos = position.round();
      print("position=====>$position");
      print("position2222=====>${position.round()}");
@@ -244,7 +244,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         content: SingleChildScrollView(
             child: Container(
-                height: MediaQuery.of(context).size.height / 1.7,
+                height: MediaQuery.of(context).size.height / 1.6,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,6 +409,8 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
   Future<void> syncTravelDataAPI(
       LocalConveyanceModel LocalConveyance, distancePrefix.DistanceCalculateModel distanceCalculateModel,) async {
 
+    totalWayPoints = totalWayPoints.replaceAll("via:", "");
+
     allLatLng = '${LocalConveyance.fromLatitude},'
         '${LocalConveyance.fromLongitude},'
         '${LocalConveyance.toLatitude},'
@@ -423,7 +425,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
         endLat: LocalConveyance.toLatitude,
         startLong: LocalConveyance.fromLongitude,
         endLong: LocalConveyance.toLongitude,
-        latLong111: allLatLng!,
+        latLong111: totalWayPoints,
         startLocation: '${LocalConveyance.fromLatitude},${LocalConveyance.fromLongitude}',
         endLocation: '${LocalConveyance.toLatitude},${LocalConveyance.toLongitude}',
         distance: distanceCalculateModel
@@ -431,6 +433,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
         travelMode: travelModeController.text.toString(),
         latLong: allLatLng!));
     String value = convert.jsonEncode(travelList).toString();
+    print('travelList======>${travelList.toString()}');
   var jsonData = null;
     dynamic response = await HTTP.get(syncLocalConveyanceAPI(value));
     if (response != null && response.statusCode == 200) {

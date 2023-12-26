@@ -1071,7 +1071,7 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         content: SingleChildScrollView(
             child: Container(
-                height: MediaQuery.of(context).size.height / 1.7,
+                height: MediaQuery.of(context).size.height / 1.6,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1497,7 +1497,7 @@ class _HomePageState extends State<HomePage> {
       print('list_length====>${list.length}');
 
       if(list.length>20){
-        double  position = list.length/4;
+        double  position = list.length/15;
         int pos = position.round();
         print("position=====>$position");
         print("position2222=====>${position.round()}");
@@ -1568,8 +1568,14 @@ class _HomePageState extends State<HomePage> {
     LocalConveyanceModel LocalConveyance,
     distancePrefix.DistanceCalculateModel distanceCalculateModel,
   ) async {
+
+
     String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
     String currentTime = DateFormat('HHmmss').format(DateTime.now());
+
+    totalWayPoints = totalWayPoints.replaceAll("via:", "");
+
+
     allLatLng = '${LocalConveyance.fromLatitude},'
         '${LocalConveyance.fromLongitude},'
         '${LocalConveyance.toLatitude},'
@@ -1584,7 +1590,7 @@ class _HomePageState extends State<HomePage> {
         endLat: latlong!.latitude.toString(),
         startLong: LocalConveyance.fromLongitude,
         endLong: latlong!.longitude.toString(),
-        latLong111: allLatLng,
+        latLong111: totalWayPoints,
         startLocation: '${LocalConveyance.fromLatitude},${LocalConveyance.fromLongitude}',
         endLocation: '${LocalConveyance.toLatitude},${LocalConveyance.toLongitude}',
         distance: distanceCalculateModel.routes[0].legs[0].distance.text,

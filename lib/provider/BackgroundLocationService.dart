@@ -22,7 +22,7 @@ class BackgroundLocationService extends ChangeNotifier {
   List<WayPointsModel> wayPointList = [];
   List<LocalConveyanceModel> localConveyanceList = [];
   Timer? timer;
-  var MeterDistance = 30;
+  var MeterDistance = 50;
   bool _serviceEnabled = false;
 
 
