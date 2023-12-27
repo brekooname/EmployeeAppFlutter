@@ -21,12 +21,14 @@ import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
 import 'package:shakti_employee_app/gatepass/model/PendingGatePassResponse.dart';
 import 'package:shakti_employee_app/home/model/FirestoreDataModel.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
+import 'package:shakti_employee_app/home/model/WayPointsModel.dart';
 import 'package:shakti_employee_app/home/model/distance_calculate_model.dart'
     as distancePrefix;
 import 'package:shakti_employee_app/home/model/personalindoresponse.dart';
 import 'package:shakti_employee_app/leave/LeaveRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officalRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officialApprove.dart';
+import 'package:shakti_employee_app/provider/BackgroundLocationService.dart';
 import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
 import 'package:shakti_employee_app/task/taskApprove.dart';
 import 'package:shakti_employee_app/task/taskRequest.dart';
@@ -89,6 +91,7 @@ class _HomePageState extends State<HomePage> {
   List<vendorGatePassPrefix.Response> vendorGatePassList = [];
   List<TravelModel> travelList = [];
   List<LocalConveyanceModel> localConveyanceList = [];
+  List<WayPointsModel> wayPointList = [];
   SyncAndroidToSapResponse? syncAndroidToSapResponse;
   PersonalInfoResponse? personInfo;
   PendingGatePassResponse? gatePassResponse;
@@ -96,7 +99,9 @@ class _HomePageState extends State<HomePage> {
   TR.TravelRequestList? travelRequestList;
   TextEditingController travelModeController = TextEditingController();
   FirestoreDataModel? fireStoreDataModel;
+  BackgroundLocationService? backgroundLocationService;
 
+  var totalWayPoints ="";
   @override
   void initState() {
     // TODO: implement initState
@@ -147,6 +152,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+      backgroundLocationService = Provider.of<BackgroundLocationService>(context,listen: true);
+
+    // TODO: implement build
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -530,8 +539,12 @@ class _HomePageState extends State<HomePage> {
       setVendorgatePassData();
     }
 
+    if (journeyStart == True){
+      backgroundLocationService?.startLocationFetch();
+    }
 
-  }
+
+    }
 
   imageTextWidget(String svg, String msg, String title) {
     return GestureDetector(
@@ -628,22 +641,22 @@ class _HomePageState extends State<HomePage> {
         switch (msg) {
           case "Start":
             if(!isLoading)  {
-              if (journeyStart == False) {
+
                 getCurrentLocation();
                 setState(() {
                   isLoading = true;
                 });
-              }
+
             }
             break;
           case "End":
             if(!isLoading)   {
-              if (journeyStart == True) {
+
                 getCurrentLocation();
                 setState(() {
                   isLoading = true;
                 });
-              }
+
             }
             break;
         }
@@ -896,6 +909,7 @@ class _HomePageState extends State<HomePage> {
 
   void showJourneyDialogue() {
     if (journeyStart == False) {
+
       showDialog(
         context: context,
         builder: (BuildContext context) => startJourneyPopup(context),
@@ -981,6 +995,7 @@ class _HomePageState extends State<HomePage> {
                   Flexible(
                     child: ElevatedButton(
                       onPressed: () {
+                        backgroundLocationService?.startLocationFetch();
                         String currentDate =
                             DateFormat('yyyyMMdd').format(DateTime.now());
                         String currentTime =
@@ -1002,12 +1017,27 @@ class _HomePageState extends State<HomePage> {
                           endTime: '',
                         );
 
+                        String latlng = "via:" + latlong!.latitude.toString() + "," + latlong!.longitude.toString();
+
+                        WayPointsModel waypoints = WayPointsModel(userId: sharedPreferences.getString(userID).toString(),
+                            latlng: latlng,
+                            createDate: currentDate,
+                            createTime: currentTime,
+                            endDate: '',
+                            endTime: '');
+
                         setState(() {
-                          journeyStart = True;
+                         journeyStart = True;
+                         DatabaseHelper.instance
+                             .insertWaypoints(waypoints.toMapWithoutId());
+                         DatabaseHelper.instance
+                             .insertLocalConveyance(localConveyance.toMapWithoutId());
                           Utility().setSharedPreference(
-                              localConveyanceJourneyStart, True);
-                          DatabaseHelper.instance.insertLocalConveyance(
-                              localConveyance.toMapWithoutId());
+                              FromLatitude, latlong!.latitude.toString());
+                         Utility().setSharedPreference(
+                             FromLongitude, latlong!.longitude.toString());
+                         Utility().setSharedPreference(
+                             localConveyanceJourneyStart, True);
                         });
                         Navigator.of(context).pop();
                       },
@@ -1041,7 +1071,7 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         content: SingleChildScrollView(
             child: Container(
-                height: MediaQuery.of(context).size.height / 1.7,
+                height: MediaQuery.of(context).size.height / 1.6,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1068,13 +1098,13 @@ class _HomePageState extends State<HomePage> {
                         '$toLongitude  $toLongitud',
                       ),
                       latLongWidget(
-                        '$fromAddress ${distanceCalculateModel.originAddresses[0]}',
+                        '$fromAddress ${distanceCalculateModel.routes[0].legs[0].startAddress}',
                       ),
                       latLongWidget(
-                        '$toAddress ${distanceCalculateModel.destinationAddresses[0]}',
+                        '$toAddress ${distanceCalculateModel.routes[0].legs[0].endAddress}',
                       ),
                       latLongWidget(
-                        '$distanceTravelled ${distanceCalculateModel.rows[0].elements[0].distance.text}',
+                        '$distanceTravelled ${distanceCalculateModel.routes[0].legs[0].distance.text.toString()}',
                       ),
                       travelModeWidget(),
                       const SizedBox(
@@ -1111,10 +1141,10 @@ class _HomePageState extends State<HomePage> {
                                     .checkInternetConnection()
                                     .then((connectionResult) {
                                   if (connectionResult) {
+
                                     setState(() {
                                       isLoading = true;
-                                      syncTravelDataAPI(localConveyanceList,
-                                          distanceCalculateModel);
+                                      syncTravelDataAPI(localConveyanceList,distanceCalculateModel);
                                     });
                                   } else {
                                     Utility().showInSnackBar(
@@ -1208,12 +1238,14 @@ class _HomePageState extends State<HomePage> {
       jsonData = convert.jsonDecode(response.body);
       SyncAndroidToSapResponse androidToSapResponse =
           SyncAndroidToSapResponse.fromJson(jsonData);
-      setState(() {
-        syncAndroidToSapResponse = androidToSapResponse;
-        Utility()
-            .setSharedPreference(syncSapResponse, response.body.toString());
-        Utility().setSharedPreference(currentDate, formattedDate);
-      });
+      if(mounted) {
+        setState(() {
+          syncAndroidToSapResponse = androidToSapResponse;
+          Utility()
+              .setSharedPreference(syncSapResponse, response.body.toString());
+          Utility().setSharedPreference(currentDate, formattedDate);
+        });
+      }
       setListData();
     }
 
@@ -1437,38 +1469,113 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> calculateDistance(
       LocalConveyanceModel localConveyanceList) async {
-    var jsonData;
-    String toLatitude = latlong!.latitude.toString();
-    String toLongitude = latlong!.longitude.toString();
-    dynamic response = await HTTP.get(getDistanceAPI(
-        '${localConveyanceList.fromLatitude},${localConveyanceList.fromLongitude}',
-        '$toLatitude,$toLongitude'));
-    if (response != null && response.statusCode == 200) {
-      jsonData = convert.jsonDecode(response.body);
-      distancePrefix.DistanceCalculateModel distanceCalculateModel =
-          distancePrefix.DistanceCalculateModel.fromJson(jsonData);
-      if (distanceCalculateModel.rows.isNotEmpty &&
-          distanceCalculateModel.rows[0].elements.isNotEmpty &&
-          distanceCalculateModel.rows[0].elements[0].distance.text.isNotEmpty) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) => stopJourneyPopup(
-              context,
-              distanceCalculateModel,
-              localConveyanceList,
-              toLatitude,
-              toLongitude),
-        );
+
+    List<WayPointsModel> wayPointList = [];
+    List<LocalConveyanceModel> localConveyanceList = [];
+
+    List<Map<String, dynamic>> listMap =
+    await DatabaseHelper.instance.queryAllLocalConveyance();
+    listMap.forEach(
+            (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
+    if (localConveyanceList.isNotEmpty) {
+      List<Map<String, dynamic>> listMap =
+      await DatabaseHelper.instance.queryAllWaypoints(
+          localConveyanceList[localConveyanceList.length - 1]
+              .toMapWithoutId());
+
+      listMap.forEach(
+              (map) => wayPointList.add(WayPointsModel.fromMap(map)));
+
+     print('wayPointList======>${wayPointList[wayPointList.length - 1].latlng}');
+
+      String waypoints =wayPointList[wayPointList.length - 1].latlng;
+
+      List<String> list = waypoints.split("|");
+
+      print('list====>${list.toString()}');
+
+      print('list_length====>${list.length}');
+
+      if(list.length>20){
+        double  position = list.length/15;
+        int pos = position.round();
+        print("position=====>$position");
+        print("position2222=====>${position.round()}");
+
+
+        for (int i = 0; i <= list.length; i++) {
+          if (i != 0 && i != list.length - 1) {
+            if (totalWayPoints.isEmpty) {
+
+              totalWayPoints = list[pos * i];
+              print('positi====>${i}======>${list[pos * i]}');
+            } else {
+              if (pos * i < list.length) {
+                if (!totalWayPoints.contains(list[pos * i])) {
+                  totalWayPoints = totalWayPoints + "|" + list[pos * i];
+                  print('positi====>${i}======>${list[pos * i]}');
+                }
+              }
+            }
+          }
+        }
+
+      }else {
+        for (int i = 0; i <= list.length; i++) {
+          if (totalWayPoints.isEmpty) {
+            totalWayPoints = list[i];
+          } else {
+            if (i < list.length) {
+              if (!totalWayPoints.contains(list[i])) {
+                totalWayPoints = totalWayPoints + "|" + list[i];
+              }
+            }
+          }
+        }
       }
-    }
-  }
+      print('totalWayPoints======>${totalWayPoints.toString()}');
+
+      var jsonData;
+      String toLatitude = latlong!.latitude.toString();
+      String toLongitude = latlong!.longitude.toString();
+      dynamic response = await HTTP.get(getDistanceAPI(
+          '${localConveyanceList[localConveyanceList.length-1].fromLatitude},'
+              '${localConveyanceList[localConveyanceList.length-1].fromLongitude}',
+          '$toLatitude,$toLongitude','${totalWayPoints.toString()}'));
+      if (response != null && response.statusCode == 200) {
+        jsonData = convert.jsonDecode(response.body);
+        print('jsonData=====>$jsonData');
+        distancePrefix.DistanceCalculateModel distanceCalculateModel =
+        distancePrefix.DistanceCalculateModel.fromJson(jsonData);
+        if (distanceCalculateModel.routes.isNotEmpty &&
+            distanceCalculateModel.routes[0].legs.isNotEmpty &&
+            distanceCalculateModel.routes[0].legs[0].distance.text.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => stopJourneyPopup(
+                context,
+                distanceCalculateModel,
+                localConveyanceList[localConveyanceList.length-1],
+                toLatitude,
+                toLongitude),
+          );
+        }
+      }
+
+    }}
 
   Future<void> syncTravelDataAPI(
     LocalConveyanceModel LocalConveyance,
     distancePrefix.DistanceCalculateModel distanceCalculateModel,
   ) async {
+
+
     String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
     String currentTime = DateFormat('HHmmss').format(DateTime.now());
+
+    totalWayPoints = totalWayPoints.replaceAll("via:", "");
+
+
     allLatLng = '${LocalConveyance.fromLatitude},'
         '${LocalConveyance.fromLongitude},'
         '${LocalConveyance.toLatitude},'
@@ -1483,10 +1590,10 @@ class _HomePageState extends State<HomePage> {
         endLat: latlong!.latitude.toString(),
         startLong: LocalConveyance.fromLongitude,
         endLong: latlong!.longitude.toString(),
-        latLong111: allLatLng,
-        startLocation: distanceCalculateModel.originAddresses[0],
-        endLocation: distanceCalculateModel.destinationAddresses[0],
-        distance: distanceCalculateModel.rows[0].elements[0].distance.text,
+        latLong111: totalWayPoints,
+        startLocation: '${LocalConveyance.fromLatitude},${LocalConveyance.fromLongitude}',
+        endLocation: '${LocalConveyance.toLatitude},${LocalConveyance.toLongitude}',
+        distance: distanceCalculateModel.routes[0].legs[0].distance.text,
         travelMode: travelModeController.text.toString(),
         latLong: allLatLng));
     String value = convert.jsonEncode(travelList).toString();
@@ -1497,6 +1604,7 @@ class _HomePageState extends State<HomePage> {
 
       print('jsonData=====>$jsonData');
       setState(() {
+        backgroundLocationService?.stopLocationFetch();
         journeyStart = False;
         Utility().setSharedPreference(localConveyanceJourneyStart, False);
         DatabaseHelper.instance
@@ -1511,9 +1619,20 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void savedOfflineLocalConvance(LocalConveyanceModel localConveyanceList) {
+
+  Future<void> savedOfflineLocalConvance(LocalConveyanceModel localConveyanceList) async {
     String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
     String currentTime = DateFormat('HHmmss').format(DateTime.now());
+
+
+
+    List<Map<String, dynamic>> listMap =
+    await DatabaseHelper.instance.queryAllWaypoints(
+        localConveyanceList.toMapWithoutId());
+
+    listMap.forEach(
+            (map) => wayPointList.add(WayPointsModel.fromMap(map)));
+
 
     LocalConveyanceModel localConveyance = LocalConveyanceModel(
         empId: int.parse(sharedPreferences.getString(userID).toString()),
@@ -1523,9 +1642,17 @@ class _HomePageState extends State<HomePage> {
         toLatitude: latlong!.latitude.toString(),
         toLongitude: latlong!.longitude.toString(),
         fromAddress: localConveyanceList.fromAddress,
-        toAddress: '',
+        toAddress:  '',
         createDate: localConveyanceList.createDate,
         createTime: localConveyanceList.createTime,
+        endDate: currentDate,
+        endTime: currentTime);
+
+    WayPointsModel waypoints = WayPointsModel(
+        userId: sharedPreferences.getString(userID).toString(),
+        latlng: wayPointList[wayPointList.length - 1].latlng,
+        createDate: wayPointList[wayPointList.length - 1].createDate,
+        createTime: wayPointList[wayPointList.length - 1].createTime,
         endDate: currentDate,
         endTime: currentTime);
 
@@ -1533,8 +1660,9 @@ class _HomePageState extends State<HomePage> {
       journeyStart = False;
       Utility().setSharedPreference(localConveyanceJourneyStart, False);
       Utility().showInSnackBar(value: dataSavedOffline, context: context);
-      DatabaseHelper.instance
-          .updateLocalConveyance(localConveyance.toMapWithoutId());
+      DatabaseHelper.instance.updateLocalConveyance(localConveyance.toMapWithoutId());
+      DatabaseHelper.instance.updateWaypoints(waypoints.toMapWithoutId());
+
     });
   }
 }

@@ -82,4 +82,9 @@ class TravelModel {
     "LAT_LONG": latLong
 
   };
+
+  @override
+  String toString() {
+    return '{pernr: $pernr, begda: $begda, endda: $endda, startTime: $startTime, endTime: $endTime, startLat: $startLat, endLat: $endLat, startLong: $startLong, endLong: $endLong, latLong111: $latLong111, startLocation: $startLocation, endLocation: $endLocation, distance: $distance, travelMode: $travelMode, latLong: $latLong}';
+  }
 }

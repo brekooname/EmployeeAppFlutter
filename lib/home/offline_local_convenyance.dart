@@ -13,6 +13,7 @@ import '../theme/color.dart';
 import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/APIDirectory.dart';
+import 'model/WayPointsModel.dart';
 
 class OfflineLocalConveyance extends StatefulWidget {
   const OfflineLocalConveyance({Key? key}) : super(key: key);
@@ -28,6 +29,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
   int? selectedIndex;
   bool isLoading = false;
   String? allLatLng;
+  var totalWayPoints = "";
 
   Future<List<Map<String, dynamic>>?> getAllLocalConveyanceData() async {
     List<Map<String, dynamic>> listMap =
@@ -144,32 +146,94 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
   Future<void> calculateDistance(
       LocalConveyanceModel localConveyanceList) async {
     var jsonData = null;
-    dynamic response = await HTTP.get(getDistanceAPI(
-        '${localConveyanceList.fromLatitude},${localConveyanceList.fromLongitude}',
-        '${localConveyanceList.toLatitude},${localConveyanceList.toLongitude}'));
-    if (response != null && response.statusCode == 200) {
-      jsonData = convert.jsonDecode(response.body);
-      distancePrefix.DistanceCalculateModel distanceCalculateModel =
-          distancePrefix.DistanceCalculateModel.fromJson(jsonData);
-      if (distanceCalculateModel.rows.isNotEmpty &&
-          distanceCalculateModel.rows[0].elements.isNotEmpty &&
-          distanceCalculateModel.rows[0].elements[0].distance.text.isNotEmpty) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) => stopJourneyPopup(
-              context, distanceCalculateModel, localConveyanceList),
-        );
-        setState(() {
-          isLoading = false;
-        });
+    List<WayPointsModel> wayPointList = [];
+   
+      List<Map<String, dynamic>> listMap =
+      await DatabaseHelper.instance.queryAllWaypoints(
+          localConveyanceList
+              .toMapWithoutId());
+
+      listMap.forEach(
+              (map) => wayPointList.add(WayPointsModel.fromMap(map)));
+
+      print(
+          'wayPointList======>${wayPointList[wayPointList.length - 1].latlng}');
+
+      String waypoints =wayPointList[wayPointList.length - 1].latlng;
+
+      List<String> list = waypoints.split("|");
+
+      print('list=====$list');
+
+      if(list.length>20){
+     double  position = list.length/15;
+     int pos = position.round();
+     print("position=====>$position");
+     print("position2222=====>${position.round()}");
+
+
+     for (int i = 0; i <= list.length; i++) {
+       if (i != 0 && i != list.length - 1) {
+         if (totalWayPoints.isEmpty) {
+
+           totalWayPoints = list[pos * i];
+           print('positi====>${i}======>${list[pos * i]}');
+         } else {
+           if (pos * i < list.length) {
+             if (!totalWayPoints.contains(list[pos * i])) {
+               totalWayPoints = totalWayPoints + "|" + list[pos * i];
+               print('positi====>${i}======>${list[pos * i]}');
+               }
+           }
+         }
+       }
+     }
+
+      }else {
+        for (int i = 0; i <= list.length; i++) {
+          if (totalWayPoints.isEmpty) {
+            if (!totalWayPoints.contains(list[i])) {
+              totalWayPoints = list[i];
+            }
+          } else {
+            if (i < list.length) {
+              if (!totalWayPoints.contains(list[i])) {
+                totalWayPoints = totalWayPoints + "|" + list[i];
+              }
+            }
+          }
+        }
       }
-    } else {
-      setState(() {
-        isLoading = false;
-        Utility().showInSnackBar(value: somethingWentWrong, context: context);
-      });
+      print(
+          'totalWayPoints======>${totalWayPoints.toString()}');
+
+       dynamic response = await HTTP.get(getDistanceAPI(
+          '${localConveyanceList.fromLatitude},'
+              '${localConveyanceList.fromLongitude}',
+          '${localConveyanceList.toLatitude},'
+              '${localConveyanceList.toLongitude}','${totalWayPoints.toString()}'));
+      if (response != null && response.statusCode == 200) {
+        jsonData = convert.jsonDecode(response.body);
+        print('jsonData=====>$jsonData');
+
+        distancePrefix.DistanceCalculateModel distanceCalculateModel =
+        distancePrefix.DistanceCalculateModel.fromJson(jsonData);
+        if (distanceCalculateModel.routes.isNotEmpty &&
+            distanceCalculateModel.routes[0].legs.isNotEmpty &&
+            distanceCalculateModel.routes[0].legs[0].distance.text.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => stopJourneyPopup(
+                context,
+                distanceCalculateModel,
+                localConveyanceList),
+          );
+        }
+      }
+
     }
-  }
+  
+
 
   stopJourneyPopup(
       BuildContext context,
@@ -180,7 +244,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         content: SingleChildScrollView(
             child: Container(
-                height: MediaQuery.of(context).size.height / 1.7,
+                height: MediaQuery.of(context).size.height / 1.6,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,13 +271,13 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
                         '$toLongitude  ${localConveyanceList.toLongitude}',
                       ),
                       latLongWidget(
-                        '$fromAddress ${distanceCalculateModel.originAddresses[0]}',
+                        '$fromAddress ${distanceCalculateModel.routes[0].legs[0].startAddress}',
                       ),
                       latLongWidget(
-                        '$toAddress ${distanceCalculateModel.destinationAddresses[0]}',
+                        '$toAddress ${distanceCalculateModel.routes[0].legs[0].endAddress}',
                       ),
                       latLongWidget(
-                        '$distanceTravelled ${distanceCalculateModel.rows[0].elements[0].distance.text}',
+                        '$distanceTravelled ${distanceCalculateModel.routes[0].legs[0].distance.text}',
                       ),
                       travelModeWidget(),
                       const SizedBox(
@@ -225,8 +289,12 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
                           Flexible(
                             child: ElevatedButton(
                               onPressed: () {
+
                                 Navigator.of(context).pop();
-                              },
+                              setState(() {
+                                isLoading = false;
+                              });
+                                },
                               style: ElevatedButton.styleFrom(
                                 primary: AppColor.whiteColor,
                                 shape: RoundedRectangleBorder(
@@ -341,6 +409,8 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
   Future<void> syncTravelDataAPI(
       LocalConveyanceModel LocalConveyance, distancePrefix.DistanceCalculateModel distanceCalculateModel,) async {
 
+    totalWayPoints = totalWayPoints.replaceAll("via:", "");
+
     allLatLng = '${LocalConveyance.fromLatitude},'
         '${LocalConveyance.fromLongitude},'
         '${LocalConveyance.toLatitude},'
@@ -355,14 +425,15 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
         endLat: LocalConveyance.toLatitude,
         startLong: LocalConveyance.fromLongitude,
         endLong: LocalConveyance.toLongitude,
-        latLong111: allLatLng!,
-        startLocation: distanceCalculateModel.originAddresses[0],
-        endLocation: distanceCalculateModel.destinationAddresses[0],
+        latLong111: totalWayPoints,
+        startLocation: '${LocalConveyance.fromLatitude},${LocalConveyance.fromLongitude}',
+        endLocation: '${LocalConveyance.toLatitude},${LocalConveyance.toLongitude}',
         distance: distanceCalculateModel
-            .rows[0].elements[0].distance.text,
+            .routes[0].legs[0].distance.text,
         travelMode: travelModeController.text.toString(),
         latLong: allLatLng!));
     String value = convert.jsonEncode(travelList).toString();
+    print('travelList======>${travelList.toString()}');
   var jsonData = null;
     dynamic response = await HTTP.get(syncLocalConveyanceAPI(value));
     if (response != null && response.statusCode == 200) {

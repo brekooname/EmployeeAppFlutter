@@ -51,5 +51,18 @@
     	<string>This app requires access to your location for FilledStacks tutorial.</string>
     	<key>NSLocationAlwaysUsageDescription</key>
     	<string>This app requires access to your location for FilledStacks tutorial.</string>
+
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>This app needs access to location.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>This app needs access to location.</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs access to location.</string>
+<key>UIBackgroundModes</key>
+<array>
+	<string>fetch</string>
+	<string>location</string>
+</array
+
 </dict>
 </plist>
