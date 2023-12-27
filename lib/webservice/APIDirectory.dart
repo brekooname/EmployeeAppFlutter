@@ -4,7 +4,7 @@ import 'package:shakti_employee_app/theme/string.dart';
 import 'constant.dart';
 
 const productionUrl = 'https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/';
-const googleDistanceMatrixAPI = 'https://maps.googleapis.com/maps/api/distancematrix/';
+const googleDistanceMatrixAPI = 'https://maps.googleapis.com/maps/api/directions/';
 const dashboardAppUrl ='https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zshakti_dash/';
 
 
@@ -24,8 +24,8 @@ sendOTPAPI(String mobile, int otp){
 SyncAndroidToSapAPI(String pernr){
   return Uri.parse('${productionUrl}sync_android_to_sap.htm?pernr=${pernr}');
 }
-getDistanceAPI(String origin,String destination){
-  return Uri.parse('${googleDistanceMatrixAPI}json?origins=$origin&destinations=$destination&key=$googleApiKey');
+getDistanceAPI(String origin,String destination,String waypoints){
+  return Uri.parse('${googleDistanceMatrixAPI}json?origin=$origin&destination=$destination&waypoints=$waypoints&key=$googleApiKey');
 }
 
 createLeaveAPI(String sapCode, String leavetype, String leaveDuration, String fromDate, String toDate,
