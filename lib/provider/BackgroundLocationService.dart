@@ -61,7 +61,7 @@ class BackgroundLocationService extends ChangeNotifier {
   }
 
   void stopLocationFetch() {
-    timer?.cancel();
+   // timer?.cancel();
     notifyListeners();
   }
 
