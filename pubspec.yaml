@@ -16,10 +16,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 6.9.0+55
+version: 6.9.0+56
 
 environment:
-  sdk: '>=3.0.5 <4.0.0'
+  sdk: '>=3.2.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -35,34 +35,36 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  flutter_svg: ^1.1.6
+  flutter_svg: ^2.0.9
   date_format: ^2.0.5
-  intl: ^0.18.0
+  intl: ^0.19.0
   http: any
   shared_preferences: any
   fluttertoast: ^8.0.9
-  permission_handler: ^10.0.0
+  permission_handler: ^11.1.0
   group_radio_button: ^1.2.0
-  geolocator: ^8.2.0
-  geocoding: ^2.0.4
   image_watermark: ^0.0.5
   image: ^3.2.2
-  searchfield: ^0.8.3
+  searchfield: ^0.9.0
   webview_flutter: ^4.2.2
-  package_info_plus: ^3.0.3
-  google_maps_flutter: ^2.2.1
+  package_info_plus: ^5.0.1
   sqflite: ^2.3.0
   path_provider: ^2.1.0
   url_launcher: ^6.1.12
   image_picker: ^1.0.2
-  firebase_auth: ^4.7.3
-  firebase_core: ^2.15.1
-  firebase_messaging: ^14.7.3
-  cloud_firestore: ^4.12.2
-  flutter_local_notifications: ^15.1.0+1
-  firebase_crashlytics: ^3.3.5
+  firebase_auth: ^4.15.3
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.9
+  cloud_firestore: ^4.13.6
+  flutter_local_notifications: ^16.2.0
+  firebase_crashlytics: ^3.4.8
   device_info_plus: ^9.0.3
-  provider: ^6.0.5
+  provider: ^6.1.1
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+  google_maps_flutter: ^2.5.0
+  location: ^5.0.3
+
 
 dev_dependencies:
   flutter_test:
