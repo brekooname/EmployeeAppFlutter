@@ -137,3 +137,7 @@ sendTravelRequestStatus (String docNo, String hodPernr, String perner ,String St
 getTravelListResponseAPI(String sapCode , String fromDate, String toDate){
   return Uri.parse('${productionUrl}report_travel.htm?from=${fromDate}&to=${toDate}&pernr=${sapCode}');
 }
+
+createAttendenceCorrectionAPI(String sapCode , String fromDate, String spinnerType,String remark){
+  return Uri.parse('${productionUrl}attendance_correction.htm?date=${fromDate}&perno=${sapCode}&status=${spinnerType}&remark=${remark}');
+}
