@@ -58,9 +58,9 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "shakti.shakti_employee"
-        // You can update the following values to match your application needs.
+         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        applicationId "shakti.shakti_employee"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
@@ -74,17 +74,41 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled false
             shrinkResources false
+
         }
 
-        dubug {
+        debug {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
             minifyEnabled false
             shrinkResources false
+
         }
 
     }
+
+    flavorDimensions "env"
+    productFlavors {
+        shakti_emp{
+            dimension 'env'
+            applicationId "shakti.shakti_employee"
+            versionCode flutterVersionCode.toInteger()
+            versionName flutterVersionName
+            resValue "string", "app_name", "Shakti Emp App"
+
+        }
+        offrole_emp{
+            dimension 'env'
+            applicationId "com.offrole_employee"
+             versionCode flutterVersionCode.toInteger()
+            versionName flutterVersionName
+            resValue "string", "app_name", "OffRole Emp App"
+
+        }
+
+    }
+
     lintOptions {
         checkReleaseBuilds false
     }

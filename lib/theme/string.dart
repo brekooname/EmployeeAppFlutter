@@ -1,4 +1,5 @@
 var appName = "Shakti Employee App";
+var appName2 = "Employee App";
 var name = "name";
 var welcome = "Welcome ";
 var checkInternetConnection = "Please check your internet connection and try again!";
@@ -116,6 +117,7 @@ var discussiontxt= "Discussion" ;
 var prosepetive = "Prospective Vendor";
 var leave = "Leave";
 var  officialDuty = "Official Duty";
+var travelExpenses = "Travel Expenses";
 var travelReport = "Travel Request Report";
 var gatePasstxt ="Gate Pass";
 var task = "Task";

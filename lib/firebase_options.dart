@@ -44,40 +44,38 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAWVHehcY4K4f53KOCw5QaSojC1zTBbdq8',
-    appId: '1:670091446020:web:3132db6296fd70e057b251',
-    messagingSenderId: '670091446020',
-    projectId: 'shaktiemployeeapp',
-    authDomain: 'shaktiemployeeapp.firebaseapp.com',
-    storageBucket: 'shaktiemployeeapp.appspot.com',
-    measurementId: 'G-Y1QJF9Y1Q1',
+    apiKey: 'AIzaSyDSsBPYnw5Kvv9-7klCr-72EQOZAFpa68o',
+    appId: '1:658928240288:web:d5f7a7553b4a345e6b6bc5',
+    messagingSenderId: '658928240288',
+    projectId: 'shakti-employee',
+    authDomain: 'shakti-employee.firebaseapp.com',
+    storageBucket: 'shakti-employee.appspot.com',
+    measurementId: 'G-WDP8FV5NDN',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA8sG_O8omWeHcpK6GvJb_pmyltoigA2zU',
-    appId: '1:670091446020:android:b89d0c1d720b0c2c57b251',
-    messagingSenderId: '670091446020',
-    projectId: 'shaktiemployeeapp',
-    storageBucket: 'shaktiemployeeapp.appspot.com',
+    apiKey: 'AIzaSyCj4UHOEL-3XcaG5441Bh19pxfKGQDiRLI',
+    appId: '1:658928240288:android:8505a13bb0af408f6b6bc5',
+    messagingSenderId: '658928240288',
+    projectId: 'shakti-employee',
+    storageBucket: 'shakti-employee.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA7ZZTAciGVEyerzvfWlJ8n677jmYUwiu0',
-    appId: '1:670091446020:ios:81f277c96e0e00c857b251',
-    messagingSenderId: '670091446020',
-    projectId: 'shaktiemployeeapp',
-    storageBucket: 'shaktiemployeeapp.appspot.com',
-    androidClientId: '670091446020-1r9r77op1f3nfplipnb4fu3hbn553t32.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAy0RtoMThZeHpqS4jxraqrnJOPRiktcpI',
+    appId: '1:658928240288:ios:c81f6002626f22376b6bc5',
+    messagingSenderId: '658928240288',
+    projectId: 'shakti-employee',
+    storageBucket: 'shakti-employee.appspot.com',
     iosBundleId: 'com.example.shaktiEmployeeApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA7ZZTAciGVEyerzvfWlJ8n677jmYUwiu0',
-    appId: '1:670091446020:ios:968723302c21a57d57b251',
-    messagingSenderId: '670091446020',
-    projectId: 'shaktiemployeeapp',
-    storageBucket: 'shaktiemployeeapp.appspot.com',
-    androidClientId: '670091446020-1r9r77op1f3nfplipnb4fu3hbn553t32.apps.googleusercontent.com',
+    apiKey: 'AIzaSyAy0RtoMThZeHpqS4jxraqrnJOPRiktcpI',
+    appId: '1:658928240288:ios:e0dfcbd6e569f4516b6bc5',
+    messagingSenderId: '658928240288',
+    projectId: 'shakti-employee',
+    storageBucket: 'shakti-employee.appspot.com',
     iosBundleId: 'com.example.shaktiEmployeeApp.RunnerTests',
   );
 }

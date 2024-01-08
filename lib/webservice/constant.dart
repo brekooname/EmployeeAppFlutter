@@ -1,5 +1,5 @@
 var userID = "userID";
-var password = "password";
+var password = "Password";
 var currentDate = "currentDate";
 var webBaseURL =
     "https://spprdsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_web/";

@@ -100,6 +100,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController travelModeController = TextEditingController();
   FirestoreDataModel? fireStoreDataModel;
   BackgroundLocationService? backgroundLocationService;
+  bool isEmployeeApp = false;
 
   var totalWayPoints ="";
   @override
@@ -155,6 +156,19 @@ class _HomePageState extends State<HomePage> {
       backgroundLocationService = Provider.of<BackgroundLocationService>(context,listen: true);
 
     // TODO: implement build
+      return Consumer<firestoreAppUpdateNofifier>(
+          builder: (context, value, child) {
+            isEmployeeApp = value.isEmployeeApp;
+        if (value.fireStoreData != null &&
+            value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (BuildContext context) => AppUpdateWidget(
+                        appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                    (Route<dynamic> route) => false);
+          });
+        } else {
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -162,7 +176,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: AppColor.themeColor,
         elevation: 0,
         title: robotoTextWidget(
-            textval: appName,
+            textval: value.isEmployeeApp?appName:appName2,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
@@ -176,11 +190,11 @@ class _HomePageState extends State<HomePage> {
                 // row with 2 children
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.download_for_offline,
                       color: AppColor.themeColor,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     robotoTextWidget(
@@ -212,21 +226,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Consumer<firestoreAppUpdateNofifier>(
-          builder: (context, value, child) {
-        if (value.fireStoreData != null && value.fireStoreData!.minEmployeeAppVersion !=
-            value.appVersionCode) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => AppUpdateWidget(
-                          appUrl:
-                              value.fireStoreData!.employeeAppUrl.toString())),
-                  (Route<dynamic> route) => false);
-
-          });
-        } else {
-          return Stack(
+      body: Stack(
             children: [
               SingleChildScrollView(
                 child: Container(
@@ -240,6 +240,7 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(task),
                       detailWidget(travel),
                       localConvenience(),
+                      detailWidget(travelExpenses),
                       dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
                     ],
@@ -254,11 +255,8 @@ class _HomePageState extends State<HomePage> {
                     : const SizedBox(),
               ),
             ],
-          );
-        }
-        return Container(
-        );
-      }),
+          ),
+
       drawer: Drawer(
           backgroundColor: AppColor.whiteColor,
           child: NavigationDrawerWidget(
@@ -269,6 +267,9 @@ class _HomePageState extends State<HomePage> {
             personalInfo: personalInfo,
           )),
     );
+        } return Container(
+        );
+          });
   }
 
   detailWidget(String title) {
@@ -953,7 +954,7 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: robotoTextWidget(
-                    textval: appName,
+                    textval: isEmployeeApp?appName:appName2,
                     colorval: AppColor.themeColor,
                     sizeval: 16,
                     fontWeight: FontWeight.bold),
@@ -1080,7 +1081,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: robotoTextWidget(
-                            textval: appName,
+                            textval: isEmployeeApp?appName:appName2,
                             colorval: AppColor.themeColor,
                             sizeval: 16,
                             fontWeight: FontWeight.bold),

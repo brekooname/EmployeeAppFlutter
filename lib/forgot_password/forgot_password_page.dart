@@ -3,14 +3,17 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/forgot_password/model/otpreponse.dart';
 import 'package:shakti_employee_app/forgot_password/otppage.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
 import '../../Util/utility.dart';
 import '../../uiwidget/robotoTextWidget.dart';
+import '../provider/firestore_appupdate_notifier.dart';
 import '../theme/color.dart';
 import '../theme/string.dart';
+import '../uiwidget/appupdatewidget.dart';
 import '../webservice/APIDirectory.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -24,9 +27,23 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
   bool isLoading = false, isScreenVisible = false;
   TextEditingController mobileNoController = TextEditingController();
   int _randomNumber1 = 0;
+  bool isEmployeeApp=false;
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+          isEmployeeApp = value.isEmployeeApp;
+      if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+        });
+      } else {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: AppColor.themeColor,
@@ -134,6 +151,9 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
             ),
           ),
         ));
+      } return Container(
+      );
+        });
   }
 
   // ignore: non_constant_identifier_names
@@ -225,7 +245,7 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Text(
-              appName,
+              isEmployeeApp?appName:appName2,
               style: const TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',
