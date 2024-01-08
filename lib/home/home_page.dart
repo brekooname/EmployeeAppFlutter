@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
 import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
     as vendorGatePassPrefix;
+import 'package:shakti_employee_app/TravelExpenses/travelexpenses.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
 import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
@@ -239,6 +240,7 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(gatePasstxt),
                       detailWidget(task),
                       detailWidget(travel),
+                      detailWidget(travelEx),
                       localConvenience(),
                       dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
@@ -1421,6 +1423,16 @@ class _HomePageState extends State<HomePage> {
                 )),
                 (route) => true);
         break;
+
+      case "Travel Expenses":
+        {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (context) => TravelExpensesScreen(
+                  )),
+                  (route) => true);
+        }
+        break;
     }
   }
 
@@ -1666,3 +1678,4 @@ class _HomePageState extends State<HomePage> {
     });
   }
 }
+

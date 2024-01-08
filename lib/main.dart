@@ -56,6 +56,7 @@ Future<void> main() async {
     return true;
   };
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn =
       (sharedPreferences.getString(userID) == null) ? False : True;
@@ -474,6 +475,4 @@ class _LoginPageState extends State<LoginPage> {
       print('Failed to get platform version');
     }
   }
-
-
 }
