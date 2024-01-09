@@ -1592,8 +1592,8 @@ class _HomePageState extends State<HomePage> {
         startLong: LocalConveyance.fromLongitude,
         endLong: latlong!.longitude.toString(),
         latLong111: totalWayPoints,
-        startLocation: '${LocalConveyance.fromLatitude},${LocalConveyance.fromLongitude}',
-        endLocation: '${LocalConveyance.toLatitude},${LocalConveyance.toLongitude}',
+        startLocation: distanceCalculateModel.routes[0].legs[0].startAddress,
+        endLocation: distanceCalculateModel.routes[0].legs[0].endAddress,
         distance: distanceCalculateModel.routes[0].legs[0].distance.text,
         travelMode: travelModeController.text.toString(),
         latLong: allLatLng));
