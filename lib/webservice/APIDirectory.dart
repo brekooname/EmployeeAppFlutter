@@ -8,8 +8,9 @@ const googleDistanceMatrixAPI = 'https://maps.googleapis.com/maps/api/directions
 const dashboardAppUrl ='https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zshakti_dash/';
 //https://spdevsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_1/ldrop_list_api.htm
 
-userLogin(String sapCode, String password, String api_version,  String api, String app_version, String imei , String os, String fcm_token) {
-  return Uri.parse('${productionUrl}login.htm?pernr=${sapCode}&pass=${password}&api_version=${api_version}&api=${api}&app_version=${app_version}&imei=${imei}&os=${os}&fcm_token=${fcm_token}');
+
+userLogin(String sapCode, String password, String api_version,  String api, String app_version, String imei , String os, String fcm_token,String loginUserType) {
+  return Uri.parse('${productionUrl}login.htm?pernr=${sapCode}&pass=${password}&api_version=${api_version}&api=${api}&app_version=${app_version}&imei=${imei}&os=${os}&fcm_token=${fcm_token}&islogin=${loginUserType}');
 }
 
 

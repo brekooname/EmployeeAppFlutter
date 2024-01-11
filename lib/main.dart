@@ -56,7 +56,6 @@ Future<void> main() async {
     return true;
   };
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn =
       (sharedPreferences.getString(userID) == null) ? False : True;
@@ -415,11 +414,9 @@ class _LoginPageState extends State<LoginPage> {
                 builder: (context) => HomePage(
                       journeyStart: False,
                     ),),
-            (route) => false);
-
-        setState(() {
-          isLoading = false;
-        });
+      print('Response======>${response.body}');
+      if(loginResponse[0].name.isNotEmpty){
+      loginResManage(loginResponse[0]);
       } else {
         Utility().showToast(errorMssg);
         setState(() {
@@ -432,6 +429,26 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = false;
       });
     }
+  }
+
+  void loginResManage(LoginModelResponse loginResponse) {
+    Utility().setSharedPreference(userID, sapCodeController.text.toString());
+    Utility().setSharedPreference(password, passwordController.text.toString());
+
+    Utility().setSharedPreference(name, loginResponse.name);
+    Utility().setSharedPreference(localConveyanceJourneyStart, 'false');
+    Utility().showToast(welcome + loginResponse.name);
+    // ignore: use_build_context_synchronously
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) => HomePage(
+              journeyStart: False,
+            )),
+            (route) => false);
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> retrieveFCMToken() async {
@@ -475,4 +492,8 @@ class _LoginPageState extends State<LoginPage> {
       print('Failed to get platform version');
     }
   }
+
+
+
+
 }
