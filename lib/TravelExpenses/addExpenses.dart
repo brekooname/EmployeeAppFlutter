@@ -29,7 +29,7 @@ class AddExpensesScreen extends StatefulWidget {
 }
 
 class _AddExpensesScreenState extends State<AddExpensesScreen> {
-  bool isLoading = false, isHotel = false, isSend = false;
+  bool isLoading = false;
   List<Country.Response> countryList = [];
   List<StateList.Response> stateList = [];
   List<StateList.Response> stateToList = [];
@@ -483,19 +483,19 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       setState(() {
         countryList = countryListResponse.response;
         getStateList();
-        isLoading = false;
+
       });
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
       setState(() {
-        isLoading = false;
+
       });
     }
   }
 
   Future<void> getStateList( ) async {
     setState(() {
-      isLoading = true;
+
     });
 
 
@@ -516,9 +516,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
 
       if (stateListResponse.status.compareTo("true") == 0) {
         setState(() {
-
             stateList = stateListResponse.response;
-
 
           isLoading = false;
         });

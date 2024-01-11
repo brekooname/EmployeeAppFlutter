@@ -23,7 +23,7 @@ class TravelExpensesScreen extends StatefulWidget {
 
 class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
 
-  bool listView = false, isLoading = false,pdfLoading = false;
+  bool isLoading = false ;
   DateTime datefrom = DateTime.now();
   String?  selectedFromDate, selectedToDate;
   TextEditingController targetDateController = TextEditingController();
@@ -57,9 +57,11 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
 
     });
 
+
     getCountryList();
-    getAllTraveExpenses();
     getDropDownList();
+    getAllTraveExpenses();
+
 
   }
 
@@ -350,9 +352,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
       });
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
-      setState(() {
 
-      });
     }
   }
 
@@ -610,9 +610,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   }
 
   Future<void> getDropDownList()  async {
-    setState(() {
-      isLoading = true;
-    });
+
 
     var jsonData = null;
 
