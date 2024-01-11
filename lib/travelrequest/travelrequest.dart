@@ -267,10 +267,9 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
   }
 
   countryListWidget() {
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      child: Container(
-        height: 52,
+    return  Container(
+      margin: EdgeInsets.only(top:10),
+        height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
           decoration: InputDecoration(
@@ -289,11 +288,14 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
           items: countryList
               .map((ListItem) => DropdownMenuItem(
                   value: ListItem.land1,
-                  child: robotoTextWidget(
-                      textval: ListItem.landx50 + " " + ListItem.land1,
-                      colorval: AppColor.themeColor,
-                      sizeval: 12,
-                      fontWeight: FontWeight.bold)))
+                  child: Container(
+                    width: MediaQuery.of(context).size.width/2,
+                    child: robotoTextWidget(
+                        textval: ListItem.landx50 + " " + ListItem.land1,
+                        colorval: AppColor.themeColor,
+                        sizeval: 12,
+                        fontWeight: FontWeight.bold),
+                  )))
               .toList(),
           onChanged: (Object? value) {
             setState(() {
@@ -315,15 +317,14 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
             });
           },
         ),
-      ),
-    );
+      );
   }
 
   stateListWidget() {
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: Container(
-        height: 52,
+        height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
           decoration: InputDecoration(
@@ -376,7 +377,7 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
     return Container(
       margin: const EdgeInsets.only(top: 10, bottom: 10),
       child: Container(
-        height: 52,
+        height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
           decoration: InputDecoration(
@@ -737,7 +738,7 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: Container(
-        height: 52,
+        height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
           decoration: InputDecoration(
@@ -756,11 +757,14 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
           items: countryList
               .map((ListItem) => DropdownMenuItem(
                   value: ListItem.land1,
-                  child: robotoTextWidget(
-                      textval: ListItem.landx50 + " " + ListItem.land1,
-                      colorval: AppColor.themeColor,
-                      sizeval: 12,
-                      fontWeight: FontWeight.bold)))
+                  child: Container(
+                    width: MediaQuery.of(context).size.width/2,
+                    child: robotoTextWidget(
+                        textval: ListItem.landx50 + " " + ListItem.land1,
+                        colorval: AppColor.themeColor,
+                        sizeval: 12,
+                        fontWeight: FontWeight.bold),
+                  )))
               .toList(),
           onChanged: (Object? value) {
             setState(() {
@@ -790,7 +794,7 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: Container(
-        height: 52,
+        height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
           decoration: InputDecoration(
@@ -843,7 +847,7 @@ class _TravelRequestScreenState extends State<TravelRequestScreen> {
     return Container(
       margin: const EdgeInsets.only(top: 10),
       child: Container(
-        height: 52,
+        height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
           decoration: InputDecoration(

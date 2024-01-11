@@ -94,7 +94,7 @@ class MyApp extends StatelessWidget {
                   journeyStart: journStar!,
                 )
               : const LoginPage(),
-        ));
+        ),);
   }
 }
 
@@ -414,7 +414,7 @@ class _LoginPageState extends State<LoginPage> {
             MaterialPageRoute(
                 builder: (context) => HomePage(
                       journeyStart: False,
-                    )),
+                    ),),
             (route) => false);
 
         setState(() {

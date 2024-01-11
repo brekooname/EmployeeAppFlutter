@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/TravelExpenses/addExpenses.dart';
+import 'package:shakti_employee_app/TravelExpenses/model/dropDownList.dart';
 import 'package:shakti_employee_app/TravelExpenses/model/trvaelExp.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/database/database_helper.dart';
@@ -31,8 +33,10 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   String dateTimeFormat = "dd/MM/yyyy";
   DateTime? pickedDate;
   List<C.Response> countryList = [];
-  String? countryCodeSpinner = "IN";
-
+  List<TaxCode> taxCode = [];
+  List<ExpenseType> expenseType = [];
+  List<CostCenter> costCenter = [];
+  String? countryCodeSpinner = "IN" ,costCenterSpinner;
   TravelExpenseModel? travelExpenseModel;
   List<TravelExpenseModel> savedtravelExpense = [];
 
@@ -55,6 +59,8 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
 
     getCountryList();
     getAllTraveExpenses();
+    getDropDownList();
+
   }
 
 
@@ -85,7 +91,12 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
       floatingActionButton:  FloatingActionButton(
         backgroundColor: AppColor.themeColor,
         onPressed: (){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=> AddExpensesScreen()));
+
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+              builder: (context) => AddExpensesScreen(editTravelExpense: null, taxCode: taxCode, expenseType: expenseType,)))
+              .then((value) => {getAllTraveExpenses()});
+
         },
         child: const Icon(Icons.add , color: AppColor.whiteColor,),
       ),
@@ -108,6 +119,8 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
                   countryListWidget(),
                   LocationofTravel(),
                   costCenterListWidget(),
+
+                  _buildPosts(context),
                 ],
               ),
             ),
@@ -247,9 +260,10 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   costCenterListWidget() {
     return  Container(
       margin: const EdgeInsets.only(top: 10),
-      height: 55,
+      height: 58,
       width: MediaQuery.of(context).size.width,
       child: DropdownButtonFormField(
+        iconSize: 0,
         decoration: InputDecoration(
             border: const OutlineInputBorder(
               borderSide: BorderSide(color: AppColor.themeColor),
@@ -260,26 +274,28 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
             hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
             hintText: selectCostCenter,
             fillColor: Colors.white),
-        value:  countryCodeSpinner ,
+        value:  costCenterSpinner ,
         validator: (value) =>
         value == null || value.isEmpty ? selectCostCenter : "",
-        items: countryList
+        items: costCenter
             .map(( ListItem) => DropdownMenuItem(
-            value: ListItem.land1,
+            value: ListItem.kostlTxt,
             child: Container(
-
-              child: robotoTextWidget(
-                  textval: ListItem.landx50  +" " +ListItem.land1,
-                  colorval: AppColor.themeColor,
-                  sizeval: 14,
-                  fontWeight: FontWeight.bold),
-              width: MediaQuery.of(context).size.width/2,)))
+              width: MediaQuery.of(context).size.width/1.15,
+                child: robotoTextWidget(
+                      textval: ListItem.kostlTxt,
+                      colorval: AppColor.themeColor,
+                      sizeval: 14,
+                      fontWeight: FontWeight.bold),
+              ),
+            ),
+               )
             .toList(),
         onChanged: (Object? value) {
           setState(() {
             print('value=====>$value');
 
-            countryCodeSpinner = value.toString();
+            costCenterSpinner = value.toString();
 
           });
         },
@@ -327,18 +343,18 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
       C.CountryListResponse.fromJson(jsonData);
       setState(() {
         countryList = countryListResponse.response;
-        isLoading = false;
+
       });
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
       setState(() {
-        isLoading = false;
+
       });
     }
   }
 
   Future<List<Map<String, dynamic>>?> getAllTraveExpenses() async {
-
+    savedtravelExpense=[];
     List<Map<String, dynamic>> listMap =
     await DatabaseHelper.instance.queryAllTravelExpenseTable();
     setState(() {
@@ -349,5 +365,273 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
      // DatabaseHelper.instance.deleteDSREntry();
 
     print('savedtravelExpense=========>${savedtravelExpense.toString()}');
+  }
+
+  Widget _buildPosts(BuildContext context) {
+    return  Column(
+      children: [
+        //searchbar
+/*        Container(
+          padding: EdgeInsets.all(8),
+          child: TextField(
+            onChanged: (value) => _runFilter(value),
+            decoration: const InputDecoration(
+                labelText: 'Search', suffixIcon: Icon(Icons.search)),
+          ),
+        ),*/
+        robotoTextWidget(textval: expensesList, colorval: AppColor.themeColor, sizeval: 15, fontWeight: FontWeight.bold),
+        savedtravelExpense.length > 0
+            ? ListView.builder(
+          scrollDirection: Axis.vertical,
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            return ListItem(index);
+          },
+          itemCount: savedtravelExpense.length,
+          padding: const EdgeInsets.all(2),
+        )
+            : NoDataFound()
+      ],
+    ) ;
+  }
+
+  Wrap ListItem(int index) {
+    return Wrap(children: [
+      Card(
+        elevation: 10,
+        semanticContainer: true,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        shape: const RoundedRectangleBorder(
+          side: BorderSide(
+            color: AppColor.greyBorder,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Container(
+          width: 400,
+          color: AppColor.whiteColor,
+          padding: EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Container(
+                width: MediaQuery.sizeOf(context).width/1.3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    detailWidget(from, savedtravelExpense[index].fromDate),
+                    detailWidget(to, savedtravelExpense[index].toDate),
+                    detailWidget(desc, savedtravelExpense[index].description ),
+                    detailWidget(amonuttxt, savedtravelExpense[index].amount ),
+                    detailWidget(currencytxt, savedtravelExpense[index].currency ),
+                  ],
+                ),
+              ),
+
+              Column(
+                children: [
+                  loadSVG("assets/svg/delete.svg",index,0),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  loadSVG("assets/svg/pen.svg",index,1),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  SizedBox NoDataFound() {
+    return SizedBox(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Center(
+          child: Container(
+            height: MediaQuery.of(context).size.height / 10,
+            width: MediaQuery.of(context).size.width,
+            margin: const EdgeInsets.only(left: 20, right: 20),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                      color: Color.fromRGBO(30, 136, 229, .2),
+                      blurRadius: 20,
+                      offset: Offset(0, 10))
+                ]),
+            child: Align(
+              alignment: Alignment.center,
+              child: robotoTextWidget(
+                textval: noDataFound,
+                colorval: AppColor.themeColor,
+                sizeval: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ));
+  }
+
+  detailWidget(String title, String value) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 1.25,
+      height: 25,
+      child: Row(
+        children: [
+          robotoTextWidget(
+            textval: title,
+            colorval: AppColor.blackColor,
+            sizeval: 14.0,
+            fontWeight: FontWeight.w600,
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Flexible(
+            child: robotoTextWidget(
+              textval: value,
+              colorval: AppColor.themeColor,
+              sizeval: 14.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget loadSVG(String svg, int index, int pos) {
+    return InkWell(
+      onTap: (){
+       if(pos == 0) {
+         showDialog(
+           context: context,
+           builder: (BuildContext context) =>
+               deleteRowFromTable(
+                   context, index),
+         );
+       }else{
+         Navigator.of(context)
+             .push(MaterialPageRoute(
+             builder: (context) => AddExpensesScreen(editTravelExpense: savedtravelExpense[index], taxCode: taxCode, expenseType: expenseType,)))
+             .then((value) => {getAllTraveExpenses()});
+       }
+      },
+      child: SvgPicture.asset(
+        svg,
+        width: 30,
+        height: 30,
+      ),
+    );
+  }
+
+  Widget deleteRowFromTable(BuildContext context, int index) {
+    return AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              appName,
+              style: const TextStyle(
+                  color: AppColor.themeColor,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14),
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            removeTravelConfirmation,
+            style: const TextStyle(
+                color: AppColor.themeColor,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w400,
+                fontSize: 12),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.whiteColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
+                    ),
+                  ),
+                  child: robotoTextWidget(
+                    textval: cancel,
+                    colorval: AppColor.darkGrey,
+                    sizeval: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    DatabaseHelper.instance.deleteRowTravelExpenseTable(savedtravelExpense[index].toMap());
+                    getAllTraveExpenses();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.themeColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
+                    ),
+                  ),
+                  child: robotoTextWidget(
+                    textval: confirm,
+                    colorval: AppColor.whiteColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          )
+        ]));
+  }
+
+  Future<void> getDropDownList()  async {
+    setState(() {
+      isLoading = true;
+    });
+
+    var jsonData = null;
+
+    dynamic response = await HTTP.get(getTravelDropDown());
+    if (response != null && response.statusCode == 200) {
+      jsonData = convert.jsonDecode(response.body);
+      DropListModel dropListModel =
+      DropListModel.fromJson(jsonData);
+      setState(() {
+        taxCode = dropListModel.taxCode;
+        expenseType = dropListModel.expenseType;
+       costCenter = dropListModel.costCenter;
+      /*  print("taxCode==== ${taxCode.toString()}");
+        print("expenseType===== ${expenseType.toString()}");
+        print("costCenter===== ${costCenter.toString()}");*/
+        isLoading = false;
+      });
+    } else {
+      Utility().showInSnackBar(value: somethingWentWrong, context: context);
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 }

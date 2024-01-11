@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shakti_employee_app/TravelExpenses/model/dropDownList.dart';
 import 'package:shakti_employee_app/TravelExpenses/model/trvaelExp.dart';
 import 'package:shakti_employee_app/database/database_helper.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -17,7 +18,11 @@ import 'dart:convert' as convert;
 import '../Util/utility.dart';
 
 class AddExpensesScreen extends StatefulWidget {
-  const AddExpensesScreen({Key? key}) : super(key: key);
+    AddExpensesScreen({Key? key, required this.editTravelExpense, required this.taxCode, required this.expenseType}) : super(key: key);
+
+  TravelExpenseModel? editTravelExpense;
+    List<TaxCode> taxCode = [];
+    List<ExpenseType> expenseType = [];
 
   @override
   State<AddExpensesScreen> createState() => _AddExpensesScreenState();
@@ -30,6 +35,8 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   List<S.Response> stateToList = [];
   List<City.Response> cityList = [];
   List<City.Response> cityToList = [];
+  List<TaxCode> taxCodeModel = [];
+  List<ExpenseType> expenseTypeModel = [];
   String? countryCodeSpinner = "IN",
       countryToCodeSpinner = "IN",
       stateCodeSpinner,
@@ -43,7 +50,6 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   TextEditingController localController = TextEditingController();
   TextEditingController locationController =TextEditingController();
   TextEditingController amountController =TextEditingController();
-  TextEditingController currencyController =TextEditingController();
   TextEditingController descController = TextEditingController();
   TextEditingController gstController = TextEditingController();
   DateTime datefrom = DateTime.now();
@@ -60,7 +66,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   ];
 
   TravelExpenseModel? travelExpenseModel;
-
+  TravelExpenseModel? editTravelExpenseModel;
 
   @override
   void initState() {
@@ -77,7 +83,30 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       toDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
     });
 
+    editTravelExpenseModel = widget.editTravelExpense;
+    taxCodeModel = widget.taxCode;
+     expenseTypeModel = widget.expenseType;
+
     getCountryList();
+    if(editTravelExpenseModel == null){
+      getCountryList();
+    }else{
+      print("EditData${editTravelExpenseModel.toString()}");
+
+      fromDateController.text = editTravelExpenseModel!.fromDate;
+      toDateController.text = editTravelExpenseModel!.toDate;
+      countryCodeSpinner = editTravelExpenseModel!.country;
+      stateCodeSpinner = editTravelExpenseModel!.state;
+      cityCodeSpinner =editTravelExpenseModel!.city;
+      taxCodeSpinner = editTravelExpenseModel!.taxCode;
+      expenseTypeSpinner =editTravelExpenseModel!.expenseType;
+      descController.text = editTravelExpenseModel!.description;
+      locationController.text = editTravelExpenseModel!.location;
+      amountController.text = editTravelExpenseModel!.amount;
+      gstController.text = editTravelExpenseModel!.gstNo;
+      currencySpinner = editTravelExpenseModel!.currency;
+    }
+
   }
 
   @override
@@ -137,7 +166,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
                   ExpenseTypeListWidget(),
                   //Tax Code
                   taxCodeWidget(),
-                  locationofTravel(),
+                  locationOfTravel(),
                   amountWidget(),
                   currencyWidget(),
                   descriptionTravel() ,
@@ -173,11 +202,11 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: selectDayOrMore,
+              hintText: selectCurr,
               fillColor: Colors.white),
           value: currencySpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? selectDayOrMore : "",
+          value == null || value.isEmpty ? selectCurr : "",
           items: currencyList
               .map((dayType) => DropdownMenuItem(
               value: dayType,
@@ -575,17 +604,17 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
               ),
             ),
             hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-            hintText: selectCountryCode,
+            hintText: selectExpenseType,
             fillColor: Colors.white),
         value: expenseTypeSpinner,
         validator: (value) =>
-            value == null || value.isEmpty ? selectCountryCode : "",
-        items: countryList
+            value == null || value.isEmpty ? selectExpenseType : "",
+        items: expenseTypeModel
             .map((ListItem) => DropdownMenuItem(
-                value: ListItem.land1,
+                value: ListItem.spkzl,
                 child: Container(
                   child: robotoTextWidget(
-                      textval: ListItem.landx50 + " " + ListItem.land1,
+                      textval: ListItem.spkzl + " " + ListItem.sptxt,
                       colorval: AppColor.themeColor,
                       sizeval: 12,
                       fontWeight: FontWeight.bold),
@@ -617,17 +646,17 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
               ),
             ),
             hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-            hintText: selectCountryCode,
+            hintText: selectTaxCode,
             fillColor: Colors.white),
         value: taxCodeSpinner,
         validator: (value) =>
-        value == null || value.isEmpty ? selectCountryCode : "",
-        items: countryList
+        value == null || value.isEmpty ? selectTaxCode : "",
+        items: taxCodeModel
             .map((ListItem) => DropdownMenuItem(
-            value: ListItem.land1,
+            value: ListItem.text,
             child: Container(
               child: robotoTextWidget(
-                  textval: ListItem.landx50 + " " + ListItem.land1,
+                  textval: ListItem.taxCode + " " + ListItem.text,
                   colorval: AppColor.themeColor,
                   sizeval: 12,
                   fontWeight: FontWeight.bold),
@@ -637,7 +666,6 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         onChanged: (Object? value) {
           setState(() {
             print('value=====>$value');
-
             taxCodeSpinner = value.toString();
           });
         },
@@ -645,7 +673,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
     );
   }
 
-  locationofTravel() {
+  locationOfTravel() {
     return Container(
       height: 50,
       margin: const EdgeInsets.only(top: 10),
@@ -748,22 +776,21 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         hintText: GSTINNotxt,
         hintStyle: const TextStyle(color: AppColor.themeColor, fontSize: 12),
       ),
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.number,
       textInputAction: TextInputAction.done,
     ),
   );
   }
 
   void saveDataToDatabase() {
-    TravelExpenseModel travelExpenseModel = TravelExpenseModel(fromDate: fromDateController.text.toString(), toDate: toDateController.text.toString(), country: countryCodeSpinner!, state: stateCodeSpinner!, city: cityCodeSpinner!, expenseType: expenseTypeSpinner!, taxCode: taxCodeSpinner!, location: locationController.text.toString(), amount: amountController.text.toString(), currency: currencyController.text.toString(), description: descController.text.toString(), gstNo: gstController.text.toString());
 
-    print("travelExpenseModelEntry===>${travelExpenseModel.toString()}");
+    TravelExpenseModel travelExpenseModel = TravelExpenseModel(key: 0,fromDate: fromDateController.text.toString(), toDate: toDateController.text.toString(), country: countryCodeSpinner!, state: stateCodeSpinner!, city: cityCodeSpinner!, expenseType: expenseTypeSpinner!, taxCode: taxCodeSpinner!, location: locationController.text.toString(), amount: amountController.text.toString(), currency: currencySpinner!, description: descController.text.toString(), gstNo: gstController.text.toString());
 
-    DatabaseHelper.instance.insertTravelExpenseTable(travelExpenseModel.toMapWithoutId());
+    if(editTravelExpenseModel == null){
+      DatabaseHelper.instance.insertTravelExpenseTable(travelExpenseModel.toMapWithoutId());
+    }else{
+      DatabaseHelper.instance.updateTravelExpenseTable(editTravelExpenseModel!.key ,travelExpenseModel.toMapWithoutId());
+    }
     //String value = convert.jsonEncode(sendDsrEntry).toString();
-
-
   }
-
-
 }

@@ -185,6 +185,16 @@ class DatabaseHelper {
     return await db.insert( travelExpenseTable, row);
   }
 
+  Future<int> updateTravelExpenseTable(int index, Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    int serailNo = index;
+    return await db.update(
+      travelExpenseTable,
+      row,
+      where: "${columnId} = ?",
+      whereArgs: [serailNo],
+    );
+  }
 
   Future<List<Map<String, dynamic>>> queryAllTravelExpenseTable() async {
     Database db = await instance.database;
@@ -198,5 +208,17 @@ class DatabaseHelper {
        travelExpenseTable,
     );
   }
+
+  Future<int> deleteRowTravelExpenseTable(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    int serailNo = row[columnId];
+    return await db.delete(
+      travelExpenseTable,
+      where: "${columnId} = ?",
+      whereArgs: [serailNo],
+    );
+  }
+
+
 
 }

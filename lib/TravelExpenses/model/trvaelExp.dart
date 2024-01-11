@@ -1,6 +1,7 @@
 
 
 class TravelExpenseModel {
+  int key;
   String fromDate;
   String toDate;
   String country;
@@ -15,6 +16,7 @@ class TravelExpenseModel {
   String gstNo;
 
   TravelExpenseModel({
+    required this.key,
     required this.fromDate,
     required this.toDate,
     required this.country,
@@ -30,6 +32,7 @@ class TravelExpenseModel {
   });
 
   factory TravelExpenseModel.fromMap(Map<String, dynamic> json) => TravelExpenseModel(
+    key: json["column_id"]?? "",
     fromDate: json["from_date"]?? "",
     toDate: json["to_date"]?? "",
     country: json["country"]?? "",
@@ -66,6 +69,7 @@ class TravelExpenseModel {
   //to be used when updating a row in the table
   Map<String, dynamic> toMap() {
     final map = new Map<String, dynamic>();
+    map["column_id"] = key;
     map["from_date"] = fromDate;
     map["to_date"] = toDate;
     map["country"] = country;
@@ -81,9 +85,8 @@ class TravelExpenseModel {
     return map;
   }
 
-
   @override
   String toString() {
-    return 'TravelExpenseModel{fromDate: $fromDate, toDate: $toDate, country: $country, state: $state, city: $city, expenseType: $expenseType, taxCode: $taxCode, location: $location, amount: $amount, currency: $currency, description: $description, gstNo: $gstNo}';
+    return 'TravelExpenseModel{key: $key, fromDate: $fromDate, toDate: $toDate, country: $country, state: $state, city: $city, expenseType: $expenseType, taxCode: $taxCode, location: $location, amount: $amount, currency: $currency, description: $description, gstNo: $gstNo}';
   }
 }
