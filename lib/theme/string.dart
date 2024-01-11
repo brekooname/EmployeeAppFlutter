@@ -131,7 +131,6 @@ var selectTimeSlot = "Select Time Slot";
 var selectBookingTime = "Select Booking Type";
 var selectExpenseType = "Select Expense Type";
 var selectTaxCode = "Select Tax Code";
-var location = "Location services are disabled. Please enable the services";
 var locationDenid ="Location permissions are denied";
 var locationDenidtxt="Location permissions are permanently denied, we cannot request permissions.";
 var registeredMob ="Enter correct registered Mob no.";

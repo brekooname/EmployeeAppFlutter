@@ -7,11 +7,11 @@ import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/travelrequest/model/countrylistrequest.dart'
-    as C;
+    as Country;
 import 'package:shakti_employee_app/travelrequest/model/citylistresponse.dart'
     as City;
 import 'package:shakti_employee_app/travelrequest/model/statelistresponse.dart'
-    as S;
+    as StateList;
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'dart:convert' as convert;
@@ -30,35 +30,36 @@ class AddExpensesScreen extends StatefulWidget {
 
 class _AddExpensesScreenState extends State<AddExpensesScreen> {
   bool isLoading = false, isHotel = false, isSend = false;
-  List<C.Response> countryList = [];
-  List<S.Response> stateList = [];
-  List<S.Response> stateToList = [];
+  List<Country.Response> countryList = [];
+  List<StateList.Response> stateList = [];
+  List<StateList.Response> stateToList = [];
   List<City.Response> cityList = [];
   List<City.Response> cityToList = [];
   List<TaxCode> taxCodeModel = [];
   List<ExpenseType> expenseTypeModel = [];
   String? countryCodeSpinner = "IN",
-      countryToCodeSpinner = "IN",
-      stateCodeSpinner,
+      stateCodeSpinner ,
       taxCodeSpinner,
       cityCodeSpinner,
       fromCity,
-      expenseTypeSpinner     ;
+      expenseTypeSpinner;
 
   TextEditingController nameController = TextEditingController();
   TextEditingController remarkController = TextEditingController();
-  TextEditingController localController = TextEditingController();
   TextEditingController locationController =TextEditingController();
   TextEditingController amountController =TextEditingController();
   TextEditingController descController = TextEditingController();
   TextEditingController gstController = TextEditingController();
   DateTime datefrom = DateTime.now();
+  DateTime dateto = DateTime.now();
   String? selectedFromDate, selectedToDate ,currencySpinner;
-  TextEditingController targetDateController = TextEditingController();
+
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
   String dateTimeFormat = "dd/MM/yyyy";
   DateTime? pickedDate;
+
+
 
   var currencyList = [
     'India Rupee',
@@ -73,8 +74,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
     // TODO: implement initState
     super.initState();
     setState(() {
-      targetDateController.text =
-          DateFormat(dateTimeFormat).format(DateTime.now());
+      datefrom = DateTime.now();      dateto = DateTime.now();
 
       selectedFromDate = DateFormat("yyyyMMdd").format(DateTime.now());
       selectedToDate = DateFormat("yyyyMMdd").format(DateTime.now());
@@ -88,9 +88,9 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
      expenseTypeModel = widget.expenseType;
 
     getCountryList();
-    if(editTravelExpenseModel == null){
-      getCountryList();
-    }else{
+
+    if(editTravelExpenseModel != null){
+
       print("EditData${editTravelExpenseModel.toString()}");
 
       fromDateController.text = editTravelExpenseModel!.fromDate;
@@ -105,6 +105,11 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       amountController.text = editTravelExpenseModel!.amount;
       gstController.text = editTravelExpenseModel!.gstNo;
       currencySpinner = editTravelExpenseModel!.currency;
+
+      if(stateCodeSpinner!= null && countryCodeSpinner!= null){
+        getCityList();
+      }
+
     }
 
   }
@@ -113,6 +118,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
+      
       appBar: AppBar(
         backgroundColor: AppColor.themeColor,
         elevation: 0,
@@ -135,9 +141,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       floatingActionButton:  FloatingActionButton(
         backgroundColor: AppColor.themeColor,
         onPressed: (){
-
-            saveDataToDatabase();
-            Navigator.pop(context);
+          validation();
         },
         child: const Icon(Icons.check , color: AppColor.whiteColor,),
       ),
@@ -166,9 +170,10 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
                   ExpenseTypeListWidget(),
                   //Tax Code
                   taxCodeWidget(),
+                  currencyWidget(),
                   locationOfTravel(),
                   amountWidget(),
-                  currencyWidget(),
+
                   descriptionTravel() ,
                   GSTINNoWidget(),
                 ],
@@ -284,7 +289,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         firstDate: DateTime(1050),
         //DateTime.now() - not to allow to choose before today.
         lastDate: DateTime(2050));
-    if (pickedDate != null) {
+    if (pickedDate== null) {
       print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
       String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
       print(
@@ -294,10 +299,12 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
           selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
           fromDateController.text = formattedDate;
           selectedFromDate = DateFormat("yyyyMMdd").format(pickedDate!);
+          datefrom = pickedDate!;
         } else {
           selectedToDate = DateFormat(dateTimeFormat).format(pickedDate!);
           toDateController.text = formattedDate;
           selectedToDate = DateFormat("yyyyMMdd").format(pickedDate!);
+          dateto =pickedDate!;
         }
       });
     }
@@ -325,13 +332,13 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         items: countryList
             .map((ListItem) => DropdownMenuItem(
                 value: ListItem.land1,
-                child: Container(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width /1.28,
                   child: robotoTextWidget(
-                      textval: ListItem.landx50 + " " + ListItem.land1,
+                      textval: "${ListItem.landx50} ${ListItem.land1}",
                       colorval: AppColor.themeColor,
                       sizeval: 12,
                       fontWeight: FontWeight.bold),
-                  width: MediaQuery.of(context).size.width / 2,
                 )))
             .toList(),
         onChanged: (Object? value) {
@@ -345,7 +352,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
                 .checkInternetConnection()
                 .then((connectionResult) async {
               if (connectionResult) {
-                getStateList(0);
+                getStateList();
               } else {
                 Utility().showInSnackBar(
                     value: checkInternetConnection, context: context);
@@ -360,7 +367,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   stateListWidget() {
     return Container(
       margin: const EdgeInsets.only(top: 10),
-      child: Container(
+      child: SizedBox(
         height: 58,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -380,13 +387,13 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
           items: stateList
               .map((ListItem) => DropdownMenuItem(
                   value: ListItem.bland,
-                  child: Container(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width /1.28,
                     child: robotoTextWidget(
-                        textval: ListItem.bezei + " " + ListItem.bland,
+                        textval: "${ListItem.bezei} ${ListItem.bland}",
                         colorval: AppColor.themeColor,
                         sizeval: 12,
                         fontWeight: FontWeight.bold),
-                    width: MediaQuery.of(context).size.width / 2,
                   )))
               .toList(),
           onChanged: (Object? value) {
@@ -400,7 +407,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
                   .checkInternetConnection()
                   .then((connectionResult) async {
                 if (connectionResult) {
-                  getCityList(0);
+                  getCityList();
                 } else {
                   Utility().showInSnackBar(
                       value: checkInternetConnection, context: context);
@@ -416,7 +423,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   cityListWidget() {
     return Container(
       margin: const EdgeInsets.only(top: 10,),
-      child: Container(
+      child: SizedBox(
         height: 58,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -436,13 +443,13 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
           items: cityList
               .map((ListItem) => DropdownMenuItem(
                   value: ListItem.cityc,
-                  child: Container(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width / 1.28,
                     child: robotoTextWidget(
-                        textval: ListItem.bezei + " " + ListItem.cityc,
+                        textval: "${ListItem.bezei} ${ListItem.cityc}",
                         colorval: AppColor.themeColor,
                         sizeval: 12,
                         fontWeight: FontWeight.bold),
-                    width: MediaQuery.of(context).size.width / 2,
                   )))
               .toList(),
           onChanged: (Object? value) {
@@ -471,11 +478,11 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
     dynamic response = await HTTP.get(getCountryListAPI());
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-      C.CountryListResponse countryListResponse =
-          C.CountryListResponse.fromJson(jsonData);
+      Country.CountryListResponse countryListResponse =
+          Country.CountryListResponse.fromJson(jsonData);
       setState(() {
         countryList = countryListResponse.response;
-        getStateList(2);
+        getStateList();
         isLoading = false;
       });
     } else {
@@ -486,46 +493,32 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
     }
   }
 
-  Future<void> getStateList(int pos) async {
+  Future<void> getStateList( ) async {
     setState(() {
       isLoading = true;
     });
 
-    if (pos == 0) {
+
       stateList = [];
-    } else if (pos == 1) {
-      stateToList = [];
-    } else {
-      stateList = [];
-      stateToList = [];
-    }
+
 
     var jsonData = null;
 
-    dynamic response = await HTTP.get(getStateListAPI(pos == 2
-        ? countryCodeSpinner!
-        : pos == 1
-            ? countryToCodeSpinner!
-            : pos == 0
-                ? countryCodeSpinner!
-                : countryToCodeSpinner!));
+    dynamic response = await HTTP.get(getStateListAPI(
+        countryCodeSpinner!
+        ));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-      S.StateListResponse stateListResponse =
-          S.StateListResponse.fromJson(jsonData);
+      StateList.StateListResponse stateListResponse =
+      StateList.StateListResponse.fromJson(jsonData);
 
       //  print("object===> ${stateListResponse.toString()}");
 
       if (stateListResponse.status.compareTo("true") == 0) {
         setState(() {
-          if (pos == 0) {
+
             stateList = stateListResponse.response;
-          } else if (pos == 1) {
-            stateToList = stateListResponse.response;
-          } else {
-            stateList = stateListResponse.response;
-            stateToList = stateListResponse.response;
-          }
+
 
           isLoading = false;
         });
@@ -544,44 +537,30 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
     }
   }
 
-  Future<void> getCityList(int pos) async {
+  Future<void> getCityList() async {
     setState(() {
       isLoading = true;
     });
 
-    if (pos == 0) {
       cityList = [];
-    } else {
-      cityToList = [];
-    }
+
 
     var jsonData = null;
 
     dynamic response = await HTTP.get(getCityListAPI(
-        pos == 0 ? countryCodeSpinner! : countryToCodeSpinner!,
+        countryCodeSpinner! ,
          stateCodeSpinner!  ));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
       City.CityListResponse cityListResponse =
           City.CityListResponse.fromJson(jsonData);
 
-      if (cityListResponse.status != "false") {
         setState(() {
-          if (pos == 0) {
             cityList = cityListResponse.response;
-          } else {
-            cityToList = cityListResponse.response;
-          }
 
           isLoading = false;
         });
-      } else {
-        Utility()
-            .showInSnackBar(value: cityListResponse.message, context: context);
-        setState(() {
-          isLoading = false;
-        });
-      }
+
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
       setState(() {
@@ -612,20 +591,20 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         items: expenseTypeModel
             .map((ListItem) => DropdownMenuItem(
                 value: ListItem.spkzl,
-                child: Container(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.28,
                   child: robotoTextWidget(
-                      textval: ListItem.spkzl + " " + ListItem.sptxt,
+                      textval: "${ListItem.spkzl} ${ListItem.sptxt}",
                       colorval: AppColor.themeColor,
                       sizeval: 12,
                       fontWeight: FontWeight.bold),
-                  width: MediaQuery.of(context).size.width / 2,
-                )))
+                ),),)
             .toList(),
         onChanged: (Object? value) {
           setState(() {
             print('value=====>$value');
 
-            expenseTypeSpinner = value.toString();
+          expenseTypeSpinner = value.toString();
           });
         },
       ),
@@ -654,13 +633,13 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         items: taxCodeModel
             .map((ListItem) => DropdownMenuItem(
             value: ListItem.text,
-            child: Container(
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width /1.28,
               child: robotoTextWidget(
-                  textval: ListItem.taxCode + " " + ListItem.text,
+                  textval: "${ListItem.taxCode} ${ListItem.text}",
                   colorval: AppColor.themeColor,
                   sizeval: 12,
                   fontWeight: FontWeight.bold),
-              width: MediaQuery.of(context).size.width / 2,
             )))
             .toList(),
         onChanged: (Object? value) {
@@ -722,7 +701,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
           hintStyle: const TextStyle(color: AppColor.themeColor, fontSize: 14),
         ),
         keyboardType: TextInputType.number,
-        textInputAction: TextInputAction.next,
+        textInputAction: TextInputAction.done,
       ),
     );
   }
@@ -793,4 +772,34 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
     }
     //String value = convert.jsonEncode(sendDsrEntry).toString();
   }
+
+  void validation() {
+    if(dateto.isBefore(datefrom)){
+      Utility().showInSnackBar(value: "Date To Cannot be before From Date.", context: context);
+    }else if(countryCodeSpinner  == null || countryCodeSpinner!.isEmpty){
+      Utility().showInSnackBar(value: selectCountryCode, context: context);
+    }else if( stateCodeSpinner== null || stateCodeSpinner!.isEmpty){
+      Utility().showInSnackBar(value: selectStateCode, context: context);
+    }else if( cityCodeSpinner== null || cityCodeSpinner!.isEmpty){
+      Utility().showInSnackBar(value: selectCityCode, context: context);
+    }else if( expenseTypeSpinner==null || expenseTypeSpinner!.isEmpty){
+      Utility().showInSnackBar(value: selectExpenseType, context: context);
+    }else if( taxCodeSpinner==null || taxCodeSpinner!.isEmpty){
+      Utility().showInSnackBar(value: selectTaxCode, context: context);
+    }else if(locationController.text.isEmpty){
+      Utility().showInSnackBar(value: "Enter " + locationtxt, context: context);
+    }else if(amountController.text.isEmpty){
+      Utility().showInSnackBar(value:  "Enter " + amonuttxt, context: context);
+    }else if(currencySpinner==null || currencySpinner!.isEmpty){
+      Utility().showInSnackBar(value: selectCurr , context: context);
+    }else if(descController.text.isEmpty){
+      Utility().showInSnackBar(value: "Enter " + desc, context: context);
+    }else if(gstController.text.isEmpty){
+      Utility().showInSnackBar(value: "Enter " + GSTINNotxt, context: context);
+    }else{
+      saveDataToDatabase();
+      Navigator.pop(context);
+    }
+  }
+
 }

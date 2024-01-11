@@ -9,7 +9,7 @@ import 'package:shakti_employee_app/database/database_helper.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'dart:convert' as convert;
-import 'package:shakti_employee_app/travelrequest/model/countrylistrequest.dart' as C;
+import 'package:shakti_employee_app/travelrequest/model/countrylistrequest.dart' as Country;
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
@@ -32,7 +32,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   TextEditingController locationController = TextEditingController();
   String dateTimeFormat = "dd/MM/yyyy";
   DateTime? pickedDate;
-  List<C.Response> countryList = [];
+  List<Country.Response> countryList = [];
   List<TaxCode> taxCode = [];
   List<ExpenseType> expenseType = [];
   List<CostCenter> costCenter = [];
@@ -88,8 +88,10 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
             }),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      floatingActionButton:  FloatingActionButton(
+      floatingActionButton:  FloatingActionButton.extended(
+
         backgroundColor: AppColor.themeColor,
+
         onPressed: (){
 
           Navigator.of(context)
@@ -98,7 +100,8 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
               .then((value) => {getAllTraveExpenses()});
 
         },
-        child: const Icon(Icons.add , color: AppColor.whiteColor,),
+        label: robotoTextWidget(textval: "Add Expenses", colorval: Colors.white, sizeval: 14, fontWeight: FontWeight.w400),
+
       ),
       body:Stack(
         children: [
@@ -120,7 +123,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
                   LocationofTravel(),
                   costCenterListWidget(),
 
-                  _buildPosts(context),
+                  savedtravelExpense.length>0?_buildPosts(context):SizedBox(),
                 ],
               ),
             ),
@@ -339,8 +342,8 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
     dynamic response = await HTTP.get(getCountryListAPI());
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-      C.CountryListResponse countryListResponse =
-      C.CountryListResponse.fromJson(jsonData);
+      Country.CountryListResponse countryListResponse =
+      Country.CountryListResponse.fromJson(jsonData);
       setState(() {
         countryList = countryListResponse.response;
 
@@ -390,8 +393,8 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
           },
           itemCount: savedtravelExpense.length,
           padding: const EdgeInsets.all(2),
-        )
-            : NoDataFound()
+        ):NoDataFound(),
+
       ],
     ) ;
   }
@@ -446,7 +449,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
 
   SizedBox NoDataFound() {
     return SizedBox(
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery.of(context).size.height/2,
         width: MediaQuery.of(context).size.width,
         child: Center(
           child: Container(
