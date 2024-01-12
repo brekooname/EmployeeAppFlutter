@@ -88,8 +88,6 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
                   attendenceTypeSpinnerWidget(),
                   remarkWidget(),
                   submitWidget(),
-
-
                 ],
               ),
             ),
