@@ -26,9 +26,9 @@ class TaskCountModel {
   factory TaskCountModel.fromJson(Map<String, dynamic> json) => TaskCountModel(
     status: json["status"],
     message: json["message"],
-    pending: List<Completed>.from(json["Pending"].map((x) => Completed.fromJson(x))),
-    total: List<Completed>.from(json["total"].map((x) => Completed.fromJson(x))),
-    completed: List<Completed>.from(json["Completed"].map((x) => Completed.fromJson(x))),
+    pending: json["Pending"] !=null? List<Completed>.from(json["Pending"].map((x) => Completed.fromJson(x))):[],
+    total: json["total"] != null? List<Completed>.from(json["total"].map((x) => Completed.fromJson(x))):[],
+    completed:["Completed"]!= null? List<Completed>.from(json["Completed"].map((x) => Completed.fromJson(x))):[],
   );
 
   Map<String, dynamic> toJson() => {

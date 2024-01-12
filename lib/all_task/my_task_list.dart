@@ -228,7 +228,8 @@ class _MyTaskListWidgetState extends State<MyTaskListWidget> {
                         ],
                       ),
                     )
-                    .toList())));
+                    .toList()))
+    );
   }
 
   Widget setTitle(String value) {
