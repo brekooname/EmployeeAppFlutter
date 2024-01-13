@@ -7,6 +7,7 @@ import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 
 import '../main.dart';
 import '../sidemenu/attendance/attendanceReport.dart';
+import '../sidemenu/attendanceCorrection/attendencecorrection.dart';
 import '../sidemenu/leavereport/LeaveReport.dart';
 import '../sidemenu/officaldutyreport/officialdutyReport.dart';
 import '../sidemenu/personalinfo/personalinfo.dart';
@@ -81,12 +82,13 @@ class _HomePageState extends State<NavigationDrawerWidget> {
             navigationItemWidget(0, Icons.home, hometxt),
             navigationItemWidget(1, Icons.task, myTask),
             navigationItemWidget(2, Icons.calendar_month, attendance),
-            navigationItemWidget(3, Icons.calendar_today_rounded, leave),
-            navigationItemWidget(4, Icons.person_outline_rounded, officialDuty),
-            navigationItemWidget(5, Icons.route_outlined, travelReport),
-            navigationItemWidget(6, Icons.person_outline_rounded, payslip),
-            navigationItemWidget(7, Icons.person, personalInfo),
-            navigationItemWidget(8, Icons.logout, logout),
+            navigationItemWidget(3, Icons.calendar_month_sharp, attendanceC),
+            navigationItemWidget(4, Icons.calendar_today_rounded, leave),
+            navigationItemWidget(5, Icons.person_outline_rounded, officialDuty),
+            navigationItemWidget(6, Icons.route_outlined, travelReport),
+            navigationItemWidget(7, Icons.person_outline_rounded, payslip),
+            navigationItemWidget(8, Icons.person, personalInfo),
+            navigationItemWidget(9, Icons.logout, logout),
           ],
         ));
   }
@@ -129,7 +131,16 @@ class _HomePageState extends State<NavigationDrawerWidget> {
                   (route) => true);
             }
             break;
-          case 3:
+          case 3:{
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => AttendenceCorrectionScreen()),
+                    (route) => true);
+            break;
+
+          }
+
+          case 4:
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
@@ -139,7 +150,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
                   (route) => true);
             }
             break;
-          case 4:
+          case 5:
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
@@ -150,7 +161,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
             }
             break;
 
-          case 5 :{
+          case 6 :{
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                     builder: (context) => TravelReportScreen()),
@@ -158,14 +169,14 @@ class _HomePageState extends State<NavigationDrawerWidget> {
           }
             break;
 
-          case 6:
+          case 7:
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const SalarySlip()),
                   (route) => true);
             }
             break;
-          case 7:
+          case 8:
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
@@ -175,7 +186,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
                   (route) => true);
             }
             break;
-          case 8:
+          case 9:
             {
               Utility().clearSharedPreference();
               Utility().deleteDatabase(databaseName);
