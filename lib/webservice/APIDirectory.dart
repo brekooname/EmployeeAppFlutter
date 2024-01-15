@@ -6,7 +6,7 @@ import 'constant.dart';
 const productionUrl = 'https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/';
 const googleDistanceMatrixAPI = 'https://maps.googleapis.com/maps/api/directions/';
 const dashboardAppUrl ='https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zshakti_dash/';
-//https://spdevsrvr1.shaktipumps.com:8423/sap(bD1lbiZjPTkwMA==)/bc/bsp/sap/zhr_emp_app_1/ldrop_list_api.htm
+
 
 
 userLogin(String sapCode, String password, String api_version,  String api, String app_version, String imei , String os, String fcm_token,String loginUserType) {
@@ -141,4 +141,8 @@ getTravelListResponseAPI(String sapCode , String fromDate, String toDate){
 
 getTravelDropDown(){
   return Uri.parse('${productionUrl}ldrop_list_api.htm');
+}
+
+createAttendenceCorrectionAPI(String sapCode , String fromDate, String spinnerType,String remark){
+  return Uri.parse('${productionUrl}attendance_correction.htm?date=${fromDate}&perno=${sapCode}&status=${spinnerType}&remark=${remark}');
 }
