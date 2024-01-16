@@ -12,6 +12,9 @@ import 'package:shakti_employee_app/travelrequest/model/citylistresponse.dart'
     as City;
 import 'package:shakti_employee_app/travelrequest/model/statelistresponse.dart'
     as StateList;
+import 'package:shakti_employee_app/travelrequest/model/regionlist.dart'
+as RegionList;
+
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'dart:convert' as convert;
@@ -32,15 +35,16 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   bool isLoading = false;
   List<Country.Response> countryList = [];
   List<StateList.Response> stateList = [];
-  List<StateList.Response> stateToList = [];
+  List<RegionList.Response> regionList = [];
   List<City.Response> cityList = [];
-  List<City.Response> cityToList = [];
+
   List<TaxCode> taxCodeModel = [];
   List<ExpenseType> expenseTypeModel = [];
   String? countryCodeSpinner = "IN",
       stateCodeSpinner ,
       taxCodeSpinner,
       cityCodeSpinner,
+      regionCodeSpinner,
       fromCity,
       expenseTypeSpinner;
 
@@ -52,14 +56,12 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   TextEditingController gstController = TextEditingController();
   DateTime datefrom = DateTime.now();
   DateTime dateto = DateTime.now();
-  String? selectedFromDate, selectedToDate ,currencySpinner;
+  String? selectedFromDate, selectedToDate ,currencySpinner,currencyShortForm;
 
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
   String dateTimeFormat = "dd/MM/yyyy";
   DateTime? pickedDate;
-
-
 
   var currencyList = [
     'India Rupee',
@@ -100,11 +102,11 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       cityCodeSpinner =editTravelExpenseModel!.city;
       taxCodeSpinner = editTravelExpenseModel!.taxCode;
       expenseTypeSpinner =editTravelExpenseModel!.expenseType;
-      descController.text = editTravelExpenseModel!.description;
+      descController.text = editTravelExpenseModel!.descript;
       locationController.text = editTravelExpenseModel!.location;
-      amountController.text = editTravelExpenseModel!.amount;
+      amountController.text = editTravelExpenseModel!.rec_amount;
       gstController.text = editTravelExpenseModel!.gstNo;
-      currencySpinner = editTravelExpenseModel!.currency;
+      currencySpinner = editTravelExpenseModel!.rec_curr;
 
       if(stateCodeSpinner!= null && countryCodeSpinner!= null){
         getCityList();
@@ -166,6 +168,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
                   countryListWidget(),
                   stateListWidget(),
                   cityListWidget(),
+                  regionListWidget(),
                   //Expense Type
                   ExpenseTypeListWidget(),
                   //Tax Code
@@ -224,6 +227,11 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
           onChanged: (Object? value) {
             setState(() {
               currencySpinner = value.toString();
+              if(value == "India Rupee"){
+                currencyShortForm = "INR";
+              }else{
+                currencyShortForm = "USD";
+              }
             });
           },
         ));
@@ -462,6 +470,51 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
                 }
               }
             });
+
+            getRegionList();
+          },
+        ),
+      ),
+    );
+  }
+
+ regionListWidget() {
+    return Container(
+      margin: const EdgeInsets.only(top: 10,),
+      child: SizedBox(
+        height: 58,
+        width: MediaQuery.of(context).size.width,
+        child: DropdownButtonFormField(
+          decoration: InputDecoration(
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(color: AppColor.themeColor),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
+              hintText: selectRegionCode,
+              fillColor: Colors.white),
+          value: regionCodeSpinner,
+          validator: (value) =>
+          value == null || value.isEmpty ? selectRegionCode : "",
+          items: regionList
+              .map((ListItem) => DropdownMenuItem(
+              value: ListItem.tehsil,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width / 1.28,
+                child: robotoTextWidget(
+                    textval: "${ListItem.grd} ${ListItem.tehsilText}",
+                    colorval: AppColor.themeColor,
+                    sizeval: 12,
+                    fontWeight: FontWeight.bold),
+              )))
+              .toList(),
+          onChanged: (Object? value) {
+            setState(() {
+              print('value=====>$value');
+              regionCodeSpinner = value.toString();
+            });
           },
         ),
       ),
@@ -483,25 +536,18 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       setState(() {
         countryList = countryListResponse.response;
         getStateList();
-
+        isLoading = false;
       });
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
       setState(() {
-
+        isLoading = false;
       });
     }
   }
 
   Future<void> getStateList( ) async {
-    setState(() {
-
-    });
-
-
-      stateList = [];
-
-
+  stateList = [];
     var jsonData = null;
 
     dynamic response = await HTTP.get(getStateListAPI(
@@ -518,30 +564,20 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         setState(() {
             stateList = stateListResponse.response;
 
-          isLoading = false;
         });
       } else {
         Utility()
             .showInSnackBar(value: stateListResponse.message, context: context);
-        setState(() {
-          isLoading = false;
-        });
+
       }
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
-      setState(() {
-        isLoading = false;
-      });
+
     }
   }
 
   Future<void> getCityList() async {
-    setState(() {
-      isLoading = true;
-    });
-
       cityList = [];
-
 
     var jsonData = null;
 
@@ -555,15 +591,33 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
 
         setState(() {
             cityList = cityListResponse.response;
-
-          isLoading = false;
         });
 
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
+    }
+  }
+
+  Future<void> getRegionList() async {
+    regionList = [];
+
+    var jsonData = null;
+
+    dynamic response = await HTTP.get(getRegionListAPI(
+        countryCodeSpinner! ,
+        stateCodeSpinner! ,
+        cityCodeSpinner!));
+    if (response != null && response.statusCode == 200) {
+      jsonData = convert.jsonDecode(response.body);
+      RegionList.RegionListResponse regionListResponse =
+      RegionList.RegionListResponse.fromJson(jsonData);
+
       setState(() {
-        isLoading = false;
+        regionList = regionListResponse.response;
       });
+
+    } else {
+      Utility().showInSnackBar(value: somethingWentWrong, context: context);
     }
   }
 
@@ -630,7 +684,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         value == null || value.isEmpty ? selectTaxCode : "",
         items: taxCodeModel
             .map((ListItem) => DropdownMenuItem(
-            value: ListItem.text,
+            value: ListItem.taxCode,
             child: SizedBox(
               width: MediaQuery.of(context).size.width /1.28,
               child: robotoTextWidget(
@@ -761,14 +815,13 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
 
   void saveDataToDatabase() {
 
-    TravelExpenseModel travelExpenseModel = TravelExpenseModel(key: 0,fromDate: fromDateController.text.toString(), toDate: toDateController.text.toString(), country: countryCodeSpinner!, state: stateCodeSpinner!, city: cityCodeSpinner!, expenseType: expenseTypeSpinner!, taxCode: taxCodeSpinner!, location: locationController.text.toString(), amount: amountController.text.toString(), currency: currencySpinner!, description: descController.text.toString(), gstNo: gstController.text.toString());
+    TravelExpenseModel travelExpenseModel = TravelExpenseModel(key: 0,fromDate: selectedFromDate!, toDate: selectedToDate!, country: countryCodeSpinner!, state: stateCodeSpinner!, city: cityCodeSpinner!, expenseType: expenseTypeSpinner!, taxCode: taxCodeSpinner!, location: locationController.text.toString(), rec_amount: amountController.text.toString(), rec_curr: currencyShortForm!, descript: descController.text.toString(), gstNo: gstController.text.toString(), region: regionCodeSpinner!);
 
     if(editTravelExpenseModel == null){
       DatabaseHelper.instance.insertTravelExpenseTable(travelExpenseModel.toMapWithoutId());
     }else{
       DatabaseHelper.instance.updateTravelExpenseTable(editTravelExpenseModel!.key ,travelExpenseModel.toMapWithoutId());
     }
-    //String value = convert.jsonEncode(sendDsrEntry).toString();
   }
 
   void validation() {

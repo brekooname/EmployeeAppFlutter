@@ -127,6 +127,7 @@ var selectCountryCode = "Select Country";
 var selectCostCenter = "Select Cost Center";
 var selectStateCode = "Select State";
 var selectCityCode = "Select City";
+var selectRegionCode = "Select Region";
 var selectTimeSlot = "Select Time Slot";
 var selectBookingTime = "Select Booking Type";
 var selectExpenseType = "Select Expense Type";

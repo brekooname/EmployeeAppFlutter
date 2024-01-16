@@ -24,7 +24,6 @@ import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'forgot_password/forgot_password_page.dart';
 import 'home/home_page.dart';
 import 'home/model/firestoredatamodel.dart';
@@ -379,7 +378,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isLoading = true;
     });
-
 
     if (Platform.isAndroid) {
       platform = "Android";

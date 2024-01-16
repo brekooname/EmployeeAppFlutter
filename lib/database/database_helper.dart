@@ -27,18 +27,19 @@ class DatabaseHelper {
   static final endTime = 'end_time';
   static final latLng = 'lat_lng';
 
-  static final fromDate = 'from_date';
-  static final toDate = 'to_date';
+  static final fromDate = 'from_date1';
+  static final toDate = 'to_date1';
   static final country = 'country';
   static final state = 'state';
   static final city = 'city';
-  static final expenseType = 'expense_type';
-  static final taxCode = 'tax_code';
+  static final expenseType = 'exp_type';
+  static final taxCode = 'TAX_CODE';
   static final location = 'location';
-  static final amount = 'amount';
-  static final currency = 'currency';
-  static final description = 'description';
+  static final amount = 'rec_amount';
+  static final currency = 'rec_curr';
+  static final description = 'descript';
   static final gstNo = 'gst_no';
+  static final region = 'region';
 
   DatabaseHelper._privateConstructor();
 
@@ -102,7 +103,8 @@ class DatabaseHelper {
             $amount  TEXT NOT NULL,
             $currency  TEXT NOT NULL,
             $description TEXT NOT NULL,
-            $gstNo  TEXT NOT NULL
+            $gstNo  TEXT NOT NULL,
+            $region TEXT NOT NULL
     )''');
   }
 

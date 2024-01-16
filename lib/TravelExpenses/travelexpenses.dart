@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/TravelExpenses/addExpenses.dart';
 import 'package:shakti_employee_app/TravelExpenses/model/dropDownList.dart';
+import 'package:shakti_employee_app/TravelExpenses/model/savetravelresponse.dart';
 import 'package:shakti_employee_app/TravelExpenses/model/trvaelExp.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/database/database_helper.dart';
@@ -13,6 +14,9 @@ import 'package:shakti_employee_app/travelrequest/model/countrylistrequest.dart'
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../webservice/constant.dart';
 
 class TravelExpensesScreen extends StatefulWidget {
   const TravelExpensesScreen({Key? key}) : super(key: key);
@@ -23,7 +27,7 @@ class TravelExpensesScreen extends StatefulWidget {
 
 class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
 
-  bool isLoading = false ;
+  bool isLoading = false ,isSend =false;
   DateTime datefrom = DateTime.now();
   String?  selectedFromDate, selectedToDate;
   TextEditingController targetDateController = TextEditingController();
@@ -57,14 +61,18 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
 
     });
 
+    Utility().checkInternetConnection().then((connectionResult) {
+      if (connectionResult) {
+        getCountryList();
+        getDropDownList();
+      } else {
+        Utility()
+            .showInSnackBar(value: checkInternetConnection, context: context);
+      }
+    });
 
-    getCountryList();
-    getDropDownList();
     getAllTraveExpenses();
-
-
   }
-
 
 
   @override
@@ -124,19 +132,13 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
                   countryListWidget(),
                   LocationofTravel(),
                   costCenterListWidget(),
-
+                  submitWidget(),
                   savedtravelExpense.length>0?_buildPosts(context):SizedBox(),
                 ],
               ),
             ),
           ),
-          Center(
-            child: isLoading == true
-                ? const CircularProgressIndicator(
-              color: Colors.indigo,
-            )
-                : const SizedBox(),
-          ),
+
         ],
       ),
     );
@@ -219,6 +221,35 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
         }
       });
     }
+  }
+
+  submitWidget() {
+    return GestureDetector(
+        onTap: () {
+          validation();
+        },
+        child: Container(
+          height: 50,
+          margin: EdgeInsets.only(top: 10),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: AppColor.themeColor),
+          child: Center(
+            child: isSend
+                ? const SizedBox(
+              height: 30,
+              width: 30,
+              child: CircularProgressIndicator(
+                color: AppColor.whiteColor,
+              ),
+            )
+                : robotoTextWidget(
+                textval: submit,
+                colorval: Colors.white,
+                sizeval: 14,
+                fontWeight: FontWeight.bold),
+          ),
+        ));
   }
 
   countryListWidget() {
@@ -365,8 +396,6 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
               (map) => savedtravelExpense.add(TravelExpenseModel.fromMap(map)));
     });
 
-     // DatabaseHelper.instance.deleteDSREntry();
-
     print('savedtravelExpense=========>${savedtravelExpense.toString()}');
   }
 
@@ -422,11 +451,11 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    detailWidget(from, savedtravelExpense[index].fromDate),
-                    detailWidget(to, savedtravelExpense[index].toDate),
-                    detailWidget(desc, savedtravelExpense[index].description ),
-                    detailWidget(amonuttxt, savedtravelExpense[index].amount ),
-                    detailWidget(currencytxt, savedtravelExpense[index].currency ),
+                    detailWidget(from, formateChange(savedtravelExpense[index].fromDate)),
+                    detailWidget(to,formateChange( savedtravelExpense[index].toDate)),
+                    detailWidget(desc, savedtravelExpense[index].descript ),
+                    detailWidget(amonuttxt, savedtravelExpense[index].rec_amount ),
+                    detailWidget(currencytxt, getCurrency(savedtravelExpense[index].rec_curr) ),
                   ],
                 ),
               ),
@@ -610,8 +639,6 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   }
 
   Future<void> getDropDownList()  async {
-
-
     var jsonData = null;
 
     dynamic response = await HTTP.get(getTravelDropDown());
@@ -634,5 +661,75 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
         isLoading = false;
       });
     }
+  }
+
+  void validation() {
+
+    if(locationController.text.isEmpty){
+      Utility().showInSnackBar(value: "Enter " + locationtxt, context: context);
+    }else if( costCenterSpinner == null || costCenterSpinner!.isEmpty){
+      Utility().showInSnackBar(value: selectCostCenter, context: context);
+    }else{
+
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
+          saveExpenseAPI();
+        } else {
+          Utility()
+              .showInSnackBar(value: checkInternetConnection, context: context);
+        }
+      });
+
+    }
+  }
+
+  void saveExpenseAPI() async {
+    setState(() {
+      isSend = true;
+    });
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String value = convert.jsonEncode(savedtravelExpense).toString();
+    print("object${value}");
+    dynamic response = await HTTP.get(sendTravelExpense(selectedFromDate!,selectedToDate!,countryCodeSpinner!,locationController.text.toString(), costCenterSpinner!, sharedPreferences.getString(userID).toString(),value));
+
+    if (response != null && response.statusCode == 200) {
+
+      var jsonData = convert.jsonDecode(response.body);
+      SaveTravelExpenseResponse saveTravelExpenseResponse = SaveTravelExpenseResponse.fromJson(jsonData);
+
+      if(saveTravelExpenseResponse.status.compareTo("true") == 0){
+        Utility().showInSnackBar(value: saveTravelExpenseResponse.message, context: context);
+        await DatabaseHelper.instance.deleteTravelExpenseTable();
+        Navigator.pop(context);
+        setState(() {
+          isSend = true;
+        });
+      }else{
+        Utility().showInSnackBar(value: saveTravelExpenseResponse.message, context: context);
+        setState(() {
+          isSend = true;
+        });
+      }
+
+    } else {
+      Utility().showToast(somethingWentWrong);
+      setState(() {
+        isSend = false;
+      });
+    }
+  }
+
+  String getCurrency(String rec_curr) {
+    print('rec_curr =====  ${rec_curr}');
+    if(rec_curr == "INR"){
+      return "Indian Rupee";
+    }else{
+      return "US Dollar";
+    }
+  }
+
+  String formateChange(String fromDate) {
+    return   DateFormat(dateTimeFormat).format(DateTime.parse(fromDate));
+
   }
 }
