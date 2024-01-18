@@ -39,15 +39,13 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
   startTimeout([int? milliseconds]) {
     var duration = interval;
     Timer.periodic(duration, (timer) {
-      setState(() {
-        isTimerStart = true;
-        currentSeconds = timer.tick;
-        if (timer.tick >= timerMaxSeconds){
-          isTimerStart = false;
-          timer.cancel();}
+      isTimerStart = true;
+      currentSeconds = timer.tick;
+      if (timer.tick >= timerMaxSeconds){
+        isTimerStart = false;
+        timer.cancel();}
 
-
-      });
+      setState(() {});
     });
   }
 

@@ -502,7 +502,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   Future<void> createOD() async {
 
     setState(() {
-      isLoading =true;
+      isLoading = true;
     });
 
    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -546,6 +546,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     }
   }
 
-
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    if(isLoading==true){
+      isLoading = false;
+    }
+  }
 
 }

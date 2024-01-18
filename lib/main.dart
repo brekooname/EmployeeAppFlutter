@@ -35,7 +35,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 Future<Widget> initializeApp(ApplicationConfig? appConfig) async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn =
-      (sharedPreferences.getString(userID) == null) ? False : True;
+      sharedPreferences.getString(userID) == null && sharedPreferences.getString(userID)!.isEmpty? False : True;
   String? journeyStarts =
       (sharedPreferences.getString(localConveyanceJourneyStart) == null)
           ? False

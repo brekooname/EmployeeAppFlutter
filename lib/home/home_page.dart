@@ -44,6 +44,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../database/database_helper.dart';
 import '../leave/LeaveApprove.dart';
+import '../main.dart';
 import '../notificationService/local_notification_service.dart';
 import '../theme/string.dart';
 import '../uiwidget/appupdatewidget.dart';
@@ -240,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(task),
                       detailWidget(travel),
                       localConvenience(),
-                      detailWidget(travelExpenses),
+                     // detailWidget(travelExpenses),
                       dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
                     ],
@@ -452,10 +453,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      Utility().showInSnackBar(
-          value:
-              'Location permissions are permanently denied, we cannot request permissions.',
-          context: context);
+      Utility().showInSnackBar(value: 'Location permissions are permanently denied, we cannot request permissions.', context: context);
       return false;
     }
     return true;
@@ -467,6 +465,7 @@ class _HomePageState extends State<HomePage> {
     formattedDate = formatter.format(now);
     sharedPreferences = await SharedPreferences.getInstance();
 
+    if(sharedPreferences.getString(name)!=null && sharedPreferences.getString(name)!.isNotEmpty){
     setState(() {
       nameValue = sharedPreferences.getString(name)!;
       UserID = sharedPreferences.getString(userID)!;
@@ -495,6 +494,13 @@ class _HomePageState extends State<HomePage> {
               .showInSnackBar(value: checkInternetConnection, context: context);
         }
       });
+    }
+    }else{
+      Utility().clearSharedPreference();
+      Utility().deleteDatabase(databaseName);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) =>  LoginPage()),
+              (route) => false);
     }
   }
   void readNotifier() {
