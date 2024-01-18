@@ -20,7 +20,6 @@ import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'forgot_password/forgot_password_page.dart';
 import 'home/home_page.dart';
 import 'home/model/firestoredatamodel.dart';
@@ -75,7 +74,7 @@ class MyApp extends StatelessWidget {
                   journeyStart: journStar!,
                 )
               : const LoginPage(),
-        ));
+        ),);
   }
 }
 
@@ -95,8 +94,7 @@ class _LoginPageState extends State<LoginPage> {
       fcmToken = '',
       imeiNumber = '',
       apiNumber = '',
-      platformVersion = '',
-      loginUserType ='';
+      platformVersion = '',     loginUserType ='';
   TextEditingController sapCodeController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool getPermission = false;
@@ -121,14 +119,16 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
    return Consumer<firestoreAppUpdateNofifier>(
         builder: (context, value, child) {
-          if (value.fireStoreData != null &&
-          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+      if (value.fireStoreData != null && value.fireStoreData!.minEmployeeAppVersion !=
+          value.appVersionCode) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(
-                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
-              (Route<dynamic> route) => false);
+                      appUrl:
+                      value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+
         });
       } else {
         return Scaffold(
@@ -362,7 +362,6 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-
     if (Platform.isAndroid) {
       platform = "Android";
     } else if (Platform.isIOS) {
@@ -393,7 +392,7 @@ class _LoginPageState extends State<LoginPage> {
 
       print('Response======>${response.body}');
       if(loginResponse[0].name.isNotEmpty){
-      loginResManage(loginResponse[0]);
+        loginResManage(loginResponse[0]);
       } else {
         Utility().showToast(errorMssg);
         setState(() {
@@ -438,9 +437,11 @@ class _LoginPageState extends State<LoginPage> {
     readNotifier();
     _deviceDetails();
   }
+
   void readNotifier() {
     context.read<firestoreAppUpdateNofifier>().listenToLiveUpdateStream();
   }
+
   Future<void> _deviceDetails() async {
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -469,8 +470,5 @@ class _LoginPageState extends State<LoginPage> {
       print('Failed to get platform version');
     }
   }
-
-
-
 
 }

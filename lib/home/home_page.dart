@@ -15,6 +15,8 @@ import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
 import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
     as vendorGatePassPrefix;
+
+import 'package:shakti_employee_app/TravelExpenses/travelexpenses.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
 import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
@@ -44,7 +46,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../database/database_helper.dart';
 import '../leave/LeaveApprove.dart';
-import '../main.dart';
 import '../notificationService/local_notification_service.dart';
 import '../theme/string.dart';
 import '../uiwidget/appupdatewidget.dart';
@@ -101,7 +102,6 @@ class _HomePageState extends State<HomePage> {
   TextEditingController travelModeController = TextEditingController();
   FirestoreDataModel? fireStoreDataModel;
   BackgroundLocationService? backgroundLocationService;
-  bool isEmployeeApp = false;
 
   var totalWayPoints ="";
   @override
@@ -157,19 +157,6 @@ class _HomePageState extends State<HomePage> {
       backgroundLocationService = Provider.of<BackgroundLocationService>(context,listen: true);
 
     // TODO: implement build
-      return Consumer<firestoreAppUpdateNofifier>(
-          builder: (context, value, child) {
-            isEmployeeApp = value.isEmployeeApp;
-        if (value.fireStoreData != null &&
-            value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (BuildContext context) => AppUpdateWidget(
-                        appUrl: value.fireStoreData!.employeeAppUrl.toString())),
-                    (Route<dynamic> route) => false);
-          });
-        } else {
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -177,7 +164,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: AppColor.themeColor,
         elevation: 0,
         title: robotoTextWidget(
-            textval: value.isEmployeeApp?appName:appName2,
+            textval: appName,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
@@ -191,11 +178,11 @@ class _HomePageState extends State<HomePage> {
                 // row with 2 children
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.download_for_offline,
                       color: AppColor.themeColor,
                     ),
-                    const SizedBox(
+                    SizedBox(
                       width: 10,
                     ),
                     robotoTextWidget(
@@ -227,7 +214,21 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Stack(
+      body: Consumer<firestoreAppUpdateNofifier>(
+          builder: (context, value, child) {
+        if (value.fireStoreData != null && value.fireStoreData!.minEmployeeAppVersion !=
+            value.appVersionCode) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => AppUpdateWidget(
+                          appUrl:
+                              value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+
+          });
+        } else {
+          return Stack(
             children: [
               SingleChildScrollView(
                 child: Container(
@@ -241,7 +242,7 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(task),
                       detailWidget(travel),
                       localConvenience(),
-                     // detailWidget(travelExpenses),
+                      dailyAndWebReport(travelEx, "assets/svg/request.svg"),
                       dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
                     ],
@@ -256,8 +257,11 @@ class _HomePageState extends State<HomePage> {
                     : const SizedBox(),
               ),
             ],
-          ),
-
+          );
+        }
+        return Container(
+        );
+      }),
       drawer: Drawer(
           backgroundColor: AppColor.whiteColor,
           child: NavigationDrawerWidget(
@@ -268,9 +272,6 @@ class _HomePageState extends State<HomePage> {
             personalInfo: personalInfo,
           )),
     );
-        } return Container(
-        );
-          });
   }
 
   detailWidget(String title) {
@@ -453,7 +454,10 @@ class _HomePageState extends State<HomePage> {
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      Utility().showInSnackBar(value: 'Location permissions are permanently denied, we cannot request permissions.', context: context);
+      Utility().showInSnackBar(
+          value:
+              'Location permissions are permanently denied, we cannot request permissions.',
+          context: context);
       return false;
     }
     return true;
@@ -470,6 +474,7 @@ class _HomePageState extends State<HomePage> {
       nameValue = sharedPreferences.getString(name)!;
       UserID = sharedPreferences.getString(userID)!;
     });
+    }
    readNotifier();
     if (sharedPreferences.getString(currentDate) != null) {
       if (formattedDate !=
@@ -494,13 +499,6 @@ class _HomePageState extends State<HomePage> {
               .showInSnackBar(value: checkInternetConnection, context: context);
         }
       });
-    }
-    }else{
-      Utility().clearSharedPreference();
-      Utility().deleteDatabase(databaseName);
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) =>  LoginPage()),
-              (route) => false);
     }
   }
   void readNotifier() {
@@ -596,6 +594,15 @@ class _HomePageState extends State<HomePage> {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const WebReport()),
                   (route) => true);
+            }
+            break;
+          case "Travel Expenses Request":
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => TravelExpensesScreen(
+                      ),),
+                      (route) => true);
             }
             break;
           case "Close":
@@ -960,7 +967,7 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: robotoTextWidget(
-                    textval: isEmployeeApp?appName:appName2,
+                    textval: appName,
                     colorval: AppColor.themeColor,
                     sizeval: 16,
                     fontWeight: FontWeight.bold),
@@ -1087,7 +1094,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: robotoTextWidget(
-                            textval: isEmployeeApp?appName:appName2,
+                            textval: appName,
                             colorval: AppColor.themeColor,
                             sizeval: 16,
                             fontWeight: FontWeight.bold),
