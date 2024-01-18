@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/TravelExpenses/addExpenses.dart';
 import 'package:shakti_employee_app/TravelExpenses/model/dropDownList.dart';
 import 'package:shakti_employee_app/TravelExpenses/model/savetravelresponse.dart';
-import 'package:shakti_employee_app/TravelExpenses/model/trvaelExp.dart';
+import 'package:shakti_employee_app/TravelExpenses/model/trvaelExpneseResponse.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/database/database_helper.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
@@ -38,10 +38,9 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   DateTime? pickedDate;
   List<Country.Response> countryList = [];
   List<TaxCode> taxCode = [];
-  List<ExpenseType> expenseType = [];
+  List<ExpenseType> expenseTypeList = [];
   List<CostCenter> costCenter = [];
   String? countryCodeSpinner = "IN" ,costCenterSpinner;
-  TravelExpenseModel? travelExpenseModel;
   List<TravelExpenseModel> savedtravelExpense = [];
 
   @override
@@ -104,10 +103,15 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
 
         onPressed: (){
 
-          Navigator.of(context)
-              .push(MaterialPageRoute(
-              builder: (context) => AddExpensesScreen(editTravelExpense: null, taxCode: taxCode, expenseType: expenseType,)))
-              .then((value) => {getAllTraveExpenses()});
+          if( savedtravelExpense.length != 3){
+            Navigator.of(context)
+                .push(MaterialPageRoute(
+                builder: (context) => AddExpensesScreen(editTravelExpense: null, taxCode: taxCode, expenseType: expenseTypeList,)))
+                .then((value) => {getAllTraveExpenses()});
+          }else{
+            Utility().showInSnackBar(value: lengthValidation , context: context);
+          }
+
 
         },
         label: robotoTextWidget(textval: "Add Expenses", colorval: Colors.white, sizeval: 14, fontWeight: FontWeight.w400),
@@ -133,7 +137,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
                   LocationofTravel(),
                   costCenterListWidget(),
                   submitWidget(),
-                  savedtravelExpense.length>0?_buildPosts(context):SizedBox(),
+                  savedtravelExpense.length>0?_buildPosts(context):SizedBox() ,
                 ],
               ),
             ),
@@ -366,9 +370,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   }
 
   Future<void> getCountryList() async {
-    setState(() {
-      isLoading = true;
-    });
+
 
     var jsonData = null;
 
@@ -448,14 +450,21 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
             children: [
               Container(
                 width: MediaQuery.sizeOf(context).width/1.3,
+
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    detailWidget(from, formateChange(savedtravelExpense[index].fromDate)),
-                    detailWidget(to,formateChange( savedtravelExpense[index].toDate)),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        subDetailWidget(from, formateChange(savedtravelExpense[index].fromDate)),
+                        subDetailWidget(to,formateChange( savedtravelExpense[index].toDate)),
+                      ],
+                    ),
                     detailWidget(desc, savedtravelExpense[index].descript ),
-                    detailWidget(amonuttxt, savedtravelExpense[index].rec_amount ),
-                    detailWidget(currencytxt, getCurrency(savedtravelExpense[index].rec_curr) ),
+                    detailWidget(amonuttxt, savedtravelExpense[index].rec_amount + " " + savedtravelExpense[index].rec_curr),
+                    detailWidget(Expensetxt,  savedtravelExpense[index].expenseTypeValue),
                   ],
                 ),
               ),
@@ -510,7 +519,6 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   detailWidget(String title, String value) {
     return SizedBox(
       width: MediaQuery.of(context).size.width / 1.25,
-      height: 25,
       child: Row(
         children: [
           robotoTextWidget(
@@ -548,7 +556,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
        }else{
          Navigator.of(context)
              .push(MaterialPageRoute(
-             builder: (context) => AddExpensesScreen(editTravelExpense: savedtravelExpense[index], taxCode: taxCode, expenseType: expenseType,)))
+             builder: (context) => AddExpensesScreen(editTravelExpense: savedtravelExpense[index], taxCode: taxCode, expenseType: expenseTypeList,)))
              .then((value) => {getAllTraveExpenses()});
        }
       },
@@ -648,18 +656,16 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
       DropListModel.fromJson(jsonData);
       setState(() {
         taxCode = dropListModel.taxCode;
-        expenseType = dropListModel.expenseType;
+        expenseTypeList = dropListModel.expenseType;
        costCenter = dropListModel.costCenter;
       /*  print("taxCode==== ${taxCode.toString()}");
         print("expenseType===== ${expenseType.toString()}");
         print("costCenter===== ${costCenter.toString()}");*/
-        isLoading = false;
+
       });
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
-      setState(() {
-        isLoading = false;
-      });
+
     }
   }
 
@@ -690,7 +696,8 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String value = convert.jsonEncode(savedtravelExpense).toString();
     print("object${value}");
-    dynamic response = await HTTP.get(sendTravelExpense(selectedFromDate!,selectedToDate!,countryCodeSpinner!,locationController.text.toString(), costCenterSpinner!, sharedPreferences.getString(userID).toString(),value));
+    dynamic response = await HTTP.get(sendTravelExpense(selectedFromDate!,selectedToDate!,countryCodeSpinner!,
+        locationController.text.toString(), costCenterSpinner!, sharedPreferences.getString(userID).toString(),value));
 
     if (response != null && response.statusCode == 200) {
 
@@ -732,4 +739,33 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
     return   DateFormat(dateTimeFormat).format(DateTime.parse(fromDate));
 
   }
+
+  subDetailWidget(String title, String value) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 2.8,
+      child: Row(
+        children: [
+          robotoTextWidget(
+            textval: title,
+            colorval: AppColor.blackColor,
+            sizeval: 14.0,
+            fontWeight: FontWeight.w600,
+          ),
+          const SizedBox(
+            width: 5,
+          ),
+          Flexible(
+            child: robotoTextWidget(
+              textval: value,
+              colorval: AppColor.themeColor,
+              sizeval: 14.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 }

@@ -33,6 +33,7 @@ class DatabaseHelper {
   static final state = 'state';
   static final city = 'city';
   static final expenseType = 'exp_type';
+  static final expenseTypeValue = 'expenseTypeValue';
   static final taxCode = 'TAX_CODE';
   static final location = 'location';
   static final amount = 'rec_amount';
@@ -104,7 +105,8 @@ class DatabaseHelper {
             $currency  TEXT NOT NULL,
             $description TEXT NOT NULL,
             $gstNo  TEXT NOT NULL,
-            $region TEXT NOT NULL
+            $region TEXT NOT NULL,
+            $expenseTypeValue TEXT NOT NULL
     )''');
   }
 
@@ -220,7 +222,5 @@ class DatabaseHelper {
       whereArgs: [serailNo],
     );
   }
-
-
 
 }

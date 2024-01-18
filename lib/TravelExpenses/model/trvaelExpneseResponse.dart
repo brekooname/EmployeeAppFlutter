@@ -8,6 +8,7 @@ class TravelExpenseModel {
   String state;
   String city;
   String expenseType;
+  String expenseTypeValue;
   String taxCode;
   String location;
   String rec_amount;
@@ -24,6 +25,7 @@ class TravelExpenseModel {
     required this.state,
     required this.city,
     required this.expenseType,
+    required this.expenseTypeValue,
     required this.taxCode,
     required this.location,
     required this.rec_amount,
@@ -48,6 +50,7 @@ class TravelExpenseModel {
     descript: json["descript"]?? "",
     gstNo: json["gst_no"]?? "",
     region: json["region"]?? "",
+    expenseTypeValue:  json["expenseTypeValue"]?? "",
   );
 
 
@@ -66,6 +69,7 @@ class TravelExpenseModel {
     descript: json["descript"]?? "",
     gstNo: json["gst_no"]?? "",
     region: json["region"]?? "",
+    expenseTypeValue:  json["expenseTypeValue"]?? "",
   );
 
   Map<String, dynamic> toMapWithoutId() {
@@ -83,6 +87,7 @@ class TravelExpenseModel {
     map["descript"] = descript;
     map["gst_no"] = gstNo;
     map["region"] = region;
+    map["expenseTypeValue"]= expenseTypeValue ;
     return map;
   }
 
@@ -103,6 +108,7 @@ class TravelExpenseModel {
     map["descript"] = descript;
     map["gst_no"] = gstNo;
     map["region"] = region;
+    map["expenseTypeValue"]= expenseTypeValue ;
     return map;
   }
 
@@ -122,11 +128,12 @@ class TravelExpenseModel {
     map["descript"] = descript;
     map["gst_no"] = gstNo;
     map["region"] = region;
+    map["expenseTypeValue"]= expenseTypeValue ;
     return map;
   }
 
   @override
   String toString() {
-    return '{key: $key, fromDate: $fromDate, toDate: $toDate, country: $country, state: $state, city: $city, expenseType: $expenseType, taxCode: $taxCode, location: $location, rec_amount: $rec_amount, rec_curr: $rec_curr, descript: $descript, gstNo: $gstNo, region: $region}';
+    return '{key: $key, fromDate: $fromDate, toDate: $toDate, country: $country, state: $state, city: $city, expenseType: $expenseType, expenseTypeValue: $expenseTypeValue, taxCode: $taxCode, location: $location, rec_amount: $rec_amount, rec_curr: $rec_curr, descript: $descript, gstNo: $gstNo, region: $region}';
   }
 }

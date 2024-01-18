@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
 import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
     as vendorGatePassPrefix;
+
 import 'package:shakti_employee_app/TravelExpenses/travelexpenses.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
@@ -240,10 +241,11 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(gatePasstxt),
                       detailWidget(task),
                       detailWidget(travel),
-                      detailWidget(travelEx),
                       localConvenience(),
+                      dailyAndWebReport(travelEx, "assets/svg/request.svg"),
                       dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
+
                     ],
                   ),
                 ),
@@ -501,6 +503,7 @@ class _HomePageState extends State<HomePage> {
   void readNotifier() {
     context.read<firestoreAppUpdateNofifier>().listenToLiveUpdateStream();
   }
+
   void getSPArrayList() async {
     if (sharedPreferences.getString(syncSapResponse) != null &&
         sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
@@ -591,6 +594,15 @@ class _HomePageState extends State<HomePage> {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const WebReport()),
                   (route) => true);
+            }
+            break;
+          case "Travel Expenses Request":
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => TravelExpensesScreen(
+                      ),),
+                      (route) => true);
             }
             break;
           case "Close":
@@ -1419,20 +1431,10 @@ class _HomePageState extends State<HomePage> {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (context) => TravelRequestScreen(
-
                 )),
                 (route) => true);
         break;
 
-      case "Travel Expenses":
-        {
-          Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                  builder: (context) => TravelExpensesScreen(
-                  )),
-                  (route) => true);
-        }
-        break;
     }
   }
 
@@ -1476,7 +1478,9 @@ class _HomePageState extends State<HomePage> {
               .then((value) => {getSPArrayList()});
         }
         break;
+
     }
+
   }
 
   Future<void> calculateDistance(

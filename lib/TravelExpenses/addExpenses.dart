@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/TravelExpenses/model/dropDownList.dart';
-import 'package:shakti_employee_app/TravelExpenses/model/trvaelExp.dart';
+import 'package:shakti_employee_app/TravelExpenses/model/trvaelExpneseResponse.dart';
 import 'package:shakti_employee_app/database/database_helper.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
@@ -37,7 +37,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   List<StateList.Response> stateList = [];
   List<RegionList.Response> regionList = [];
   List<City.Response> cityList = [];
-
+  List<String>currencyList =[];
   List<TaxCode> taxCodeModel = [];
   List<ExpenseType> expenseTypeModel = [];
   String? countryCodeSpinner = "IN",
@@ -46,7 +46,8 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       cityCodeSpinner,
       regionCodeSpinner,
       fromCity,
-      expenseTypeSpinner;
+      expenseTypeSpinner,
+  expenseTypeValue;
 
   TextEditingController nameController = TextEditingController();
   TextEditingController remarkController = TextEditingController();
@@ -63,11 +64,6 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   String dateTimeFormat = "dd/MM/yyyy";
   DateTime? pickedDate;
 
-  var currencyList = [
-    'India Rupee',
-    'US Dollar',
-  ];
-
   TravelExpenseModel? travelExpenseModel;
   TravelExpenseModel? editTravelExpenseModel;
 
@@ -75,45 +71,22 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      datefrom = DateTime.now();      dateto = DateTime.now();
+
+      datefrom = DateTime.now();
+      dateto = DateTime.now();
 
       selectedFromDate = DateFormat("yyyyMMdd").format(DateTime.now());
       selectedToDate = DateFormat("yyyyMMdd").format(DateTime.now());
       fromDateController.text =
           DateFormat(dateTimeFormat).format(DateTime.now());
       toDateController.text = DateFormat(dateTimeFormat).format(DateTime.now());
-    });
-
-    editTravelExpenseModel = widget.editTravelExpense;
-    taxCodeModel = widget.taxCode;
-     expenseTypeModel = widget.expenseType;
 
     getCountryList();
+    getCurrencyList();
+    setData();
+    setState(() {
 
-    if(editTravelExpenseModel != null){
-
-      print("EditData${editTravelExpenseModel.toString()}");
-
-      fromDateController.text = editTravelExpenseModel!.fromDate;
-      toDateController.text = editTravelExpenseModel!.toDate;
-      countryCodeSpinner = editTravelExpenseModel!.country;
-      stateCodeSpinner = editTravelExpenseModel!.state;
-      cityCodeSpinner =editTravelExpenseModel!.city;
-      taxCodeSpinner = editTravelExpenseModel!.taxCode;
-      expenseTypeSpinner =editTravelExpenseModel!.expenseType;
-      descController.text = editTravelExpenseModel!.descript;
-      locationController.text = editTravelExpenseModel!.location;
-      amountController.text = editTravelExpenseModel!.rec_amount;
-      gstController.text = editTravelExpenseModel!.gstNo;
-      currencySpinner = editTravelExpenseModel!.rec_curr;
-
-      if(stateCodeSpinner!= null && countryCodeSpinner!= null){
-        getCityList();
-      }
-
-    }
-
+    });
   }
 
   @override
@@ -224,7 +197,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
                   sizeval: 12,
                   fontWeight: FontWeight.bold)))
               .toList(),
-          onChanged: (Object? value) {
+          onChanged: (String? value) {
             setState(() {
               currencySpinner = value.toString();
               if(value == "India Rupee"){
@@ -266,39 +239,38 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
             ),
             Expanded(
                 child: TextField(
-              controller: DateController,
-              maxLines: 1,
-              showCursor: false,
-              enabled: false,
-              textAlign: TextAlign.center,
-              textAlignVertical: TextAlignVertical.center,
-              decoration: InputDecoration(
-                  hintText: fromTO,
-                  hintStyle: const TextStyle(color: AppColor.themeColor),
-                  border: InputBorder.none),
-              style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.bold,
-                  color: AppColor.themeColor),
-              keyboardType: TextInputType.datetime,
-              textInputAction: TextInputAction.done,
-            ))
+                  controller: DateController,
+                  maxLines: 1,
+                  showCursor: false,
+                  enabled: false,
+                  textAlign: TextAlign.center,
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
+                      hintText: fromTO,
+                      hintStyle: const TextStyle(color: AppColor.themeColor),
+                      border: InputBorder.none),
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.themeColor),
+                  keyboardType: TextInputType.datetime,
+                  textInputAction: TextInputAction.done,
+                ))
           ],
         ),
       ),
     );
   }
 
-
   Future<void> _selectDate(BuildContext context, String value) async {
     pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(1050),
+        firstDate:  DateTime(1050),
         //DateTime.now() - not to allow to choose before today.
         lastDate: DateTime(2050));
-    if (pickedDate== null) {
+    if (pickedDate != null) {
       print(pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
       String formattedDate = DateFormat(dateTimeFormat).format(pickedDate!);
       print(
@@ -308,12 +280,10 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
           selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
           fromDateController.text = formattedDate;
           selectedFromDate = DateFormat("yyyyMMdd").format(pickedDate!);
-          datefrom = pickedDate!;
         } else {
           selectedToDate = DateFormat(dateTimeFormat).format(pickedDate!);
           toDateController.text = formattedDate;
           selectedToDate = DateFormat("yyyyMMdd").format(pickedDate!);
-          dateto =pickedDate!;
         }
       });
     }
@@ -658,6 +628,13 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
             print('value=====>$value');
 
           expenseTypeSpinner = value.toString();
+            for (int i = 0; i < expenseTypeModel.length; i++) {
+              if (expenseTypeModel[i].spkzl == value) {
+                expenseTypeValue = expenseTypeModel[i].sptxt;
+                break;
+              }
+            }
+
           });
         },
       ),
@@ -816,7 +793,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
 
   void saveDataToDatabase() {
 
-    TravelExpenseModel travelExpenseModel = TravelExpenseModel(key: 0,fromDate: selectedFromDate!, toDate: selectedToDate!, country: countryCodeSpinner!, state: stateCodeSpinner!, city: cityCodeSpinner!, expenseType: expenseTypeSpinner!, taxCode: taxCodeSpinner!, location: locationController.text.toString(), rec_amount: amountController.text.toString(), rec_curr: currencyShortForm!, descript: descController.text.toString(), gstNo: gstController.text.toString(), region: regionCodeSpinner!);
+    TravelExpenseModel travelExpenseModel = TravelExpenseModel(key: 0,fromDate: selectedFromDate!, toDate: selectedToDate!, country: countryCodeSpinner!, state: stateCodeSpinner!, city: cityCodeSpinner!, expenseType: expenseTypeSpinner!, taxCode: taxCodeSpinner!, location: locationController.text.toString(), rec_amount: amountController.text.toString(), rec_curr: currencyShortForm!, descript: descController.text.toString(), gstNo: gstController.text.toString(), region: regionCodeSpinner!, expenseTypeValue: expenseTypeValue! );
 
     if(editTravelExpenseModel == null){
       DatabaseHelper.instance.insertTravelExpenseTable(travelExpenseModel.toMapWithoutId());
@@ -834,6 +811,8 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       Utility().showInSnackBar(value: selectStateCode, context: context);
     }else if( cityCodeSpinner== null || cityCodeSpinner!.isEmpty){
       Utility().showInSnackBar(value: selectCityCode, context: context);
+    }else if( regionCodeSpinner== null || regionCodeSpinner!.isEmpty){
+      Utility().showInSnackBar(value: selectRegionCode, context: context);
     }else if( expenseTypeSpinner==null || expenseTypeSpinner!.isEmpty){
       Utility().showInSnackBar(value: selectExpenseType, context: context);
     }else if( taxCodeSpinner==null || taxCodeSpinner!.isEmpty){
@@ -852,6 +831,61 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       saveDataToDatabase();
       Navigator.pop(context);
     }
+  }
+
+  String getCurrency(String rec_curr) {
+
+    if(rec_curr == "INR"){
+      return India_Rupee;
+    }else{
+      return US_Dollar;
+    }
+  }
+
+  String formateChange(String fromDate) {
+    return   DateFormat(dateTimeFormat).format(DateTime.parse(fromDate));
+  }
+
+  void getCurrencyList() {
+    currencyList.add(India_Rupee);
+    currencyList.add(US_Dollar);
+  }
+
+  void setData() {
+
+    editTravelExpenseModel = widget.editTravelExpense;
+    taxCodeModel = widget.taxCode;
+    expenseTypeModel = widget.expenseType;
+
+    if(editTravelExpenseModel != null){
+
+      print("EditData${editTravelExpenseModel.toString()}");
+
+      fromDateController.text = formateChange(editTravelExpenseModel!.fromDate);
+      toDateController.text =  formateChange(editTravelExpenseModel!.toDate);
+      countryCodeSpinner = editTravelExpenseModel!.country;
+      stateCodeSpinner = editTravelExpenseModel!.state;
+      cityCodeSpinner =editTravelExpenseModel!.city;
+      regionCodeSpinner = editTravelExpenseModel!.region;
+      taxCodeSpinner = editTravelExpenseModel!.taxCode;
+      expenseTypeSpinner =editTravelExpenseModel!.expenseType;
+      descController.text = editTravelExpenseModel!.descript;
+      locationController.text = editTravelExpenseModel!.location;
+      amountController.text = editTravelExpenseModel!.rec_amount;
+      gstController.text = editTravelExpenseModel!.gstNo;
+      currencySpinner = getCurrency(editTravelExpenseModel!.rec_curr);
+
+      if(stateCodeSpinner!= null && countryCodeSpinner!= null){
+        getCityList();
+      }
+      if(stateCodeSpinner!= null && countryCodeSpinner!= null  && cityCodeSpinner!= null){
+        getRegionList();
+      }
+
+    }
+    setState(() {
+
+    });
   }
 
 }
