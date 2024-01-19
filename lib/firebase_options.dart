@@ -44,38 +44,38 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDSsBPYnw5Kvv9-7klCr-72EQOZAFpa68o',
-    appId: '1:658928240288:web:d5f7a7553b4a345e6b6bc5',
-    messagingSenderId: '658928240288',
-    projectId: 'shakti-employee',
-    authDomain: 'shakti-employee.firebaseapp.com',
-    storageBucket: 'shakti-employee.appspot.com',
-    measurementId: 'G-WDP8FV5NDN',
+    apiKey: 'AIzaSyBpINtRGcezIZIuKtyLylPpdxRo563u8TU',
+    appId: '1:851829651772:web:a483dc18d2d8ebb8e3c639',
+    messagingSenderId: '851829651772',
+    projectId: 'offroleemployeeapp',
+    authDomain: 'offroleemployeeapp.firebaseapp.com',
+    storageBucket: 'offroleemployeeapp.appspot.com',
+    measurementId: 'G-RBVZ24CGD0',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCj4UHOEL-3XcaG5441Bh19pxfKGQDiRLI',
-    appId: '1:658928240288:android:8505a13bb0af408f6b6bc5',
-    messagingSenderId: '658928240288',
-    projectId: 'shakti-employee',
-    storageBucket: 'shakti-employee.appspot.com',
+    apiKey: 'AIzaSyA0FQm9wenTUPMIFrP8TKfd8lW2VFu1XvI',
+    appId: '1:851829651772:android:3590111288c7501ee3c639',
+    messagingSenderId: '851829651772',
+    projectId: 'offroleemployeeapp',
+    storageBucket: 'offroleemployeeapp.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAy0RtoMThZeHpqS4jxraqrnJOPRiktcpI',
-    appId: '1:658928240288:ios:c81f6002626f22376b6bc5',
-    messagingSenderId: '658928240288',
-    projectId: 'shakti-employee',
-    storageBucket: 'shakti-employee.appspot.com',
+    apiKey: 'AIzaSyD78lDUeqm5cP47MZSkt9MBvdJ0fNnpXtw',
+    appId: '1:851829651772:ios:d62e22bcc43bfa5de3c639',
+    messagingSenderId: '851829651772',
+    projectId: 'offroleemployeeapp',
+    storageBucket: 'offroleemployeeapp.appspot.com',
     iosBundleId: 'com.example.shaktiEmployeeApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAy0RtoMThZeHpqS4jxraqrnJOPRiktcpI',
-    appId: '1:658928240288:ios:e0dfcbd6e569f4516b6bc5',
-    messagingSenderId: '658928240288',
-    projectId: 'shakti-employee',
-    storageBucket: 'shakti-employee.appspot.com',
+    apiKey: 'AIzaSyD78lDUeqm5cP47MZSkt9MBvdJ0fNnpXtw',
+    appId: '1:851829651772:ios:ce72fd753c174c35e3c639',
+    messagingSenderId: '851829651772',
+    projectId: 'offroleemployeeapp',
+    storageBucket: 'offroleemployeeapp.appspot.com',
     iosBundleId: 'com.example.shaktiEmployeeApp.RunnerTests',
   );
 }

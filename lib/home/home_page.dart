@@ -9,6 +9,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../database/database_helper.dart';
 import '../leave/LeaveApprove.dart';
+import '../main.dart';
 import '../notificationService/local_notification_service.dart';
 import '../theme/string.dart';
 import '../uiwidget/appupdatewidget.dart';
@@ -102,8 +104,12 @@ class _HomePageState extends State<HomePage> {
   TextEditingController travelModeController = TextEditingController();
   FirestoreDataModel? fireStoreDataModel;
   BackgroundLocationService? backgroundLocationService;
-
+  bool isEmployeeApp = false;
   var totalWayPoints ="";
+
+
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -111,6 +117,7 @@ class _HomePageState extends State<HomePage> {
     journeyStart = widget.journeyStart;
 
     _handleLocationPermission();
+
     getNameValue();
     receiveNotification();
   }
@@ -157,6 +164,19 @@ class _HomePageState extends State<HomePage> {
       backgroundLocationService = Provider.of<BackgroundLocationService>(context,listen: true);
 
     // TODO: implement build
+      return Consumer<firestoreAppUpdateNofifier>(
+          builder: (context, value, child) {
+            isEmployeeApp = value.isEmployeeApp;
+        if (value.fireStoreData != null &&
+            value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (BuildContext context) => AppUpdateWidget(
+                        appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                    (Route<dynamic> route) => false);
+          });
+        } else {
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -164,7 +184,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: AppColor.themeColor,
         elevation: 0,
         title: robotoTextWidget(
-            textval: appName,
+            textval: value.isEmployeeApp?appName:appName2,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
@@ -178,11 +198,11 @@ class _HomePageState extends State<HomePage> {
                 // row with 2 children
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.download_for_offline,
                       color: AppColor.themeColor,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     robotoTextWidget(
@@ -214,21 +234,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Consumer<firestoreAppUpdateNofifier>(
-          builder: (context, value, child) {
-        if (value.fireStoreData != null && value.fireStoreData!.minEmployeeAppVersion !=
-            value.appVersionCode) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => AppUpdateWidget(
-                          appUrl:
-                              value.fireStoreData!.employeeAppUrl.toString())),
-                  (Route<dynamic> route) => false);
-
-          });
-        } else {
-          return Stack(
+      body: Stack(
             children: [
               SingleChildScrollView(
                 child: Container(
@@ -242,12 +248,18 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(task),
                       detailWidget(travel),
                       localConvenience(),
-                      dailyAndWebReport(travelEx, "assets/svg/request.svg"),
+                      isEmployeeApp?SizedBox():dailyAndWebReport(travelEx, "assets/svg/request.svg"),
                       dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
                     ],
                   ),
                 ),
+
+
+
+
+
+
               ),
               Center(
                 child: isLoading == true
@@ -257,11 +269,8 @@ class _HomePageState extends State<HomePage> {
                     : const SizedBox(),
               ),
             ],
-          );
-        }
-        return Container(
-        );
-      }),
+          ),
+
       drawer: Drawer(
           backgroundColor: AppColor.whiteColor,
           child: NavigationDrawerWidget(
@@ -272,6 +281,9 @@ class _HomePageState extends State<HomePage> {
             personalInfo: personalInfo,
           )),
     );
+        } return Container(
+        );
+          });
   }
 
   detailWidget(String title) {
@@ -470,15 +482,26 @@ class _HomePageState extends State<HomePage> {
     sharedPreferences = await SharedPreferences.getInstance();
 
     if(sharedPreferences.getString(name)!=null && sharedPreferences.getString(name)!.isNotEmpty){
-    setState(() {
-      nameValue = sharedPreferences.getString(name)!;
-      UserID = sharedPreferences.getString(userID)!;
-    });
-    }
-   readNotifier();
-    if (sharedPreferences.getString(currentDate) != null) {
-      if (formattedDate !=
-          sharedPreferences.getString(currentDate).toString()) {
+      setState(() {
+        nameValue = sharedPreferences.getString(name)!;
+        UserID = sharedPreferences.getString(userID)!;
+      });
+      readNotifier();
+      if (sharedPreferences.getString(currentDate) != null) {
+        if (formattedDate !=
+            sharedPreferences.getString(currentDate).toString()) {
+          Utility().checkInternetConnection().then((connectionResult) {
+            if (connectionResult) {
+              downloadingData();
+            } else {
+              Utility()
+                  .showInSnackBar(value: checkInternetConnection, context: context);
+            }
+          });
+        } else {
+          getSPArrayList();
+        }
+      } else {
         Utility().checkInternetConnection().then((connectionResult) {
           if (connectionResult) {
             downloadingData();
@@ -487,28 +510,28 @@ class _HomePageState extends State<HomePage> {
                 .showInSnackBar(value: checkInternetConnection, context: context);
           }
         });
-      } else {
-        getSPArrayList();
       }
-    } else {
-      Utility().checkInternetConnection().then((connectionResult) {
-        if (connectionResult) {
-          downloadingData();
-        } else {
-          Utility()
-              .showInSnackBar(value: checkInternetConnection, context: context);
-        }
-      });
+    }else{
+      Utility().clearSharedPreference();
+      Utility().deleteDatabase(databaseName);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) =>  LoginPage()),
+              (route) => false);
     }
   }
+
   void readNotifier() {
     context.read<firestoreAppUpdateNofifier>().listenToLiveUpdateStream();
   }
+
   void getSPArrayList() async {
     if (sharedPreferences.getString(syncSapResponse) != null &&
-        sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
+        sharedPreferences
+            .getString(syncSapResponse)
+            .toString()
+            .isNotEmpty) {
       var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
+      convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
       syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
 
       setListData();
@@ -522,7 +545,7 @@ class _HomePageState extends State<HomePage> {
 
     if (sharedPreferences.getString(gatePassDatail) != null) {
       var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+      convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
       setgatePassData();
     }
@@ -536,20 +559,21 @@ class _HomePageState extends State<HomePage> {
 
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.getString(vendorGatePas) != null &&
-        sharedPreferences.getString(vendorGatePas).toString().isNotEmpty) {
+        sharedPreferences
+            .getString(vendorGatePas)
+            .toString()
+            .isNotEmpty) {
       var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
+      convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
       vendorGatePassModel =
           vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData);
       setVendorgatePassData();
     }
 
-    if (journeyStart == True){
+    if (journeyStart == True) {
       backgroundLocationService?.startLocationFetch();
     }
-
-
-    }
+  }
 
   imageTextWidget(String svg, String msg, String title) {
     return GestureDetector(
@@ -967,7 +991,7 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: robotoTextWidget(
-                    textval: appName,
+                    textval: isEmployeeApp?appName:appName2,
                     colorval: AppColor.themeColor,
                     sizeval: 16,
                     fontWeight: FontWeight.bold),
@@ -1094,7 +1118,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: robotoTextWidget(
-                            textval: appName,
+                            textval: isEmployeeApp?appName:appName2,
                             colorval: AppColor.themeColor,
                             sizeval: 16,
                             fontWeight: FontWeight.bold),
@@ -1639,7 +1663,6 @@ class _HomePageState extends State<HomePage> {
     String currentTime = DateFormat('HHmmss').format(DateTime.now());
 
 
-
     List<Map<String, dynamic>> listMap =
     await DatabaseHelper.instance.queryAllWaypoints(
         localConveyanceList.toMapWithoutId());
@@ -1679,4 +1702,6 @@ class _HomePageState extends State<HomePage> {
 
     });
   }
+
+
 }

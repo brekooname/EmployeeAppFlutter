@@ -34,7 +34,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 Future<Widget> initializeApp(ApplicationConfig? appConfig) async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn =
-      sharedPreferences.getString(userID) == null && sharedPreferences.getString(userID)!.isEmpty? False : True;
+      sharedPreferences.getString(userID) == null ? False : True;
   String? journeyStarts =
       (sharedPreferences.getString(localConveyanceJourneyStart) == null)
           ? False
@@ -368,7 +368,7 @@ class _LoginPageState extends State<LoginPage> {
       platform = "IOS";
     }
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    if(packageInfo.packageName =="shakti.shakti_employee"){
+    if(packageInfo.packageName == "shakti.shakti_employee"){
       loginUserType = 'ONROLL';
     }else{
       loginUserType = 'OFFROLL';
@@ -470,5 +470,8 @@ class _LoginPageState extends State<LoginPage> {
       print('Failed to get platform version');
     }
   }
+
+
+
 
 }

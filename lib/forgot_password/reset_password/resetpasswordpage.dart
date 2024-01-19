@@ -277,10 +277,9 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
   datePickerWidget() {
     return SizedBox(
-
       width: double.infinity,
       height: MediaQuery.of(context).size.height/20,
-      child:    Center(
+      child:  Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
@@ -305,28 +304,17 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
         context: context,
         builder: (BuildContext context, Widget ?child) {
           return Theme(
-            data: ThemeData(
-              splashColor: Colors.black,
-              textTheme: const TextTheme(
-                titleSmall: TextStyle(color: Colors.black),
-                bodySmall: TextStyle(color: Colors.black),
-              ),
-              dialogBackgroundColor: Colors.white, colorScheme: const ColorScheme.light(
-                primary: Color(0xff1565C0),
-                primaryContainer: Colors.black,
-                secondaryContainer: Colors.black,
-                onSecondary: Colors.black,
-                onPrimary: Colors.white,
-                surface: Colors.black,
-                onSurface: Colors.black,
-                secondary: Colors.black).copyWith(primaryContainer: Colors.grey, secondary: Colors.black),
+              data: Theme.of(context).copyWith(
+            primaryColor: Color(0xff1565C0), //color of the main banner
+            primaryColorDark: Color(0xff1565C0), //color of circle indicating the selected date
+            buttonTheme: ButtonThemeData(
+                textTheme: ButtonTextTheme.accent //color of the text in the button "OK/CANCEL"
             ),
-            child: child ??const Text(""),
-          );
+          ),child: child ??const Text(""),);
         },
         initialDate: selectedDate,
         firstDate: DateTime(1950),
-        lastDate: DateTime(2024));
+        lastDate: DateTime(2040));
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
