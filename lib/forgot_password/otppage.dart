@@ -65,7 +65,8 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                 textval: OTPTitle,
                 colorval: AppColor.whiteColor,
                 sizeval: 15,
-                fontWeight: FontWeight.w800)),
+                fontWeight: FontWeight.w800),
+        iconTheme: IconThemeData(  color:  Colors.white),),
         body: SizedBox(
           child: Container(
             width: double.infinity,
