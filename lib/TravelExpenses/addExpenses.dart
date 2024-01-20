@@ -435,6 +435,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
             setState(() {
               print('value=====>$value');
               cityCodeSpinner = value.toString();
+              regionCodeSpinner = null;
               for (var i = 0; i < cityList.length; i++) {
                 if (cityCodeSpinner == cityList[i].cityc) {
                   fromCity = cityList[i].bezei;
@@ -571,7 +572,6 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
 
   Future<void> getRegionList() async {
     regionList = [];
-
     var jsonData = null;
 
     dynamic response = await HTTP.get(getRegionListAPI(
@@ -590,6 +590,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
     } else {
       Utility().showInSnackBar(value: somethingWentWrong, context: context);
     }
+
   }
 
   ExpenseTypeListWidget() {
@@ -626,15 +627,8 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
         onChanged: (Object? value) {
           setState(() {
             print('value=====>$value');
-
-          expenseTypeSpinner = value.toString();
-            for (int i = 0; i < expenseTypeModel.length; i++) {
-              if (expenseTypeModel[i].spkzl == value) {
-                expenseTypeValue = expenseTypeModel[i].sptxt;
-                break;
-              }
-            }
-
+            expenseTypeSpinner = value.toString();
+            getExpenseTypeValue(expenseTypeSpinner);
           });
         },
       ),
@@ -825,7 +819,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       Utility().showInSnackBar(value: selectCurr , context: context);
     }else if(descController.text.isEmpty){
       Utility().showInSnackBar(value: "Enter " + desc, context: context);
-    }else if(gstController.text.isEmpty){
+    }else if(gstController.text.isEmpty && taxCodeSpinner != "V0"){
       Utility().showInSnackBar(value: "Enter " + GSTINNotxt, context: context);
     }else{
       saveDataToDatabase();
@@ -834,6 +828,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   }
 
   String getCurrency(String rec_curr) {
+    currencyShortForm = rec_curr;
 
     if(rec_curr == "INR"){
       return India_Rupee;
@@ -843,7 +838,7 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
   }
 
   String formateChange(String fromDate) {
-    return   DateFormat(dateTimeFormat).format(DateTime.parse(fromDate));
+    return DateFormat(dateTimeFormat).format(DateTime.parse(fromDate));
   }
 
   void getCurrencyList() {
@@ -875,6 +870,8 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
       gstController.text = editTravelExpenseModel!.gstNo;
       currencySpinner = getCurrency(editTravelExpenseModel!.rec_curr);
 
+      getExpenseTypeValue(expenseTypeSpinner);
+
       if(stateCodeSpinner!= null && countryCodeSpinner!= null){
         getCityList();
       }
@@ -886,6 +883,16 @@ class _AddExpensesScreenState extends State<AddExpensesScreen> {
     setState(() {
 
     });
+  }
+
+  void getExpenseTypeValue(String? expenseTypeSpinner) {
+
+    for (int i = 0; i < expenseTypeModel.length; i++) {
+      if (expenseTypeModel[i].spkzl == expenseTypeSpinner) {
+        expenseTypeValue = expenseTypeModel[i].sptxt;
+        break;
+      }
+    }
   }
 
 }

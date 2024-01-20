@@ -230,7 +230,14 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   submitWidget() {
     return GestureDetector(
         onTap: () {
-          validation();
+          showDialog(
+            context: context,
+            builder: (BuildContext context) =>
+                completeTripDialog(
+                    context),
+          );
+
+
         },
         child: Container(
           height: 50,
@@ -248,7 +255,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
               ),
             )
                 : robotoTextWidget(
-                textval: submit,
+                textval: complete,
                 colorval: Colors.white,
                 sizeval: 14,
                 fontWeight: FontWeight.bold),
@@ -675,8 +682,9 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
       Utility().showInSnackBar(value: "Enter " + locationtxt, context: context);
     }else if( costCenterSpinner == null || costCenterSpinner!.isEmpty){
       Utility().showInSnackBar(value: selectCostCenter, context: context);
+    }else if(savedtravelExpense.length == 0){
+      Utility().showInSnackBar(value: subDataVaildation, context: context);
     }else{
-
       Utility().checkInternetConnection().then((connectionResult) {
         if (connectionResult) {
           saveExpenseAPI();
@@ -765,6 +773,83 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
         ],
       ),
     );
+  }
+
+  Widget completeTripDialog(BuildContext context ) {
+    return AlertDialog(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              appName,
+              style: const TextStyle(
+                  color: AppColor.themeColor,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14),
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Text(
+            completeTripConfirmation,
+            style: const TextStyle(
+                color: AppColor.themeColor,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w400,
+                fontSize: 12),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.whiteColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
+                    ),
+                  ),
+                  child: robotoTextWidget(
+                    textval: cancel,
+                    colorval: AppColor.darkGrey,
+                    sizeval: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () {
+                    validation();
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.themeColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12), // <-- Radius
+                    ),
+                  ),
+                  child: robotoTextWidget(
+                    textval: confirm,
+                    colorval: AppColor.whiteColor,
+                    sizeval: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          )
+        ]));
   }
 
 

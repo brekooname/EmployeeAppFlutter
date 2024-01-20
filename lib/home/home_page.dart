@@ -620,7 +620,7 @@ class _HomePageState extends State<HomePage> {
                   (route) => true);
             }
             break;
-          case "Travel Expenses Request":
+          case "Travel Expenses Request & Report":
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
