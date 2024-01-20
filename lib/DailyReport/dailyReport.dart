@@ -294,6 +294,7 @@ class _DailyReportState extends State<DailyReport> {
               }
 
               setState(() {
+
                 vendoreName.text =
                     vendorNameList[selectedVendorPosition!].name1;
                 vendoreCode.text =
