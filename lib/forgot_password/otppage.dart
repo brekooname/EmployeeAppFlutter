@@ -39,15 +39,13 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
   startTimeout([int? milliseconds]) {
     var duration = interval;
     Timer.periodic(duration, (timer) {
-      setState(() {
-        isTimerStart = true;
-        currentSeconds = timer.tick;
-        if (timer.tick >= timerMaxSeconds){
-          isTimerStart = false;
-          timer.cancel();}
+      isTimerStart = true;
+      currentSeconds = timer.tick;
+      if (timer.tick >= timerMaxSeconds){
+        isTimerStart = false;
+        timer.cancel();}
 
-
-      });
+      setState(() {});
     });
   }
 
@@ -67,7 +65,8 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                 textval: OTPTitle,
                 colorval: AppColor.whiteColor,
                 sizeval: 15,
-                fontWeight: FontWeight.w800)),
+                fontWeight: FontWeight.w800),
+        iconTheme: IconThemeData(  color:  Colors.white),),
         body: SizedBox(
           child: Container(
             width: double.infinity,

@@ -1,6 +1,7 @@
 import 'dart:convert' as convert;
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/home/model/distance_calculate_model.dart'
     as distancePrefix;
@@ -9,8 +10,10 @@ import 'package:shakti_employee_app/home/model/travelmodel.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
 import '../database/database_helper.dart';
+import '../provider/firestore_appupdate_notifier.dart';
 import '../theme/color.dart';
 import '../theme/string.dart';
+import '../uiwidget/appupdatewidget.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/APIDirectory.dart';
 import 'model/WayPointsModel.dart';
@@ -30,6 +33,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
   bool isLoading = false;
   String? allLatLng;
   var totalWayPoints = "";
+  bool isEmployeeApp=false;
 
   Future<List<Map<String, dynamic>>?> getAllLocalConveyanceData() async {
     List<Map<String, dynamic>> listMap =
@@ -50,6 +54,19 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+      isEmployeeApp = value.isEmployeeApp;
+      if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+        });
+      } else {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: AppColor.themeColor,
@@ -84,6 +101,9 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
                 : const SizedBox(),
           )
         ]));
+      } return Container(
+      );
+        });
   }
 
   Widget listItem(LocalConveyanceModel listLocalConveyance, int position) {
@@ -253,7 +273,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: robotoTextWidget(
-                            textval: appName,
+                            textval: isEmployeeApp?appName:appName2,
                             colorval: AppColor.themeColor,
                             sizeval: 16,
                             fontWeight: FontWeight.bold),

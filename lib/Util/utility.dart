@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -122,5 +123,7 @@ class Utility {
     var Km = 12742 * asin(sqrt(a));
     return Km * 1000;
   }
+
+
 
  }

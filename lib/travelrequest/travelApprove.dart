@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/travelrequest/model/approveStatus.dart';
@@ -12,7 +13,9 @@ import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
 
+import '../provider/firestore_appupdate_notifier.dart';
 import '../theme/string.dart';
+import '../uiwidget/appupdatewidget.dart';
 
 
 class TravelApproved extends StatefulWidget {
@@ -27,7 +30,7 @@ class _TravelApprovedState extends State<TravelApproved> {
   List<TR.Response> travelReqList = [];
   late SharedPreferences sharedPreferences;
   late int selectedIndex;
-  bool isDataLoading = false,isLoading =false;
+  bool isDataLoading = false,isLoading =false, isEmployeeApp=false;
 
   @override
   void initState() {
@@ -41,7 +44,18 @@ class _TravelApprovedState extends State<TravelApproved> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-
+    return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+      if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+        });
+      } else {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -69,6 +83,9 @@ class _TravelApprovedState extends State<TravelApproved> {
         ),
       ),
     );
+      } return Container(
+      );
+        });
   }
 
 
@@ -218,7 +235,7 @@ class _TravelApprovedState extends State<TravelApproved> {
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Text(
-              appName,
+              isEmployeeApp?appName:appName2,
               style: const TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',

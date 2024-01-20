@@ -262,7 +262,7 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
   void validation() {
       if (fromDateController.text.toString().isEmpty) {
           Utility().showToast(selectFromDate);
-    }else if(attendenceTypeSpinner!.isEmpty){
+    }else if(attendenceTypeSpinner!=null && attendenceTypeSpinner!.isEmpty){
         Utility().showToast(selectattendence);
       }else if(remark.text.toString().isEmpty){
         Utility().showInSnackBar(value: vaildRemark, context: context);
