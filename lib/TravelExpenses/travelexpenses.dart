@@ -70,7 +70,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
       }
     });
 
-    getAllTraveExpenses();
+    getAllTravelExpenses();
   }
 
 
@@ -107,7 +107,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
             Navigator.of(context)
                 .push(MaterialPageRoute(
                 builder: (context) => AddExpensesScreen(editTravelExpense: null, taxCode: taxCode, expenseType: expenseTypeList,)))
-                .then((value) => {getAllTraveExpenses()});
+                .then((value) => {getAllTravelExpenses()});
           }else{
             Utility().showInSnackBar(value: lengthValidation , context: context);
           }
@@ -377,8 +377,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
   }
 
   Future<void> getCountryList() async {
-
-
+    
     var jsonData = null;
 
     dynamic response = await HTTP.get(getCountryListAPI());
@@ -396,7 +395,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
     }
   }
 
-  Future<List<Map<String, dynamic>>?> getAllTraveExpenses() async {
+  Future<List<Map<String, dynamic>>?> getAllTravelExpenses() async {
     savedtravelExpense=[];
     List<Map<String, dynamic>> listMap =
     await DatabaseHelper.instance.queryAllTravelExpenseTable();
@@ -564,7 +563,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
          Navigator.of(context)
              .push(MaterialPageRoute(
              builder: (context) => AddExpensesScreen(editTravelExpense: savedtravelExpense[index], taxCode: taxCode, expenseType: expenseTypeList,)))
-             .then((value) => {getAllTraveExpenses()});
+             .then((value) => {getAllTravelExpenses()});
        }
       },
       child: SvgPicture.asset(
@@ -632,7 +631,7 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     DatabaseHelper.instance.deleteRowTravelExpenseTable(savedtravelExpense[index].toMap());
-                    getAllTraveExpenses();
+                    getAllTravelExpenses();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.themeColor,
