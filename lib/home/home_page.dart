@@ -9,12 +9,15 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
 import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
     as vendorGatePassPrefix;
+
+import 'package:shakti_employee_app/TravelExpenses/travelexpenses.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
 import 'package:shakti_employee_app/gatepass/gatepassRequest.dart';
@@ -102,8 +105,11 @@ class _HomePageState extends State<HomePage> {
   FirestoreDataModel? fireStoreDataModel;
   BackgroundLocationService? backgroundLocationService;
   bool isEmployeeApp = false;
-
   var totalWayPoints ="";
+
+
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -111,6 +117,7 @@ class _HomePageState extends State<HomePage> {
     journeyStart = widget.journeyStart;
 
     _handleLocationPermission();
+
     getNameValue();
     receiveNotification();
   }
@@ -241,12 +248,18 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(task),
                       detailWidget(travel),
                       localConvenience(),
-                     // detailWidget(travelExpenses),
+                      isEmployeeApp?SizedBox():dailyAndWebReport(travelEx, "assets/svg/request.svg"),
                       dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
                     ],
                   ),
                 ),
+
+
+
+
+
+
               ),
               Center(
                 child: isLoading == true
@@ -453,7 +466,10 @@ class _HomePageState extends State<HomePage> {
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      Utility().showInSnackBar(value: 'Location permissions are permanently denied, we cannot request permissions.', context: context);
+      Utility().showInSnackBar(
+          value:
+              'Location permissions are permanently denied, we cannot request permissions.',
+          context: context);
       return false;
     }
     return true;
@@ -466,14 +482,26 @@ class _HomePageState extends State<HomePage> {
     sharedPreferences = await SharedPreferences.getInstance();
 
     if(sharedPreferences.getString(name)!=null && sharedPreferences.getString(name)!.isNotEmpty){
-    setState(() {
-      nameValue = sharedPreferences.getString(name)!;
-      UserID = sharedPreferences.getString(userID)!;
-    });
-   readNotifier();
-    if (sharedPreferences.getString(currentDate) != null) {
-      if (formattedDate !=
-          sharedPreferences.getString(currentDate).toString()) {
+      setState(() {
+        nameValue = sharedPreferences.getString(name)!;
+        UserID = sharedPreferences.getString(userID)!;
+      });
+      readNotifier();
+      if (sharedPreferences.getString(currentDate) != null) {
+        if (formattedDate !=
+            sharedPreferences.getString(currentDate).toString()) {
+          Utility().checkInternetConnection().then((connectionResult) {
+            if (connectionResult) {
+              downloadingData();
+            } else {
+              Utility()
+                  .showInSnackBar(value: checkInternetConnection, context: context);
+            }
+          });
+        } else {
+          getSPArrayList();
+        }
+      } else {
         Utility().checkInternetConnection().then((connectionResult) {
           if (connectionResult) {
             downloadingData();
@@ -482,19 +510,7 @@ class _HomePageState extends State<HomePage> {
                 .showInSnackBar(value: checkInternetConnection, context: context);
           }
         });
-      } else {
-        getSPArrayList();
       }
-    } else {
-      Utility().checkInternetConnection().then((connectionResult) {
-        if (connectionResult) {
-          downloadingData();
-        } else {
-          Utility()
-              .showInSnackBar(value: checkInternetConnection, context: context);
-        }
-      });
-    }
     }else{
       Utility().clearSharedPreference();
       Utility().deleteDatabase(databaseName);
@@ -503,14 +519,19 @@ class _HomePageState extends State<HomePage> {
               (route) => false);
     }
   }
+
   void readNotifier() {
     context.read<firestoreAppUpdateNofifier>().listenToLiveUpdateStream();
   }
+
   void getSPArrayList() async {
     if (sharedPreferences.getString(syncSapResponse) != null &&
-        sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
+        sharedPreferences
+            .getString(syncSapResponse)
+            .toString()
+            .isNotEmpty) {
       var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
+      convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
       syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
 
       setListData();
@@ -524,7 +545,7 @@ class _HomePageState extends State<HomePage> {
 
     if (sharedPreferences.getString(gatePassDatail) != null) {
       var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+      convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
       setgatePassData();
     }
@@ -538,20 +559,21 @@ class _HomePageState extends State<HomePage> {
 
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.getString(vendorGatePas) != null &&
-        sharedPreferences.getString(vendorGatePas).toString().isNotEmpty) {
+        sharedPreferences
+            .getString(vendorGatePas)
+            .toString()
+            .isNotEmpty) {
       var jsonData =
-          convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
+      convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
       vendorGatePassModel =
           vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData);
       setVendorgatePassData();
     }
 
-    if (journeyStart == True){
+    if (journeyStart == True) {
       backgroundLocationService?.startLocationFetch();
     }
-
-
-    }
+  }
 
   imageTextWidget(String svg, String msg, String title) {
     return GestureDetector(
@@ -596,6 +618,15 @@ class _HomePageState extends State<HomePage> {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const WebReport()),
                   (route) => true);
+            }
+            break;
+          case "Travel Expenses Request & Report":
+            {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => TravelExpensesScreen(
+                      ),),
+                      (route) => true);
             }
             break;
           case "Close":
@@ -1632,7 +1663,6 @@ class _HomePageState extends State<HomePage> {
     String currentTime = DateFormat('HHmmss').format(DateTime.now());
 
 
-
     List<Map<String, dynamic>> listMap =
     await DatabaseHelper.instance.queryAllWaypoints(
         localConveyanceList.toMapWithoutId());
@@ -1672,4 +1702,6 @@ class _HomePageState extends State<HomePage> {
 
     });
   }
+
+
 }

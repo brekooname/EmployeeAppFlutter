@@ -212,7 +212,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
               dayTypeSpinner = value.toString();
             });
           },
-        ));
+        ),);
   }
 
   datePickerWidget(
@@ -272,7 +272,7 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
     pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate:  DateTime.now(),
+        firstDate:  DateTime.now().subtract(new Duration(days: 3)),
         //DateTime.now() - not to allow to choose before today.
         lastDate: DateTime(2050));
     if (pickedDate != null) {

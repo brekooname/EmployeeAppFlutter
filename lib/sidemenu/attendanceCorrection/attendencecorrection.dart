@@ -287,7 +287,7 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
 
     dynamic response = await HTTP.get(createAttendenceCorrectionAPI(
         sharedPreferences.getString(userID).toString(),
-        fromDateController.text.toString(),
+        selectedFromDate!,
         attendenceTypeSpinner.toString(),
         remark.text.toString(),
         ));
