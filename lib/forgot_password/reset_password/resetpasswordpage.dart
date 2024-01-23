@@ -266,6 +266,11 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
       List<UpdatePasswordResponse> updatepassword = List<UpdatePasswordResponse>.from(l.map((model)=> UpdatePasswordResponse.fromJson(model)));
       if (updatepassword[0].msg != null && updatepassword[0].msg != registeredMob && updatepassword[0].msg !=wrongdob) {
         Utility().showToast(updatepassword[0].msg);
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (BuildContext context) =>
+                const LoginPage()),
+                (Route<dynamic> route) => false);
       }
       else {
         Utility().showToast(updatepassword[0].msg);

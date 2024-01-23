@@ -716,15 +716,14 @@ class _TravelExpensesScreenState extends State<TravelExpensesScreen> {
         await DatabaseHelper.instance.deleteTravelExpenseTable();
         Navigator.pop(context);
         setState(() {
-          isSend = true;
+          isSend = false;
         });
       }else{
         Utility().showInSnackBar(value: saveTravelExpenseResponse.message, context: context);
         setState(() {
-          isSend = true;
+          isSend = false;
         });
       }
-
     } else {
       Utility().showToast(somethingWentWrong);
       setState(() {
