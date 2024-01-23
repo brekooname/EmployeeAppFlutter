@@ -352,7 +352,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
+        firstDate: DateTime.now().subtract(new Duration(days: 3)),
         //DateTime.now() - not to allow to choose before today.
         lastDate:  DateTime(2050));
     if (pickedDate != null) {
@@ -502,7 +502,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   Future<void> createOD() async {
 
     setState(() {
-      isLoading =true;
+      isLoading = true;
     });
 
    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -546,6 +546,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     }
   }
 
-
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    if(isLoading==true){
+      isLoading = false;
+    }
+  }
 
 }

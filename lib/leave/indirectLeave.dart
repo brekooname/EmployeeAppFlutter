@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
  import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/leave/model/leaveResponse.dart';
@@ -12,6 +13,8 @@ import '../../theme/string.dart';
 import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
+import '../provider/firestore_appupdate_notifier.dart';
+import '../uiwidget/appupdatewidget.dart';
 import '../webservice/constant.dart';
 import 'model/leaverejectResponse.dart';
 
@@ -29,6 +32,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
   bool isLoading = false;
   late int selectedIndex;
   late SharedPreferences sharedPreferences;
+  bool isEmployeeApp=false;
 
   @override
   void initState() {
@@ -39,6 +43,19 @@ class InDirectLeaveState extends State<InDirectLeave> {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+      isEmployeeApp = value.isEmployeeApp;
+      if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+        });
+      } else {
     return Scaffold(
       body: Stack(
         children: [
@@ -54,6 +71,9 @@ class InDirectLeaveState extends State<InDirectLeave> {
       ),
 
     );
+      } return Container(
+      );
+        });
   }
 
   Widget _buildPosts(BuildContext context) {
@@ -192,7 +212,7 @@ class InDirectLeaveState extends State<InDirectLeave> {
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Text(
-              appName,
+              isEmployeeApp?appName:appName2,
               style: const TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',

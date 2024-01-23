@@ -120,7 +120,11 @@ getStateListAPI(String county){
 }
 
 getCityListAPI(String county, String state){
-  return Uri.parse('${productionUrl}dictrict.htm?land1=${county}&regio=${state}');
+  return Uri.parse('${productionUrl}dictrict1.htm?land1=${county}&regio=${state}');
+}
+
+getRegionListAPI(String county, String state, String city){
+  return Uri.parse('${productionUrl}city_list_grade_api.htm?land1=${county}&regio=${state}&district=${city}');
 }
 
 getTravelRequestAPI(String value){
@@ -139,6 +143,14 @@ getTravelListResponseAPI(String sapCode , String fromDate, String toDate){
   return Uri.parse('${productionUrl}report_travel.htm?from=${fromDate}&to=${toDate}&pernr=${sapCode}');
 }
 
+getTravelDropDown(){
+  return Uri.parse('${productionUrl}ldrop_list_api.htm');
+}
+
 createAttendenceCorrectionAPI(String sapCode , String fromDate, String spinnerType,String remark){
   return Uri.parse('${productionUrl}attendance_correction.htm?date=${fromDate}&perno=${sapCode}&status=${spinnerType}&remark=${remark}');
+}
+
+sendTravelExpense(String date1 ,String date2 ,String country ,String location, String cost_center,String perno,String trip_details){
+  return Uri.parse('${productionUrl}travel_expense_entry.htm?date1=${date1}&date2=${date2}&country=${country}&location=${location}&cost_center=${cost_center}&perno=${perno}&trip_details=${trip_details}');
 }

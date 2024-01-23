@@ -191,7 +191,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
               Utility().clearSharedPreference();
               Utility().deleteDatabase(databaseName);
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                  MaterialPageRoute(builder: (context) =>  LoginPage()),
                   (route) => false);
             }
             break;

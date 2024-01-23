@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "851829651772",
+    "project_id": "offroleemployeeapp",
+    "storage_bucket": "offroleemployeeapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851829651772:android:b0835946b8950e95e3c639",
+        "android_client_info": {
+          "package_name": "com.offrole_employee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0FQm9wenTUPMIFrP8TKfd8lW2VFu1XvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
