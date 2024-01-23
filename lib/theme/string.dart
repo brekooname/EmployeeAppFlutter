@@ -139,7 +139,6 @@ var otpMessg = "OTP Send SuccessFully";
 var unableLogin = 'Unable To Login';
 var gatePassSuccess = "Gate Pass Approved Successfully";
 var gateRejectPassSuccess = "Gate Pass Rejected Successfully";
-
 var travelConfrimed = "Travel Request Approved Successfully";
 var travelRejectSucc = "Travel Request Rejected Successfully";
 var rejecttxt = "Reject";
@@ -160,6 +159,8 @@ var purposetxt = "Purpose";
 var gatePassApprove =  "Gate Pass Approve";
 var hometxt = "Home";
 var attendance = "Attendance";
+var attendanceC = "Attendance Correction";
+var selectattendence = "Select Attendance Type";
 var payslip = "Payslip";
 var personalInfo = "Personal Info";
 var version = 'Version :- ';

@@ -1,5 +1,3 @@
-// ignore_for_file: must_be_immutable, non_constant_identifier_names
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
@@ -437,7 +435,5 @@ class InDirectLeaveState extends State<InDirectLeave> {
       Utility().showToast(somethingWentWrong);
     }
   }
-
-
 
 }

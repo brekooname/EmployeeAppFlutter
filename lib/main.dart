@@ -114,7 +114,8 @@ class _LoginPageState extends State<LoginPage> {
       fcmToken = '',
       imeiNumber = '',
       apiNumber = '',
-      platformVersion = '';
+      platformVersion = '',
+      loginUserType ='';
   TextEditingController sapCodeController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool getPermission = false;
@@ -139,16 +140,14 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
    return Consumer<firestoreAppUpdateNofifier>(
         builder: (context, value, child) {
-      if (value.fireStoreData != null && value.fireStoreData!.minEmployeeAppVersion !=
-          value.appVersionCode) {
+          if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(
-                      appUrl:
-                      value.fireStoreData!.employeeAppUrl.toString())),
-                  (Route<dynamic> route) => false);
-
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+              (Route<dynamic> route) => false);
         });
       } else {
         return Scaffold(
@@ -381,13 +380,17 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-    Utility().setSharedPreference(userID, sapCodeController.text.toString());
-    Utility().setSharedPreference(password, passwordController.text.toString());
 
     if (Platform.isAndroid) {
       platform = "Android";
     } else if (Platform.isIOS) {
       platform = "IOS";
+    }
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    if(packageInfo.packageName =="shakti.shakti_employee"){
+      loginUserType = 'ONROLL';
+    }else{
+      loginUserType = 'OFFROLL';
     }
 
     dynamic response = await HTTP.get(userLogin(
@@ -398,28 +401,17 @@ class _LoginPageState extends State<LoginPage> {
         appVersion,
         imeiNumber,
         platform,
-        fcmToken));
+        fcmToken,
+        loginUserType));
 
     if (response != null && response.statusCode == 200) {
       Iterable l = json.decode(response.body);
       List<LoginModelResponse> loginResponse = List<LoginModelResponse>.from(
           l.map((model) => LoginModelResponse.fromJson(model)));
 
-      if (loginResponse[0].name.isNotEmpty) {
-        Utility().setSharedPreference(name, loginResponse[0].name);
-        Utility().setSharedPreference(localConveyanceJourneyStart, 'false');
-        Utility().showToast(welcome + loginResponse[0].name);
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) => HomePage(
-                      journeyStart: False,
-                    )),
-            (route) => false);
-
-        setState(() {
-          isLoading = false;
-        });
+      print('Response======>${response.body}');
+      if(loginResponse[0].name.isNotEmpty){
+      loginResManage(loginResponse[0]);
       } else {
         Utility().showToast(errorMssg);
         setState(() {
@@ -432,6 +424,26 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = false;
       });
     }
+  }
+
+  void loginResManage(LoginModelResponse loginResponse) {
+    Utility().setSharedPreference(userID, sapCodeController.text.toString());
+    Utility().setSharedPreference(password, passwordController.text.toString());
+
+    Utility().setSharedPreference(name, loginResponse.name);
+    Utility().setSharedPreference(localConveyanceJourneyStart, 'false');
+    Utility().showToast(welcome + loginResponse.name);
+    // ignore: use_build_context_synchronously
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) => HomePage(
+              journeyStart: False,
+            )),
+            (route) => false);
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> retrieveFCMToken() async {

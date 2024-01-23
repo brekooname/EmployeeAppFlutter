@@ -136,7 +136,7 @@ class _MyTaskListWidgetState extends State<MyTaskListWidget> {
 
   DepartmentDropdown() {
     return Container(
-        height: 50,
+        height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
           isExpanded: true,
@@ -189,7 +189,7 @@ class _MyTaskListWidgetState extends State<MyTaskListWidget> {
 
   _buildTable(BuildContext context) {
     return Scrollbar(
-        controller: _vertical,
+        controller: _horizontal,
         thumbVisibility: true,
         trackVisibility: true,
         notificationPredicate: (notif) => notif.depth == 1,
@@ -367,6 +367,8 @@ class _MyTaskListWidgetState extends State<MyTaskListWidget> {
                     .showInSnackBar(value: selectFromDate, context: context);
               } else if (selectedToDate!.isEmpty) {
                 Utility().showInSnackBar(value: selectToDate, context: context);
+              } else if(selectedSubDepartmentCode == null || selectedSubDepartmentCode!.isEmpty){
+                Utility().showInSnackBar(value: selectDepartment, context: context);
               } else {
                 getTaskCount();
               }
