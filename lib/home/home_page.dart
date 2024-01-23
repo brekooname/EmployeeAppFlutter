@@ -537,13 +537,20 @@ class _HomePageState extends State<HomePage> {
       setListData();
     }
 
-    if (sharedPreferences.getString(userInfo) != null) {
+    if (sharedPreferences.getString(userInfo) != null &&
+        sharedPreferences
+            .getString(userInfo)
+            .toString()
+            .isNotEmpty) {
       var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
       personInfo = PersonalInfoResponse.fromJson(jsonData);
       setpersonData();
     }
 
-    if (sharedPreferences.getString(gatePassDatail) != null) {
+    if (sharedPreferences.getString(gatePassDatail) != null && sharedPreferences
+        .getString(gatePassDatail)
+    .toString()
+        .isNotEmpty) {
       var jsonData =
       convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
@@ -1373,7 +1380,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setpersonData() {
-    if (personInfo != null && personInfo!.emp.isNotEmpty) {
+    if (personInfo != null) {
       setState(() {
         personalInfo = personInfo!.emp;
       });
@@ -1381,7 +1388,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setgatePassData() {
-    if (gatePassResponse != null && gatePassResponse!.data.isNotEmpty) {
+    if (gatePassResponse != null) {
       setState(() {
         gatePassList = gatePassResponse!.data;
       });
