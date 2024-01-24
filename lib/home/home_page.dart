@@ -1,5 +1,4 @@
 import 'dart:convert' as convert;
-
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -9,14 +8,11 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
 import 'package:shakti_employee_app/DailyReport/model/vendor_gate_pass_model.dart'
     as vendorGatePassPrefix;
-
 import 'package:shakti_employee_app/TravelExpenses/travelexpenses.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/gatepassApproved.dart';
@@ -279,7 +275,7 @@ class _HomePageState extends State<HomePage> {
             leaveEmpList: leaveEmpList,
             odEmpList: odEmpList,
             personalInfo: personalInfo,
-          )),
+              isEmployeeApp: isEmployeeApp)),
     );
         } return Container(
         );
@@ -547,28 +543,25 @@ class _HomePageState extends State<HomePage> {
       setpersonData();
     }
 
-    if (sharedPreferences.getString(gatePassDatail) != null && sharedPreferences
-        .getString(gatePassDatail)
-    .toString()
-        .isNotEmpty) {
+    if (sharedPreferences.getString(gatePassDatail) != null &&
+        sharedPreferences.getString(gatePassDatail).toString().isNotEmpty) {
       var jsonData =
-      convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
+          convert.jsonDecode(sharedPreferences.getString(gatePassDatail)!);
       gatePassResponse = PendingGatePassResponse.fromJson(jsonData);
       setgatePassData();
     }
 
-    if (sharedPreferences.getString(travelRequest) != null) {
+    if (sharedPreferences.getString(travelRequest) != null &&
+        sharedPreferences.getString(travelRequest).toString().isNotEmpty) {
       var jsonData =
-      convert.jsonDecode(sharedPreferences.getString(travelRequest)!);
+          convert.jsonDecode(sharedPreferences.getString(travelRequest)!);
       travelRequestList = TR.TravelRequestList.fromJson(jsonData);
       setTravelData();
     }
 
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.getString(vendorGatePas) != null &&
-        sharedPreferences
-            .getString(vendorGatePas)
-            .toString()
+        sharedPreferences.getString(vendorGatePas).toString()
             .isNotEmpty) {
       var jsonData =
       convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
@@ -1397,8 +1390,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setVendorgatePassData() {
-    if (vendorGatePassModel != null &&
-        vendorGatePassModel!.response.isNotEmpty) {
+    if (vendorGatePassModel != null) {
       setState(() {
         vendorGatePassList = vendorGatePassModel!.response;
       });
@@ -1406,8 +1398,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void setTravelData() {
-    if (travelRequestList != null &&
-        travelRequestList!.response.isNotEmpty) {
+    if (travelRequestList != null) {
       setState(() {
         travelReqList = travelRequestList!.response;
       });

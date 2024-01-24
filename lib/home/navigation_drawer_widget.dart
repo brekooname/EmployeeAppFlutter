@@ -25,7 +25,8 @@ class NavigationDrawerWidget extends StatefulWidget {
       required this.attendenceList,
       required this.leaveEmpList,
       required this.odEmpList,
-      required this.personalInfo})
+      required this.personalInfo,
+      required this.isEmployeeApp})
       : super(key: key);
   String name;
 
@@ -33,6 +34,7 @@ class NavigationDrawerWidget extends StatefulWidget {
   List<Leaveemp> leaveEmpList = [];
   List<Odemp> odEmpList = [];
   List<Emp> personalInfo = [];
+  bool isEmployeeApp;
 
   @override
   State<NavigationDrawerWidget> createState() => _HomePageState();
@@ -79,6 +81,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
                     fontWeight: FontWeight.w600):Container(),
               ),
             ),
+
             navigationItemWidget(0, Icons.home, hometxt),
             navigationItemWidget(1, Icons.task, myTask),
             navigationItemWidget(2, Icons.calendar_month, attendance),
@@ -86,7 +89,7 @@ class _HomePageState extends State<NavigationDrawerWidget> {
             navigationItemWidget(4, Icons.calendar_today_rounded, leave),
             navigationItemWidget(5, Icons.person_outline_rounded, officialDuty),
             navigationItemWidget(6, Icons.route_outlined, travelReport),
-            navigationItemWidget(7, Icons.person_outline_rounded, payslip),
+           widget.isEmployeeApp? navigationItemWidget(7, Icons.person_outline_rounded, payslip):SizedBox(),
             navigationItemWidget(8, Icons.person, personalInfo),
             navigationItemWidget(9, Icons.logout, logout),
           ],
@@ -171,9 +174,9 @@ class _HomePageState extends State<NavigationDrawerWidget> {
 
           case 7:
             {
-              Navigator.of(context).pushAndRemoveUntil(
+              widget.isEmployeeApp? Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const SalarySlip()),
-                  (route) => true);
+                  (route) => true):null;
             }
             break;
           case 8:
