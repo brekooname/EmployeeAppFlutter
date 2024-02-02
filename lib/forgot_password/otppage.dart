@@ -44,8 +44,9 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
       if (timer.tick >= timerMaxSeconds){
         isTimerStart = false;
         timer.cancel();}
-
-      setState(() {});
+       if(mounted) {
+         setState(() {});
+       }
     });
   }
 

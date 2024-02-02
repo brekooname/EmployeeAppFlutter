@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../theme/string.dart';
 import '../../webservice/constant.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SalarySlip extends StatefulWidget {
   const SalarySlip({Key? key}) : super(key: key);
@@ -19,31 +21,36 @@ class _SalarySlipState extends State<SalarySlip> {
   String? yearSpinner , monthSpinner ;
   bool isLoading = false;
   var yearList = [
-    'Select Year',
-    '2014',
-    '2015',
-    '2016',
-    '2017',
-    '2018',
-    '2019',
-    '2020',
-    '2021',
-    '2022',
     '2023',
     '2024',
-    '2025',
   ];
 
   var monthList = [
-    "Select Month", "Jan", "Feb", "Mar", "Apr",
-    "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
   ];
 
-
+  String? currentMonth, currentDate;
+  String dateFormat = "MM";
+  int? selectedIndex;
 
   @override
   void initState() {
     // TODO: implement initState
+    currentMonth = DateFormat(dateFormat).format(DateTime.now());
+    currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    print('${DateFormat('yyyy-MM-dd').format(DateTime.now())}');
+
     super.initState();
   }
 
@@ -150,9 +157,14 @@ class _SalarySlipState extends State<SalarySlip> {
                   sizeval: 12,
                   fontWeight: FontWeight.bold))).toList(),
           onChanged: (Object? value) {
-            setState(() {
-              monthSpinner = value.toString();
-            });
+            monthSpinner = value.toString();
+            for (var i = 0; i < monthList.length; i++) {
+              if (monthSpinner == monthList[i]) {
+                selectedIndex = i + 1;
+              }
+            }
+            print('selectedIndex=====>$selectedIndex');
+            setState(() {});
           },
         ));
   }
@@ -191,27 +203,35 @@ class _SalarySlipState extends State<SalarySlip> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    yearSpinner ??= "";
-    monthSpinner ??= "";
 
     String sapCode =  sharedPreferences.getString(userID).toString() ;
-    if(yearSpinner!.isEmpty){
+    if (yearSpinner == null || yearSpinner!.isEmpty) {
       Utility().showToast(pselectYear);
-    } else if(monthSpinner!.isEmpty){
+    } else if (monthSpinner == null || monthSpinner!.isEmpty) {
       Utility().showToast(pselectMonth);
-    }else{
-      Utility().checkInternetConnection().then((connectionResult) {
-        if (connectionResult) {
-          _launchUrl('$salarySlipUrl?id=$sapCode&yr=$yearSpinner&mo=$monthSpinner');
-        } else {
-          Utility()
-              .showInSnackBar(value: checkInternetConnection, context: context);
-        }
-      });
+    } else {
+      DateTime dt1 = DateTime.parse("$currentDate");
+      String compareDate = '$yearSpinner-$monthSpinner-05';
 
-
+      DateTime dt2 = DateTime.parse(Utility.convertDateFormat(
+          compareDate, "yyyy-MMM-dd", "yyyy-MM-dd hh:mm:ss"));
+      if (dt1.compareTo(dt2) == 0 || dt1.compareTo(dt2) > 0) {
+        print("Both date time are at same moment.");
+        print("DT1 is after DT2");
+        Utility().checkInternetConnection().then((connectionResult) {
+          if (connectionResult) {
+            _launchUrl(
+                '$salarySlipUrl?id=$sapCode&yr=$yearSpinner&mo=$monthSpinner');
+          } else {
+            Utility().showInSnackBar(
+                value: checkInternetConnection, context: context);
+          }
+        });
+      } else {
+        Utility().showInSnackBar(
+            value: 'Can not download this month of payslip', context: context);
+      }
     }
-
   }
 
 

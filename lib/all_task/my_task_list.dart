@@ -180,9 +180,11 @@ class _MyTaskListWidgetState extends State<MyTaskListWidget> {
       jsonData = convert.jsonDecode(res.body);
       DepartmentModel departmentModel = DepartmentModel.fromJson(jsonData);
       if (departmentModel.status.toString() == "True") {
-        setState(() {
-          departmentList = departmentModel.response;
-        });
+        if(mounted) {
+          setState(() {
+            departmentList = departmentModel.response;
+          });
+        }
       }
     }
   }

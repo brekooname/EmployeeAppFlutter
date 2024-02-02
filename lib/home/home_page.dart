@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart' as loc;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -103,7 +104,9 @@ class _HomePageState extends State<HomePage> {
   bool isEmployeeApp = false;
   var totalWayPoints ="";
 
+  bool _serviceEnabled = false, gpsEnable = false;
 
+  LocationPermission? permission;
 
 
   @override
@@ -441,11 +444,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
+    bool? serviceEnabled;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
+    if (!serviceEnabled!) {
       Utility().showInSnackBar(
           value: 'Location services are disabled. Please enable the services',
           context: context);
@@ -887,13 +888,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future getCurrentLocation() async {
+
     if (Platform.isAndroid) {
       var permission = Permission.locationWhenInUse.status;
       if (permission != PermissionStatus.granted) {
         final status = await Permission.location.request();
         if (status != PermissionStatus.granted) {
+          setState(() {
+            isLoading = false;
+          });
+
           Utility().showToast("You need location permission for use this App");
           return;
+        }else{
+          setState(() {
+            isLoading = false;
+          });
+
         }
       }
     }
@@ -910,13 +921,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    if (mounted) {
-      setState(() {
-        latlong = LatLng(position.latitude, position.longitude);
-        GetAddressFromLatLong(latlong!);
-      });
+    loc.Location location = new loc.Location();
+    _serviceEnabled = await location.serviceEnabled();
+    gpsEnable = await location.requestService();
+
+    if ( !_serviceEnabled || !gpsEnable) {
+      _serviceEnabled = await location.requestService();
+    } else {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      if (mounted) {
+        setState(() {
+          latlong = LatLng(position.latitude, position.longitude);
+          GetAddressFromLatLong(latlong!);
+        });
+      }
     }
   }
 
