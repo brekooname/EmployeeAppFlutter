@@ -16,7 +16,7 @@ class DistanceCalculateModel {
   });
 
   factory DistanceCalculateModel.fromJson(Map<String, dynamic> json) => DistanceCalculateModel(
-    routes: List<Route>.from(json["routes"].map((x) => Route.fromJson(x))),
+    routes: json["routes"] !=null?List<Route>.from(json["routes"].map((x) => Route.fromJson(x))):[],
   );
 
   Map<String, dynamic> toJson() => {
@@ -66,12 +66,12 @@ class Northeast {
 }
 
 class Leg {
-  Distance distance;
-  Distance duration;
+  Distance? distance;
+  Distance? duration;
   String endAddress;
-  Northeast endLocation;
+  Northeast? endLocation;
   String startAddress;
-  Northeast startLocation;
+  Northeast? startLocation;
 
   Leg({
     required this.distance,
@@ -84,21 +84,21 @@ class Leg {
   });
 
   factory Leg.fromJson(Map<String, dynamic> json) => Leg(
-    distance: Distance.fromJson(json["distance"]),
-    duration: Distance.fromJson(json["duration"]),
+    distance: json["distance"] != null ? Distance.fromJson(json["distance"]):null,
+    duration:  json["duration"] != null ? Distance.fromJson(json["duration"]):null,
     endAddress: json["end_address"],
-    endLocation: Northeast.fromJson(json["end_location"]),
+    endLocation:  json["end_location"] != null ? Northeast.fromJson(json["end_location"]):null,
     startAddress: json["start_address"],
-    startLocation: Northeast.fromJson(json["start_location"]),
+    startLocation: json["start_location"] != null ? Northeast.fromJson(json["start_location"]):null,
     );
 
   Map<String, dynamic> toJson() => {
-    "distance": distance.toJson(),
-    "duration": duration.toJson(),
+    "distance": distance!.toJson(),
+    "duration": duration!.toJson(),
     "end_address": endAddress,
-    "end_location": endLocation.toJson(),
+    "end_location": endLocation!.toJson(),
     "start_address": startAddress,
-    "start_location": startLocation.toJson(),
+    "start_location": startLocation!.toJson(),
      };
 }
 

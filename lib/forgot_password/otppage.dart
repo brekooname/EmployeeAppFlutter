@@ -67,7 +67,13 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                 colorval: AppColor.whiteColor,
                 sizeval: 15,
                 fontWeight: FontWeight.w800),
-        iconTheme: IconThemeData(  color:  Colors.white),),
+        iconTheme: IconThemeData(  color:  Colors.white),
+          leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
+              onPressed: () {
+                Navigator.of(context).pop();
+              }
+          ),),
         body: SizedBox(
           child: Container(
             width: double.infinity,
@@ -231,7 +237,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
         } else {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (BuildContext context) =>  const ResetPasswordPage()),
+                  builder: (BuildContext context) =>   ResetPasswordPage(mobile: widget.mobile,)),
                   (Route<dynamic> route) => true);
           // loginAPI();
         }

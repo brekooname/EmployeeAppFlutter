@@ -169,10 +169,12 @@ class _HomePageState extends State<HomePage> {
         if (value.fireStoreData != null &&
             value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            Utility().clearSharedPreference();
+            Utility().deleteDatabase(databaseName);
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                     builder: (BuildContext context) => AppUpdateWidget(
-                        appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                        appUrl: value.fireStoreData!.employeeAppUrl.toString(),)),
                     (Route<dynamic> route) => false);
           });
         } else {
@@ -900,11 +902,6 @@ class _HomePageState extends State<HomePage> {
 
           Utility().showToast("You need location permission for use this App");
           return;
-        }else{
-          setState(() {
-            isLoading = false;
-          });
-
         }
       }
     }
@@ -1128,7 +1125,7 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.all(Radius.circular(10))),
         content: SingleChildScrollView(
             child: Container(
-                height: MediaQuery.of(context).size.height / 1.6,
+                height: MediaQuery.of(context).size.height / 1.5,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1161,7 +1158,7 @@ class _HomePageState extends State<HomePage> {
                         '$toAddress ${distanceCalculateModel.routes[0].legs[0].endAddress}',
                       ),
                       latLongWidget(
-                        '$distanceTravelled ${distanceCalculateModel.routes[0].legs[0].distance.text.toString()}',
+                        '$distanceTravelled ${distanceCalculateModel.routes[0].legs[0].distance!.text.toString()}',
                       ),
                       travelModeWidget(),
                       const SizedBox(
@@ -1604,7 +1601,7 @@ class _HomePageState extends State<HomePage> {
         distancePrefix.DistanceCalculateModel.fromJson(jsonData);
         if (distanceCalculateModel.routes.isNotEmpty &&
             distanceCalculateModel.routes[0].legs.isNotEmpty &&
-            distanceCalculateModel.routes[0].legs[0].distance.text.isNotEmpty) {
+            distanceCalculateModel.routes[0].legs[0].distance!.text.isNotEmpty) {
           showDialog(
             context: context,
             builder: (BuildContext context) => stopJourneyPopup(
@@ -1648,7 +1645,7 @@ class _HomePageState extends State<HomePage> {
         latLong111: totalWayPoints,
         startLocation: distanceCalculateModel.routes[0].legs[0].startAddress,
         endLocation: distanceCalculateModel.routes[0].legs[0].endAddress,
-        distance: distanceCalculateModel.routes[0].legs[0].distance.text,
+        distance: distanceCalculateModel.routes[0].legs[0].distance!.text,
         travelMode: travelModeController.text.toString(),
         latLong: allLatLng));
     String value = convert.jsonEncode(travelList).toString();

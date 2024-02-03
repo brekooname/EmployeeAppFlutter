@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
+import 'package:shakti_employee_app/webservice/constant.dart';
 
 import '../../provider/firestore_appupdate_notifier.dart';
 import '../../uiwidget/appupdatewidget.dart';
@@ -41,6 +43,8 @@ class _AttendanceReportState extends State<AttendanceReport> {
       if (value.fireStoreData != null &&
           value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(

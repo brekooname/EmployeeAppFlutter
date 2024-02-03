@@ -49,10 +49,12 @@ class _TravelApprovedState extends State<TravelApproved> {
       if (value.fireStoreData != null &&
           value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(
-                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString(), )),
                   (Route<dynamic> route) => false);
         });
       } else {

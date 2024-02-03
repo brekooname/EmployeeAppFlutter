@@ -186,8 +186,8 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
   }
 
   Future<void> Validation() async {
-    selectedDepartmentCode ??= "";
-    if (selectedDepartmentCode!.isEmpty) {
+
+    if (selectedDepartmentCode == null || selectedDepartmentCode!.isEmpty) {
       Utility().showToast(pleaseSelectDepartment);
     } else if (taskDes.text.toString().isEmpty) {
       Utility().showToast(pleaseEnterTask);

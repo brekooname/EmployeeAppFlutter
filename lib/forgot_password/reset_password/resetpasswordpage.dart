@@ -17,8 +17,9 @@ import '../../uiwidget/robotoTextWidget.dart';
 import '../../webservice/constant.dart';
 
 class ResetPasswordPage extends StatefulWidget {
+  String mobile;
 
-  const ResetPasswordPage({Key? key}) : super(key: key);
+   ResetPasswordPage({Key? key, required this.mobile}) : super(key: key);
 
   @override
   State<ResetPasswordPage> createState() => _ForgetPasswordPageState();
@@ -100,7 +101,9 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                                     datePickerWidget(),
                                     const SizedBox( height: 10,),
                                     PasswordTextWdget(),
+
                                     editMobileWidget(),
+
                                     GestureDetector(
                                       onTap: () {
                                         signIn();
@@ -157,8 +160,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                 blurRadius: 20,
                 offset: Offset(0, 10))
           ]),
-      child: Column(
-        children: <Widget>[
+      child:
           Container(
             padding:
                 const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
@@ -176,25 +178,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
               textInputAction: TextInputAction.next,
             ),
           ),
-          Container(
-            padding:
-                const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
-            decoration: BoxDecoration(
-                border:
-                    Border(bottom: BorderSide(color: Colors.grey.shade200))),
-            child: TextField(
-              controller: mobileNo,
-              decoration: InputDecoration(
-                hintText: mobileNotxt,
-                hintStyle: const TextStyle(color: Colors.grey),
-                border: InputBorder.none,
-                alignLabelWithHint: false,
-              ),
-              textInputAction: TextInputAction.done,
-            ),
-          ),
-        ],
-      ),
+
     );
   }
 
@@ -256,7 +240,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
       isLoading = true;
     });
     var jsonData = null;
-    dynamic response = await HTTP.get(forgotpasword(sapCode.text.toString(),mobileNo.text.toString(),indianDate.toString()));
+    dynamic response = await HTTP.get(forgotpasword(sapCode.text.toString(),widget.mobile,indianDate.toString()));
    if (response != null && response.statusCode == 200) {
       setState(() {
         isLoading = false;

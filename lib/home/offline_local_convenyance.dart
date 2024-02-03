@@ -8,6 +8,7 @@ import 'package:shakti_employee_app/home/model/distance_calculate_model.dart'
 import 'package:shakti_employee_app/home/model/local_convence_model.dart';
 import 'package:shakti_employee_app/home/model/travelmodel.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+import 'package:shakti_employee_app/webservice/constant.dart';
 
 import '../database/database_helper.dart';
 import '../provider/firestore_appupdate_notifier.dart';
@@ -60,6 +61,8 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
       if (value.fireStoreData != null &&
           value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(
@@ -240,7 +243,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
         distancePrefix.DistanceCalculateModel.fromJson(jsonData);
         if (distanceCalculateModel.routes.isNotEmpty &&
             distanceCalculateModel.routes[0].legs.isNotEmpty &&
-            distanceCalculateModel.routes[0].legs[0].distance.text.isNotEmpty) {
+            distanceCalculateModel.routes[0].legs[0].distance!.text.isNotEmpty) {
           showDialog(
             context: context,
             builder: (BuildContext context) => stopJourneyPopup(
@@ -297,7 +300,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
                         '$toAddress ${distanceCalculateModel.routes[0].legs[0].endAddress}',
                       ),
                       latLongWidget(
-                        '$distanceTravelled ${distanceCalculateModel.routes[0].legs[0].distance.text}',
+                        '$distanceTravelled ${distanceCalculateModel.routes[0].legs[0].distance!.text}',
                       ),
                       travelModeWidget(),
                       const SizedBox(
@@ -449,7 +452,7 @@ class _OfflineLocalConveyanceState extends State<OfflineLocalConveyance> {
         startLocation: '${LocalConveyance.fromLatitude},${LocalConveyance.fromLongitude}',
         endLocation: '${LocalConveyance.toLatitude},${LocalConveyance.toLongitude}',
         distance: distanceCalculateModel
-            .routes[0].legs[0].distance.text,
+            .routes[0].legs[0].distance!.text,
         travelMode: travelModeController.text.toString(),
         latLong: allLatLng!));
     String value = convert.jsonEncode(travelList).toString();

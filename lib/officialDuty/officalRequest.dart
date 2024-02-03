@@ -38,7 +38,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   String?  dutyTypeSpinner, workPlaceSpinner,selectedFromDate, selectedToDate;
 
-  String  dateFormat ="dd/MM/yyyy",timeFormat = "HH:mm:ss";
+  String  dateFormat ="dd/MM/yyyy",timeFormat = "HH:mm:ss", subStringCode = "";
 
   var dutyTypeList = [
     'On Duty',
@@ -189,6 +189,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         onSubmit: (String value) {
           setState(() {
             selectedAssginTo.text = value.toString();
+ 
           });
           },
       ),
@@ -465,9 +466,10 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   }
 
 
-  void Validation() {
+  Future<void> Validation() async {
     dutyTypeSpinner ??= "";
     workPlaceSpinner ??= "";
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     if(workPlaceSpinner!.isEmpty ) {
       workPlaceSpinner = null;
@@ -486,10 +488,14 @@ class _OfficialRequestState extends State<OfficialRequest>  {
       Utility().showToast(vaildDepartment);
     }else  if(purpose1.text.toString().isEmpty){
       Utility().showToast(vaildPurpose);
-    }else {
+    }else if(selectedAssginTo.text.isEmpty){
+      Utility().showToast(vaildPerson);
+    }else if(selectedAssginTo.text.contains(sharedPreferences.getString(userID).toString())){
+      Utility().showToast(errorMessg);
+    } else {
       Utility().checkInternetConnection().then((connectionResult) {
         if (connectionResult) {
-          createOD();
+        createOD();
         } else {
           Utility()
               .showInSnackBar(value: checkInternetConnection, context: context);
