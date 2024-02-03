@@ -475,7 +475,7 @@ class _DailyReportState extends State<DailyReport> {
                   fontSize: 12,
                   fontWeight: FontWeight.normal),
             ),
-            keyboardType:title != "Vendor Contact No." && title != "Vendor Code"  && title != "Responsible Person" && title != "Responsible Person 2"&& title != "Responsible Person 3"? TextInputType.text : TextInputType.number,
+            keyboardType: title != vendor_contact && title != vendor_code  && title != responsible_Person && title != responsiblePerson_2 && title != responsiblePerson_3? TextInputType.text : TextInputType.number,
           ),
         ),
       ],
