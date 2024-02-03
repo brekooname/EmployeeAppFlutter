@@ -197,7 +197,6 @@ class _TaskRequestScreenState extends State<TaskRequestScreen> {
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       Utility().checkInternetConnection().then((connectionResult) {
         if (connectionResult) {
-
           taskData.add(TaskRequest(
               pernr: sharedPreferences.getString(userID).toString(),
               budat: currentDate!,
