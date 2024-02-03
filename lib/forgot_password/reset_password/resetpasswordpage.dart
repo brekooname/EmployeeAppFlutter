@@ -171,7 +171,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
               controller: sapCode,
               maxLines: 1,
               decoration: InputDecoration(
-                  hintText: userID,
+                  hintText: sapcode,
                   hintStyle: const TextStyle(color: Colors.grey),
                   border: InputBorder.none),
               keyboardType: TextInputType.number,
@@ -219,11 +219,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
   Future<void> signIn() async {
     Utility().checkInternetConnection().then((connectionResult) {
       if (connectionResult) {
-         if (mobileNo.text.toString().isEmpty) {
-          Utility().showInSnackBar(value: mobileNoMessage, context: context);
-        }else if (mobileNo.text.toString().length<10) {
-          Utility().showInSnackBar(value: invaildMobileNo, context: context);
-        }else if (sapCode.text.toString().isEmpty) {
+         if (sapCode.text.toString().isEmpty) {
            Utility().showInSnackBar(value: sapcodeempty, context: context);
          } else {
           updatePassword();
@@ -248,15 +244,14 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
       Iterable l = json.decode(response.body);
       List<UpdatePasswordResponse> updatepassword = List<UpdatePasswordResponse>.from(l.map((model)=> UpdatePasswordResponse.fromJson(model)));
-      if (updatepassword[0].msg != null && updatepassword[0].msg != registeredMob && updatepassword[0].msg !=wrongdob) {
-        Utility().showToast(updatepassword[0].msg);
+      if (updatepassword[0].msg !=  null && updatepassword[0].msg != registeredMob && updatepassword[0].msg != wrongdob && updatepassword[0].msg != "Employee no is invalid or not Active") {
+         Utility().showToast(updatepassword[0].msg);
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
                 builder: (BuildContext context) =>
                 const LoginPage()),
                 (Route<dynamic> route) => false);
-      }
-      else {
+      }else {
         Utility().showToast(updatepassword[0].msg);
       }
     }else{

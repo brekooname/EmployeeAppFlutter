@@ -67,13 +67,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
                 colorval: AppColor.whiteColor,
                 sizeval: 15,
                 fontWeight: FontWeight.w800),
-        iconTheme: IconThemeData(  color:  Colors.white),
-          leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
-              onPressed: () {
-                Navigator.of(context).pop();
-              }
-          ),),
+      ),
         body: SizedBox(
           child: Container(
             width: double.infinity,
