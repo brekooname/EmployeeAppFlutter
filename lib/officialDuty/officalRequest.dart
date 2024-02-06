@@ -467,26 +467,30 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
 
   Future<void> Validation() async {
-    dutyTypeSpinner ??= "";
-    workPlaceSpinner ??= "";
+    // dutyTypeSpinner ??= "";
+    // workPlaceSpinner ??= "";
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    if(workPlaceSpinner!.isEmpty ) {
+    if(dutyTypeSpinner==null || dutyTypeSpinner!.isEmpty ){
+      dutyTypeSpinner = null;
+      Utility().showToast(validOdType);
+    }
+    else if(workPlaceSpinner==null || workPlaceSpinner!.isEmpty ) {
       workPlaceSpinner = null;
       Utility().showToast(validWorkPlace);
     }
-    if (fromDateController.text.toString().isEmpty) {
+    else if (fromDateController.text.toString().isEmpty) {
       Utility().showToast(validDate);
-    }  else if(dutyTypeSpinner!.isEmpty) {
-      dutyTypeSpinner = null;
-        Utility().showToast(validateOd);
-      }else if (toDateController.text.toString().isEmpty) {
+    }
+    else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeave);
     }else if (fromTimeController.text.toString().isEmpty) {
       Utility().showToast(selectFromTime);
-    }else if(workPlaceSpinner ==  selectWorkPlace) {
-      Utility().showToast(vaildDepartment);
-    }else  if(purpose1.text.toString().isEmpty){
+    }
+    else if (visitPlaceController.text.toString().isEmpty) {
+      Utility().showToast(selectVisitPlace);
+    }
+    else  if(purpose1.text.toString().isEmpty){
       Utility().showToast(vaildPurpose);
     }else if(selectedAssginTo.text.isEmpty){
       Utility().showToast(vaildPerson);
