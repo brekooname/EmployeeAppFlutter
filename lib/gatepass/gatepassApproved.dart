@@ -49,6 +49,8 @@ class _GatePassApprovedState extends State<GatePassApproved> {
       if (value.fireStoreData != null &&
           value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(

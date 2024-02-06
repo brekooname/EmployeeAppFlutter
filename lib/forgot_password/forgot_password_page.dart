@@ -40,7 +40,7 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(
-                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString(), )),
                   (Route<dynamic> route) => false);
         });
       } else {
@@ -54,16 +54,11 @@ class _RegisterMobileState extends State<ForgotPasswordPage> {
               sizeval: 15,
               fontWeight: FontWeight.w800),
           leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                color: AppColor.whiteColor,
-              ),
+              icon: const Icon(Icons.arrow_back, color: AppColor.whiteColor,),
               onPressed: () {
-                /* Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );*/
-              }),
+                Navigator.of(context).pop();
+              }
+          ),
         ),
         body: SizedBox(
           child: Container(

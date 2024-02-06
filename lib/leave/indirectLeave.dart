@@ -49,6 +49,8 @@ class InDirectLeaveState extends State<InDirectLeave> {
       if (value.fireStoreData != null &&
           value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(
@@ -437,10 +439,13 @@ class InDirectLeaveState extends State<InDirectLeave> {
     dynamic response = await HTTP.get(
         SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
     if (response != null && response.statusCode == 200) {
-      setState(() {
-        isLoading  = false;
-        Utility().setSharedPreference(syncSapResponse, response.body.toString());
-      });
+
+      if(mounted){
+        setState(() {
+          isLoading  = false;
+          Utility().setSharedPreference(syncSapResponse, response.body.toString());
+        });
+      }
 
       if(value=="0"){
         Utility().showToast(leaveASuccessfully);

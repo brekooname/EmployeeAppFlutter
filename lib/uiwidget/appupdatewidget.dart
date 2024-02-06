@@ -37,7 +37,7 @@ class _AppUpdateWidgetPageState extends State<AppUpdateWidget> {
             margin: const EdgeInsets.only(left: 20,right: 20),
             child: const Text(
 
-              "App latest version are available on play store\n please update first and enjoy",
+              "App latest version are available on play store\n please update first and Login again",
               style: TextStyle(
                   decoration: TextDecoration.none,
                   fontSize: 14,fontFamily: 'Roboto',
