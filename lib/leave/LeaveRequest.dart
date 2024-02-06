@@ -544,12 +544,20 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
         ));
   }
 
-  void Validation() {
-    selectedLeaveType ??= "";
-    if (selectedLeaveType!.isEmpty) {
+  Future<void> Validation() async {
+   // selectedLeaveType ??= "";
+  //  dayTypeSpinner ??= "";
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    if (selectedLeaveType==null || selectedLeaveType!.isEmpty) {
       selectedLeaveType = null;
       Utility().showToast(vaildLeaveType);
-    } else if (fromDateController.text.toString().isEmpty) {
+    }
+    else if(dayTypeSpinner==null || dayTypeSpinner!.isEmpty){
+      dayTypeSpinner = null;
+      Utility().showToast(validDayType);
+    }
+    else if (fromDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeaveDate);
     } else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeaveDateTO);
@@ -557,8 +565,15 @@ class _LeaveRequestScreenState extends State<LeaveRequestScreen> {
       Utility().showToast(vaildRaseon);
     } else if (person1.text.toString().isEmpty) {
       Utility().showToast(vaildPerson1);
-    } else if (person2.text.toString().isEmpty) {
+    }
+    else if(person1.text.contains(sharedPreferences.getString(userID).toString())){
+      Utility().showToast(errorMessg);
+    }
+    else if (person2.text.toString().isEmpty) {
       Utility().showToast(vaildPerson2);
+    }
+    else if(person2.text.contains(sharedPreferences.getString(userID).toString())){
+      Utility().showToast(errorMessg);
     }
     else {
       if (dayTypeSpinner == "Half Day") {
