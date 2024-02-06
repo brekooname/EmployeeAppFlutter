@@ -1,52 +1,45 @@
 {
   "project_info": {
-    "project_number": "670091446020",
-    "project_id": "shaktiemployeeapp",
-    "storage_bucket": "shaktiemployeeapp.appspot.com"
+    "project_number": "851829651772",
+    "project_id": "offroleemployeeapp",
+    "storage_bucket": "offroleemployeeapp.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:670091446020:android:b89d0c1d720b0c2c57b251",
+        "mobilesdk_app_id": "1:851829651772:android:b0835946b8950e95e3c639",
         "android_client_info": {
-          "package_name": "shakti.shakti_employee"
+          "package_name": "com.offrole_employee"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "670091446020-1r9r77op1f3nfplipnb4fu3hbn553t32.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "shakti.shakti_employee",
-            "certificate_hash": "1108b556e53aab076eb887d310aa674484addf15"
-          }
-        },
-        {
-          "client_id": "670091446020-9btso6fr43j4tpl15dp4o1teapvh2c6r.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "shakti.shakti_employee",
-            "certificate_hash": "1bc75af9b07e6314323ab9b41a4875f7a1f52337"
-          }
-        },
-        {
-          "client_id": "670091446020-3uijk1k4mrbmd14uvd4u51kv95fjol23.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA8sG_O8omWeHcpK6GvJb_pmyltoigA2zU"
+          "current_key": "AIzaSyA0FQm9wenTUPMIFrP8TKfd8lW2VFu1XvI"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "670091446020-3uijk1k4mrbmd14uvd4u51kv95fjol23.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851829651772:android:3590111288c7501ee3c639",
+        "android_client_info": {
+          "package_name": "shakti.shakti_employee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0FQm9wenTUPMIFrP8TKfd8lW2VFu1XvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
         }
       }
     }

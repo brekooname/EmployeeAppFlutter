@@ -371,11 +371,13 @@ class _TaskApprovedState extends State<TaskApproved> {
     dynamic response = await HTTP.get(
         SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
     if (response != null && response.statusCode == 200) {
-      setState(() {
-        isLoading = false;
-        Utility()
-            .setSharedPreference(syncSapResponse, response.body.toString());
-      });
+      if(mounted){
+        setState(() {
+          isLoading = false;
+          Utility()
+              .setSharedPreference(syncSapResponse, response.body.toString());
+        });
+      }
       Utility().showToast(taskClosed);
       Navigator.of(context).pop();
     } else {

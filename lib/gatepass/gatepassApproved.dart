@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/gatepass/model/PendingGatePassResponse.dart';
 import 'package:shakti_employee_app/gatepass/model/gatePassResponse.dart';
@@ -11,7 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/string.dart';
 import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+import '../provider/firestore_appupdate_notifier.dart';
 import '../theme/color.dart';
+import '../uiwidget/appupdatewidget.dart';
 import '../webservice/constant.dart';
 
 
@@ -30,6 +33,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   String rejectStatus = 'reject',approveStatus = 'approve';
   late SharedPreferences sharedPreferences;
   String dateTimeOldFormat ='dd.MM.yyyy HH:mm:SS',dateTimeNewFormat ="dd MMM yyyy HH:mm a";
+  bool isEmployeeApp=false;
 
   @override
   void initState() {
@@ -39,6 +43,21 @@ class _GatePassApprovedState extends State<GatePassApproved> {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+      isEmployeeApp = value.isEmployeeApp;
+      if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+        });
+      } else {
     return Scaffold(
       appBar:  AppBar(
           leading: IconButton(
@@ -63,6 +82,9 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         ],
       ),
     );
+      } return Container(
+      );
+        });
   }
 
   Widget _buildPosts(BuildContext context) {
@@ -272,7 +294,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Text(
-              appName,
+              isEmployeeApp?appName:appName2,
               style: const TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',

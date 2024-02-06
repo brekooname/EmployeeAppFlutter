@@ -38,7 +38,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
 
   String?  dutyTypeSpinner, workPlaceSpinner,selectedFromDate, selectedToDate;
 
-  String  dateFormat ="dd/MM/yyyy",timeFormat = "HH:mm:ss";
+  String  dateFormat ="dd/MM/yyyy",timeFormat = "HH:mm:ss", subStringCode = "";
 
   var dutyTypeList = [
     'On Duty',
@@ -189,6 +189,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
         onSubmit: (String value) {
           setState(() {
             selectedAssginTo.text = value.toString();
+ 
           });
           },
       ),
@@ -352,7 +353,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime.now(),
+        firstDate: DateTime.now().subtract(new Duration(days: 3)),
         //DateTime.now() - not to allow to choose before today.
         lastDate:  DateTime(2050));
     if (pickedDate != null) {
@@ -465,31 +466,40 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   }
 
 
-  void Validation() {
-    dutyTypeSpinner ??= "";
-    workPlaceSpinner ??= "";
+  Future<void> Validation() async {
+    // dutyTypeSpinner ??= "";
+    // workPlaceSpinner ??= "";
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    if(workPlaceSpinner!.isEmpty ) {
+    if(dutyTypeSpinner==null || dutyTypeSpinner!.isEmpty ){
+      dutyTypeSpinner = null;
+      Utility().showToast(validOdType);
+    }
+    else if(workPlaceSpinner==null || workPlaceSpinner!.isEmpty ) {
       workPlaceSpinner = null;
       Utility().showToast(validWorkPlace);
     }
-    if (fromDateController.text.toString().isEmpty) {
+    else if (fromDateController.text.toString().isEmpty) {
       Utility().showToast(validDate);
-    }  else if(dutyTypeSpinner!.isEmpty) {
-      dutyTypeSpinner = null;
-        Utility().showToast(validateOd);
-      }else if (toDateController.text.toString().isEmpty) {
+    }
+    else if (toDateController.text.toString().isEmpty) {
       Utility().showToast(vaildLeave);
     }else if (fromTimeController.text.toString().isEmpty) {
       Utility().showToast(selectFromTime);
-    }else if(workPlaceSpinner ==  selectWorkPlace) {
-      Utility().showToast(vaildDepartment);
-    }else  if(purpose1.text.toString().isEmpty){
+    }
+    else if (visitPlaceController.text.toString().isEmpty) {
+      Utility().showToast(selectVisitPlace);
+    }
+    else  if(purpose1.text.toString().isEmpty){
       Utility().showToast(vaildPurpose);
-    }else {
+    }else if(selectedAssginTo.text.isEmpty){
+      Utility().showToast(vaildPerson);
+    }else if(selectedAssginTo.text.contains(sharedPreferences.getString(userID).toString())){
+      Utility().showToast(errorMessg);
+    } else {
       Utility().checkInternetConnection().then((connectionResult) {
         if (connectionResult) {
-          createOD();
+        createOD();
         } else {
           Utility()
               .showInSnackBar(value: checkInternetConnection, context: context);
@@ -502,7 +512,7 @@ class _OfficialRequestState extends State<OfficialRequest>  {
   Future<void> createOD() async {
 
     setState(() {
-      isLoading =true;
+      isLoading = true;
     });
 
    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -546,6 +556,13 @@ class _OfficialRequestState extends State<OfficialRequest>  {
     }
   }
 
-
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    if(isLoading==true){
+      isLoading = false;
+    }
+  }
 
 }

@@ -29,10 +29,7 @@ class GatepassRequestScreen extends StatefulWidget {
 class _GatepassRequestState extends State<GatepassRequestScreen> {
   bool isLoading = false;
 
-  TextEditingController visitPlace = TextEditingController();
-  TextEditingController purpose = TextEditingController();
 
-  TextEditingController selectedAssginTo  = TextEditingController();
   String dateTimeFormat = "dd/MM/yyyy", timeFormate = "HH:mm:ss";
 
   // List of items in our dropdown menu
@@ -50,11 +47,16 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
   String? _time, _comeTime;
   String? gatePassType, returnalbeTypeSpinner, selectedFromDate, selectedToDate;
   bool isListVisible = false;
+  TextEditingController visitPlace = TextEditingController();
+  TextEditingController purpose = TextEditingController();
+  TextEditingController selectedAssginTo  = TextEditingController();
   TextEditingController fromDateController = TextEditingController();
   TextEditingController toDateController = TextEditingController();
   TextEditingController fromTimeController = TextEditingController();
   TextEditingController toTimeController = TextEditingController();
   DateTime? pickedDate;
+  late SharedPreferences sharedPreferences;
+
 
   @override
   void initState() {
@@ -246,21 +248,28 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
         ));
   }
 
-  void Validation() {
-    returnalbeTypeSpinner ??= "";
-    gatePassType ??= "";
+  Future<void> Validation() async {
+    // returnalbeTypeSpinner ??= "";
+    // gatePassType ??= "";
+     sharedPreferences = await SharedPreferences.getInstance();
 
-    if (gatePassType.toString().isEmpty) {
+    if (returnalbeTypeSpinner==null || returnalbeTypeSpinner!.isEmpty) {
+    returnalbeTypeSpinner = null;
+    Utility().showToast("Please enter returnable type");
+    } else if (gatePassType==null || gatePassType!.isEmpty) {
       gatePassType = null;
       Utility().showToast(selectGatePassType);
-    } else if (returnalbeTypeSpinner.toString().isEmpty) {
-      returnalbeTypeSpinner = null;
-      Utility().showToast("Please enter returnable type");
-    } else if (purpose.text.toString().isEmpty) {
-      Utility().showToast("Please enter purpose");
     } else if (visitPlace.text.toString().isEmpty) {
       Utility().showToast("Please enter visit place ");
-    } else {
+    } else if (purpose.text.toString().isEmpty) {
+      Utility().showToast("Please enter purpose");
+    }  else if (selectedAssginTo.text.toString().isEmpty) {
+      Utility().showToast(vaildPerson1);
+    }
+    else if(selectedAssginTo.text.contains(sharedPreferences.getString(userID).toString())){
+      Utility().showToast(errorMessg);
+    }
+    else {
       if ( returnalbeTypeSpinner == 'Returnable') {
               if(fromTimeController.text.toString().isEmpty){
                 Utility().showToast("Please select from time");
@@ -277,13 +286,11 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
                   }
                 });
               }
-
-
       }else {
         if(fromTimeController.text.toString().isEmpty){
-          Utility().showToast("Please select from time");
-        }else {
-
+        Utility().showToast("Please select from time");
+      }
+        else{
           Utility().checkInternetConnection().then((connectionResult) {
             if (connectionResult) {
               toTimeController.text = '00:00:00';
@@ -540,7 +547,7 @@ class _GatepassRequestState extends State<GatepassRequestScreen> {
       isLoading = true;
     });
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
     String? sapcode = sharedPreferences.getString(userID).toString();
 
     dynamic response = await HTTP.get(createGatePassAPI(

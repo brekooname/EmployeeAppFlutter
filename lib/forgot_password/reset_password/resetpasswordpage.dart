@@ -17,8 +17,9 @@ import '../../uiwidget/robotoTextWidget.dart';
 import '../../webservice/constant.dart';
 
 class ResetPasswordPage extends StatefulWidget {
+  String mobile;
 
-  const ResetPasswordPage({Key? key}) : super(key: key);
+   ResetPasswordPage({Key? key, required this.mobile}) : super(key: key);
 
   @override
   State<ResetPasswordPage> createState() => _ForgetPasswordPageState();
@@ -100,7 +101,9 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                                     datePickerWidget(),
                                     const SizedBox( height: 10,),
                                     PasswordTextWdget(),
+
                                     editMobileWidget(),
+
                                     GestureDetector(
                                       onTap: () {
                                         signIn();
@@ -157,8 +160,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
                 blurRadius: 20,
                 offset: Offset(0, 10))
           ]),
-      child: Column(
-        children: <Widget>[
+      child:
           Container(
             padding:
                 const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
@@ -169,32 +171,14 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
               controller: sapCode,
               maxLines: 1,
               decoration: InputDecoration(
-                  hintText: userID,
+                  hintText: sapcode,
                   hintStyle: const TextStyle(color: Colors.grey),
                   border: InputBorder.none),
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.next,
             ),
           ),
-          Container(
-            padding:
-                const EdgeInsets.only(left: 10, top: 5, bottom: 5, right: 5),
-            decoration: BoxDecoration(
-                border:
-                    Border(bottom: BorderSide(color: Colors.grey.shade200))),
-            child: TextField(
-              controller: mobileNo,
-              decoration: InputDecoration(
-                hintText: mobileNotxt,
-                hintStyle: const TextStyle(color: Colors.grey),
-                border: InputBorder.none,
-                alignLabelWithHint: false,
-              ),
-              textInputAction: TextInputAction.done,
-            ),
-          ),
-        ],
-      ),
+
     );
   }
 
@@ -235,11 +219,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
   Future<void> signIn() async {
     Utility().checkInternetConnection().then((connectionResult) {
       if (connectionResult) {
-         if (mobileNo.text.toString().isEmpty) {
-          Utility().showInSnackBar(value: mobileNoMessage, context: context);
-        }else if (mobileNo.text.toString().length<10) {
-          Utility().showInSnackBar(value: invaildMobileNo, context: context);
-        }else if (sapCode.text.toString().isEmpty) {
+         if (sapCode.text.toString().isEmpty) {
            Utility().showInSnackBar(value: sapcodeempty, context: context);
          } else {
           updatePassword();
@@ -256,7 +236,7 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
       isLoading = true;
     });
     var jsonData = null;
-    dynamic response = await HTTP.get(forgotpasword(sapCode.text.toString(),mobileNo.text.toString(),indianDate.toString()));
+    dynamic response = await HTTP.get(forgotpasword(sapCode.text.toString(),widget.mobile,indianDate.toString()));
    if (response != null && response.statusCode == 200) {
       setState(() {
         isLoading = false;
@@ -264,10 +244,14 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
       Iterable l = json.decode(response.body);
       List<UpdatePasswordResponse> updatepassword = List<UpdatePasswordResponse>.from(l.map((model)=> UpdatePasswordResponse.fromJson(model)));
-      if (updatepassword[0].msg != null && updatepassword[0].msg != registeredMob && updatepassword[0].msg !=wrongdob) {
-        Utility().showToast(updatepassword[0].msg);
-      }
-      else {
+      if (updatepassword[0].msg !=  null && updatepassword[0].msg != registeredMob && updatepassword[0].msg != wrongdob && updatepassword[0].msg != "Employee no is invalid or not Active") {
+         Utility().showToast(updatepassword[0].msg);
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (BuildContext context) =>
+                const LoginPage()),
+                (Route<dynamic> route) => false);
+      }else {
         Utility().showToast(updatepassword[0].msg);
       }
     }else{
@@ -277,10 +261,9 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
 
   datePickerWidget() {
     return SizedBox(
-
       width: double.infinity,
       height: MediaQuery.of(context).size.height/20,
-      child:    Center(
+      child:  Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
@@ -305,28 +288,17 @@ class _ForgetPasswordPageState extends State<ResetPasswordPage> {
         context: context,
         builder: (BuildContext context, Widget ?child) {
           return Theme(
-            data: ThemeData(
-              splashColor: Colors.black,
-              textTheme: const TextTheme(
-                titleSmall: TextStyle(color: Colors.black),
-                bodySmall: TextStyle(color: Colors.black),
-              ),
-              dialogBackgroundColor: Colors.white, colorScheme: const ColorScheme.light(
-                primary: Color(0xff1565C0),
-                primaryContainer: Colors.black,
-                secondaryContainer: Colors.black,
-                onSecondary: Colors.black,
-                onPrimary: Colors.white,
-                surface: Colors.black,
-                onSurface: Colors.black,
-                secondary: Colors.black).copyWith(primaryContainer: Colors.grey, secondary: Colors.black),
+              data: Theme.of(context).copyWith(
+            primaryColor: Color(0xff1565C0), //color of the main banner
+            primaryColorDark: Color(0xff1565C0), //color of circle indicating the selected date
+            buttonTheme: ButtonThemeData(
+                textTheme: ButtonTextTheme.accent //color of the text in the button "OK/CANCEL"
             ),
-            child: child ??const Text(""),
-          );
+          ),child: child ??const Text(""),);
         },
         initialDate: selectedDate,
         firstDate: DateTime(1950),
-        lastDate: DateTime(2024));
+        lastDate: DateTime(2040));
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;

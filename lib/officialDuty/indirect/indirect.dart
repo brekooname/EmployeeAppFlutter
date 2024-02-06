@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/officialDuty/model/odApproveResponse.dart';
@@ -9,10 +10,12 @@ import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../provider/firestore_appupdate_notifier.dart';
 import '../../theme/string.dart';
 import 'dart:convert' as convert;
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 
+import '../../uiwidget/appupdatewidget.dart';
 import '../../webservice/constant.dart';
 
 class InDirect extends StatefulWidget {
@@ -30,6 +33,7 @@ class InDirectState extends State<InDirect> {
   bool isLoading = false;
   late int selectedIndex;
   late SharedPreferences sharedPreferences;
+  bool isEmployeeApp=false;
 
   @override
   void initState() {
@@ -39,6 +43,20 @@ class InDirectState extends State<InDirect> {
 
   @override
   Widget build(BuildContext context) {
+    return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+      if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+        });
+      } else {
     return Scaffold(
       body: Stack(
         children: [
@@ -53,6 +71,9 @@ class InDirectState extends State<InDirect> {
         ],
       ),
     );
+      } return Container(
+      );
+        });
   }
 
   Widget _buildPosts(BuildContext context) {
@@ -208,7 +229,7 @@ class InDirectState extends State<InDirect> {
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Text(
-              appName,
+              isEmployeeApp?appName:appName2,
               style: const TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',
