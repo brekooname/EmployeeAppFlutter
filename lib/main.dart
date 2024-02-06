@@ -2,15 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
+import 'package:shakti_employee_app/firebase_options.dart';
 import 'package:shakti_employee_app/loginModel/LoginModel.dart';
-import 'package:shakti_employee_app/productFlavour/applicationconfig.dart';
 import 'package:shakti_employee_app/provider/BackgroundLocationService.dart';
 import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -20,9 +24,11 @@ import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'forgot_password/forgot_password_page.dart';
 import 'home/home_page.dart';
 import 'home/model/firestoredatamodel.dart';
+import 'notificationService/local_notification_service.dart';
 import 'theme/string.dart';
 
 
@@ -31,29 +37,42 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   print(message.notification!.title);
 }
 
-Future<Widget> initializeApp(ApplicationConfig? appConfig) async {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  LocalNotificationService.initialize();
+  await Permission.notification.isDenied.then((value) {
+    if (value) {
+      Permission.notification.request();
+    }
+  });
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String? isLoggedIn =
-      sharedPreferences.getString(userID) == null ? False : True;
+      (sharedPreferences.getString(userID) == null) ? False : True;
   String? journeyStarts =
       (sharedPreferences.getString(localConveyanceJourneyStart) == null)
           ? False
           : sharedPreferences.getString(localConveyanceJourneyStart);
-
-
-  return MyApp(
+  runApp(MyApp(
     isLoggedIn: isLoggedIn,
     journStar: journeyStarts,
-     );
+  ));
 }
 
 class MyApp extends StatelessWidget {
   String? isLoggedIn, journStar;
 
-  MyApp(
-      {Key? key,
-      required this.isLoggedIn,
-      required this.journStar})
+  MyApp({Key? key, required this.isLoggedIn, required this.journStar})
       : super(key: key);
 
   @override
@@ -74,7 +93,7 @@ class MyApp extends StatelessWidget {
                   journeyStart: journStar!,
                 )
               : const LoginPage(),
-        ),);
+        ));
   }
 }
 
@@ -147,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.all(20),
                       child: Center(
                         child: SvgPicture.asset(
-                          value.isEmployeeApp ?"assets/svg/applogo.svg":"assets/svg/offRoleEmpLogo.svg",
+                          "assets/svg/applogo.svg",
                           width: 150,
                           height: 150,
                         ),
