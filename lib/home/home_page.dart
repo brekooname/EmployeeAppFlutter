@@ -1195,7 +1195,6 @@ class _HomePageState extends State<HomePage> {
                                     .checkInternetConnection()
                                     .then((connectionResult) {
                                   if (connectionResult) {
-
                                     setState(() {
                                       isLoading = true;
                                       syncTravelDataAPI(localConveyanceList,distanceCalculateModel);
