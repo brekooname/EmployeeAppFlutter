@@ -11,6 +11,7 @@ import '../Util/utility.dart';
 class firestoreAppUpdateNofifier extends ChangeNotifier {
   FirestoreDataModel? fireStoreData;
   String appVersionCode ="";
+  bool isEmployeeApp = false;
   Future<void> listenToLiveUpdateStream() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     try {
@@ -33,6 +34,12 @@ class firestoreAppUpdateNofifier extends ChangeNotifier {
             } else {
               fireStoreData = null;
               appVersionCode = "";
+            }
+
+            if(packageInfo.packageName =="shakti.shakti_employee"){
+              isEmployeeApp = true;
+            }else{
+              isEmployeeApp = false;
             }
 
             notifyListeners();

@@ -113,8 +113,7 @@ class _LoginPageState extends State<LoginPage> {
       fcmToken = '',
       imeiNumber = '',
       apiNumber = '',
-      platformVersion = '',
-      loginUserType ='';
+      platformVersion = '',     loginUserType ='';
   TextEditingController sapCodeController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool getPermission = false;
@@ -139,14 +138,16 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
    return Consumer<firestoreAppUpdateNofifier>(
         builder: (context, value, child) {
-          if (value.fireStoreData != null &&
-          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+      if (value.fireStoreData != null && value.fireStoreData!.minEmployeeAppVersion !=
+          value.appVersionCode) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(
-                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
-              (Route<dynamic> route) => false);
+                      appUrl:
+                      value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+
         });
       } else {
         return Scaffold(
@@ -261,10 +262,11 @@ class _LoginPageState extends State<LoginPage> {
                 color: AppColor.themeColor,
               ),
               border: InputBorder.none,
-              hintText: 'Sap Login',
+              hintText: 'Login Id',
               hintStyle: TextStyle(color: AppColor.themeColor),
             ),
             keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
           ),
         ),
         const SizedBox(
@@ -379,14 +381,13 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
-
     if (Platform.isAndroid) {
       platform = "Android";
     } else if (Platform.isIOS) {
       platform = "IOS";
     }
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    if(packageInfo.packageName =="shakti.shakti_employee"){
+    if(packageInfo.packageName == "shakti.shakti_employee"){
       loginUserType = 'ONROLL';
     }else{
       loginUserType = 'OFFROLL';
@@ -410,7 +411,7 @@ class _LoginPageState extends State<LoginPage> {
 
       print('Response======>${response.body}');
       if(loginResponse[0].name.isNotEmpty){
-      loginResManage(loginResponse[0]);
+        loginResManage(loginResponse[0]);
       } else {
         Utility().showToast(errorMssg);
         setState(() {
@@ -455,9 +456,11 @@ class _LoginPageState extends State<LoginPage> {
     readNotifier();
     _deviceDetails();
   }
+
   void readNotifier() {
     context.read<firestoreAppUpdateNofifier>().listenToLiveUpdateStream();
   }
+
   Future<void> _deviceDetails() async {
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -486,8 +489,4 @@ class _LoginPageState extends State<LoginPage> {
       print('Failed to get platform version');
     }
   }
-
-
-
-
 }

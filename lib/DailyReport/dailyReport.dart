@@ -293,16 +293,19 @@ class _DailyReportState extends State<DailyReport> {
                 }
               }
 
-              setState(() {
-                vendoreName.text =
-                    vendorNameList[selectedVendorPosition!].name1;
-                vendoreCode.text =
-                    vendorNameList[selectedVendorPosition!].lifnr;
-                vendoreContac.text =
-                    vendorNameList[selectedVendorPosition!].telf1;
-                vendoreAddress.text =
-                    vendorNameList[selectedVendorPosition!].add;
-              });
+          if(mounted){
+            setState(() {
+
+              vendoreName.text =
+                  vendorNameList[selectedVendorPosition!].name1;
+              vendoreCode.text =
+                  vendorNameList[selectedVendorPosition!].lifnr;
+              vendoreContac.text =
+                  vendorNameList[selectedVendorPosition!].telf1;
+              vendoreAddress.text =
+                  vendorNameList[selectedVendorPosition!].add;
+            });
+          }
             },
           ),
         )
@@ -472,7 +475,7 @@ class _DailyReportState extends State<DailyReport> {
                   fontSize: 12,
                   fontWeight: FontWeight.normal),
             ),
-            keyboardType: TextInputType.text,
+            keyboardType: title != vendor_contact && title != vendor_code  && title != responsible_person && title != responsible_person2 && title != responsible_person3? TextInputType.text : TextInputType.number,
           ),
         ),
       ],
@@ -933,6 +936,8 @@ class _DailyReportState extends State<DailyReport> {
       Utility().showInSnackBar(value: enterVendorAddress, context: context);
     } else if (vendoreContac.text.isEmpty) {
       Utility().showInSnackBar(value: enterVendorContact, context: context);
+    } else if (vendoreContac.text.length != 10) {
+      Utility().showInSnackBar(value: enterVendorContactNo, context: context);
     } else if (selectVisit.toString().isEmpty) {
       Utility().showInSnackBar(value: selectVisitAtStatus, context: context);
     } else if (responsiblePerson1.text.toString().isEmpty) {

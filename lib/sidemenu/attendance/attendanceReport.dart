@@ -1,10 +1,16 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/home/model/ScyncAndroidtoSAP.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
+import 'package:shakti_employee_app/webservice/constant.dart';
+
+import '../../provider/firestore_appupdate_notifier.dart';
+import '../../uiwidget/appupdatewidget.dart';
 
 class AttendanceReport extends StatefulWidget {
   List<Attendanceemp> attendenceList = [];
@@ -19,6 +25,9 @@ class _AttendanceReportState extends State<AttendanceReport> {
   final ScrollController _horizontal = ScrollController(),
       _vertical = ScrollController();
 
+  bool isEmployeeApp=false;
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -28,7 +37,21 @@ class _AttendanceReportState extends State<AttendanceReport> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-
+    return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+      isEmployeeApp = value.isEmployeeApp;
+      if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                      appUrl: value.fireStoreData!.employeeAppUrl.toString())),
+                  (Route<dynamic> route) => false);
+        });
+      } else {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -52,9 +75,9 @@ class _AttendanceReportState extends State<AttendanceReport> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        decoration: const BoxDecoration(
+        decoration:  BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/shaktiLogo.png'),
+            image: isEmployeeApp?AssetImage('assets/images/shaktiLogo.png'):AssetImage('assets/images/offRoleEmpLogo.png'),
             fit: BoxFit.contain,
             opacity: 0.3,
           ),
@@ -62,6 +85,10 @@ class _AttendanceReportState extends State<AttendanceReport> {
         child: _buildTable(context),
       ),
     );
+
+      } return Container(
+      );
+        });
   }
 
   _buildTable(BuildContext context) {

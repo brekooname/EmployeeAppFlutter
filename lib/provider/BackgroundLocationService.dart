@@ -23,7 +23,7 @@ class BackgroundLocationService extends ChangeNotifier {
   List<LocalConveyanceModel> localConveyanceList = [];
   Timer? timer;
   var MeterDistance = 50;
-  bool _serviceEnabled = false;
+  bool _serviceEnabled = false, gpsEnable = false;
 
 
   BackgroundLocationService() {
@@ -36,27 +36,36 @@ class BackgroundLocationService extends ChangeNotifier {
     Location location = new Location();
     var _permissionGranted = await location.hasPermission();
     _serviceEnabled = await location.serviceEnabled();
-    if (_permissionGranted != PermissionStatus.granted || !_serviceEnabled) {
+    gpsEnable = await location.requestService();
+
+    if (_permissionGranted != PermissionStatus.granted || !_serviceEnabled || !gpsEnable) {
       _permissionGranted = await location.requestPermission();
       _serviceEnabled = await location.requestService();
     } else {
-      location.enableBackgroundMode(enable: true);
-      location.onLocationChanged.listen((LocationData currentLocation) {
-        // Use current location
+      if (_serviceEnabled || gpsEnable) {
+        location.enableBackgroundMode(enable: true);
+        location.onLocationChanged.listen((LocationData currentLocation) {
+          // Use current location
 
-        if(currentLocation!=null && currentLocation.toString().isNotEmpty) {
+          if (currentLocation != null && currentLocation
+              .toString()
+              .isNotEmpty) {
+            if (sharedPreferences.getString(localConveyanceJourneyStart) ==
+                True) {
+              latitude = currentLocation.latitude.toString();
+              longitude = currentLocation.longitude.toString();
 
-          if(sharedPreferences.getString(localConveyanceJourneyStart)==True) {
-            latitude = currentLocation.latitude.toString();
-            longitude = currentLocation.longitude.toString();
-
-            getLatLng();
+              getLatLng();
+            }
           }
-        }
-      });
-    }
-   // timer = Timer.periodic(Duration(seconds: 15), (Timer t) => getLatLng());
+        });
+      }else{
+        _permissionGranted = await location.requestPermission();
+        _serviceEnabled = await location.requestService();
 
+      }
+      // timer = Timer.periodic(Duration(seconds: 15), (Timer t) => getLatLng());
+    }
 
   }
 

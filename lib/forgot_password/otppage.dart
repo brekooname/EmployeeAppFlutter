@@ -39,15 +39,14 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
   startTimeout([int? milliseconds]) {
     var duration = interval;
     Timer.periodic(duration, (timer) {
-      setState(() {
-        isTimerStart = true;
-        currentSeconds = timer.tick;
-        if (timer.tick >= timerMaxSeconds){
-          isTimerStart = false;
-          timer.cancel();}
-
-
-      });
+      isTimerStart = true;
+      currentSeconds = timer.tick;
+      if (timer.tick >= timerMaxSeconds){
+        isTimerStart = false;
+        timer.cancel();}
+       if(mounted) {
+         setState(() {});
+       }
     });
   }
 
@@ -59,99 +58,104 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-            backgroundColor: AppColor.themeColor,
-            elevation: 0,
-            title: robotoTextWidget(
-                textval: OTPTitle,
-                colorval: AppColor.whiteColor,
-                sizeval: 15,
-                fontWeight: FontWeight.w800)),
-        body: SizedBox(
-          child: Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(color: AppColor.themeColor),
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          "assets/svg/shield.svg",
-                          width: 150,
-                          height: 150,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+          appBar: AppBar(
+              backgroundColor: AppColor.themeColor,
+              elevation: 0,
+              title: robotoTextWidget(
+                  textval: OTPTitle,
+                  colorval: AppColor.whiteColor,
+                  sizeval: 15,
+                  fontWeight: FontWeight.w800),
+            automaticallyImplyLeading: false,
+        ),
+          body: SizedBox(
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(color: AppColor.themeColor),
+              child: Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            "assets/svg/shield.svg",
+                            width: 150,
+                            height: 150,
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Container(
-                          width: double.infinity,
-                          height: MediaQuery.of(context).size.height / 2,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(60),
-                                  topRight: Radius.circular(60)),
-                          ),
-                          child: SingleChildScrollView(
-                            child: Container(
-                              margin: const EdgeInsets.only(top: 80),
-                              child: Column(
-                                children: [
-                                  Text(verfiyOTP, textAlign: TextAlign.center,style: const TextStyle(color:Colors.grey,
-                                      fontSize: 12,fontWeight: FontWeight.w600)),
-                                  otpTextWidget(),
-                                  resendOtpTimeWidget(),
-                                  GestureDetector(
-                                      onTap: () {
-                                        signIn();
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 50),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                            color: AppColor.themeColor),
-                                        child: Center(
-                                          child: isLoading
-                                              ? Container(
-                                                  height: 30,
-                                                  width: 30,
-                                                  child:
-                                                      const CircularProgressIndicator(
-                                                    color: AppColor.whiteColor,
-                                                  ),
-                                                )
-                                              : robotoTextWidget(
-                                                  textval: OTPTitle,
-                                                  colorval: Colors.white,
-                                                  sizeval: 14,
-                                                  fontWeight: FontWeight.bold),
-                                        ),
-                                      )
-                                  ),
-                                ],
+                      Expanded(
+                        child: Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.height / 2,
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(60),
+                                    topRight: Radius.circular(60)),
+                            ),
+                            child: SingleChildScrollView(
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 80),
+                                child: Column(
+                                  children: [
+                                    Text(verfiyOTP, textAlign: TextAlign.center,style: const TextStyle(color:Colors.grey,
+                                        fontSize: 12,fontWeight: FontWeight.w600)),
+                                    otpTextWidget(),
+                                    resendOtpTimeWidget(),
+                                    GestureDetector(
+                                        onTap: () {
+                                          signIn();
+                                        },
+                                        child: Container(
+                                          height: 50,
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 50),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              color: AppColor.themeColor),
+                                          child: Center(
+                                            child: isLoading
+                                                ? Container(
+                                                    height: 30,
+                                                    width: 30,
+                                                    child:
+                                                        const CircularProgressIndicator(
+                                                      color: AppColor.whiteColor,
+                                                    ),
+                                                  )
+                                                : robotoTextWidget(
+                                                    textval: OTPTitle,
+                                                    colorval: Colors.white,
+                                                    sizeval: 14,
+                                                    fontWeight: FontWeight.bold),
+                                          ),
+                                        )
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                      ),
-                    )
-                  ],
-                ),
-              ],
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ));
+          )),
+    );
   }
 
   Container otpTextWidget() {
@@ -231,7 +235,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
         } else {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (BuildContext context) =>  const ResetPasswordPage()),
+                  builder: (BuildContext context) =>   ResetPasswordPage(mobile: widget.mobile,)),
                   (Route<dynamic> route) => true);
           // loginAPI();
         }
