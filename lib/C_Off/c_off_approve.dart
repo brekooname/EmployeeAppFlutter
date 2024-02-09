@@ -1,34 +1,28 @@
-// ignore_for_file: must_be_immutable, non_constant_identifier_names
-
-import 'dart:convert' as convert;
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/gatepass/model/PendingGatePassResponse.dart';
-import 'package:shakti_employee_app/gatepass/model/gatePassResponse.dart';
-import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
-import 'package:shakti_employee_app/webservice/APIDirectory.dart';
-import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
+import 'package:shakti_employee_app/C_Off/model/coffApproveList.dart' as CO;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../theme/string.dart';
+import '../Util/utility.dart';
 import '../provider/firestore_appupdate_notifier.dart';
 import '../theme/color.dart';
+import '../theme/string.dart';
 import '../uiwidget/appupdatewidget.dart';
+import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/constant.dart';
 
-class GatePassApproved extends StatefulWidget {
-  List<Datum> gatePassList = [];
+class coffApproveWidget extends StatefulWidget {
+  List<CO.Response> cOffApprovalList = [];
 
-  GatePassApproved({Key? key, required this.gatePassList}) : super(key: key);
+  coffApproveWidget({Key? key, required this.cOffApprovalList})
+      : super(key: key);
 
   @override
-  State<GatePassApproved> createState() => _GatePassApprovedState();
+  State<coffApproveWidget> createState() => _coffApproveWidgetState();
 }
 
-class _GatePassApprovedState extends State<GatePassApproved> {
+class _coffApproveWidgetState extends State<coffApproveWidget> {
   bool isLoading = false;
   late int selectedIndex;
   String rejectStatus = 'reject', approveStatus = 'approve';
@@ -45,6 +39,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: implement build
     return Consumer<firestoreAppUpdateNofifier>(
         builder: (context, value, child) {
       isEmployeeApp = value.isEmployeeApp;
@@ -68,7 +63,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
             ),
             backgroundColor: AppColor.themeColor,
             title: robotoTextWidget(
-                textval: gatePassApprove,
+                textval: cOffApprove,
                 colorval: AppColor.whiteColor,
                 sizeval: 16,
                 fontWeight: FontWeight.w600),
@@ -92,7 +87,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
   }
 
   Widget _buildPosts(BuildContext context) {
-    if (widget.gatePassList.isEmpty) {
+    if (widget.cOffApprovalList.isEmpty) {
       return NoDataFound();
     }
     return Container(
@@ -102,7 +97,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         itemBuilder: (context, index) {
           return ListItem(index);
         },
-        itemCount: widget.gatePassList.length,
+        itemCount: widget.cOffApprovalList.length,
         padding: const EdgeInsets.all(5),
       ),
     );
@@ -128,32 +123,12 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    detailWidget(nametxt, widget.cOffApprovalList[index].appBy),
                     detailWidget(
-                        gatePassNo, widget.gatePassList[index].gpno.toString()),
-                    detailWidget(nametxt, widget.gatePassList[index].ename),
+                        leaveType, widget.cOffApprovalList[index].appBy),
                     detailWidget(
-                        gatePassType, widget.gatePassList[index].gptypeTxt),
-                    detailWidget(
-                        requiredType, widget.gatePassList[index].reqtypeTxt),
-                    datedetailWidget(
-                        from,
-                        Utility.convertDateFormat(
-                            '${widget.gatePassList[index].gpdat.toString()} ${widget.gatePassList[index].gptime.toString()}',
-                            dateTimeOldFormat,
-                            dateTimeNewFormat)),
-                    widget.gatePassList[index].eindat.toString() !=
-                                '00.00.0000' &&
-                            widget.gatePassList[index].eintime.toString() !=
-                                '00:00:00'
-                        ? datedetailWidget(
-                            to,
-                            Utility.convertDateFormat(
-                                '${widget.gatePassList[index].eindat.toString()} '
-                                '${widget.gatePassList[index].eintime.toString()}',
-                                dateTimeOldFormat,
-                                dateTimeNewFormat))
-                        : Container(),
-                    detailWidget(visitPlace, widget.gatePassList[index].vplace),
+                        applyDate, widget.cOffApprovalList[index].applyDate),
+                    
                     const SizedBox(
                       height: 2,
                     ),
@@ -165,16 +140,16 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                           padding: const EdgeInsets.only(left: 30),
                           child: InkWell(
                             onTap: () {
-                              selectedIndex = index;
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    dialogue_removeDevice(
-                                        context,
-                                        widget.gatePassList[index].pernr,
-                                        widget.gatePassList[index].gpno,
-                                        0),
-                              );
+                            //  selectedIndex = index;
+                              // showDialog(
+                              //   context: context,
+                              //   builder: (BuildContext context) =>
+                              //       dialogue_removeCoffData(
+                              //           context,
+                              //           widget.hodApprovalList[index],
+                              //           widget.hodApprovalList[index].gpno,
+                              //           0),
+                              // );
                             },
                             child:
                                 IconWidget('assets/svg/delete.svg', rejecttxt),
@@ -186,16 +161,16 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                           padding: const EdgeInsets.only(left: 30),
                           child: InkWell(
                             onTap: () {
-                              selectedIndex = index;
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    dialogue_removeDevice(
-                                        context,
-                                        widget.gatePassList[index].pernr,
-                                        widget.gatePassList[index].gpno,
-                                        1),
-                              );
+                            //  selectedIndex = index;
+                              // showDialog(
+                              //   context: context,
+                              //   builder: (BuildContext context) =>
+                              //       dialogue_removeCoffData(
+                              //           context,
+                              //           widget.hodApprovalList[index].pernr,
+                              //           widget.hodApprovalList[index].gpno,
+                              //           1),
+                              // );
                             },
                             child: IconWidget(
                                 'assets/svg/checkmark.svg', approvetxt),
@@ -238,31 +213,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
         )));
   }
 
-  datedetailWidget(String title, String value) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: 30,
-      child: Row(
-        children: [
-          robotoTextWidget(
-            textval: title,
-            colorval: AppColor.blackColor,
-            sizeval: 14.0,
-            fontWeight: FontWeight.w600,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          robotoTextWidget(
-            textval: value,
-            colorval: AppColor.themeColor,
-            sizeval: 14.0,
-            fontWeight: FontWeight.w600,
-          ),
-        ],
-      ),
-    );
-  }
+
 
   detailWidget(String title, var value) {
     return Container(
@@ -311,7 +262,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
     );
   }
 
-  Widget dialogue_removeDevice(
+  Widget dialogue_removeCoffData(
       BuildContext context, var perner, var leaveNo, int i) {
     return AlertDialog(
         shape: const RoundedRectangleBorder(
@@ -332,7 +283,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
             height: 10,
           ),
           Text(
-            i == 0 ? gatePassReject : gatePassConfirmation,
+            i == 0 ? cOffReject : cOffConfirmation,
             style: const TextStyle(
                 color: AppColor.themeColor,
                 fontFamily: 'Roboto',
@@ -372,11 +323,7 @@ class _GatePassApprovedState extends State<GatePassApproved> {
                         .checkInternetConnection()
                         .then((connectionResult) {
                       if (connectionResult) {
-                        if (i == 0) {
-                          confirmGatePass(perner, leaveNo, rejectStatus);
-                        } else {
-                          confirmGatePass(perner, leaveNo, approveStatus);
-                        }
+                        // API Call for reject and approve
                       } else {
                         Utility().showInSnackBar(
                             value: checkInternetConnection, context: context);
@@ -400,54 +347,5 @@ class _GatePassApprovedState extends State<GatePassApproved> {
             ],
           )
         ]));
-  }
-
-  Future<void> confirmGatePass(
-      String prner, String leaveNo, String status) async {
-    setState(() {
-      isLoading = true;
-    });
-    sharedPreferences = await SharedPreferences.getInstance();
-    dynamic response = await HTTP.get(approveGatePassAPI(prner, leaveNo,
-        sharedPreferences.getString(userID).toString(), status));
-    if (response != null && response.statusCode == 200) {
-      Iterable l = convert.json.decode(response.body);
-      List<GatePassResponse> gatePassResponse = List<GatePassResponse>.from(
-          l.map((model) => GatePassResponse.fromJson(model)));
-
-      if (gatePassResponse[0].msgtyp.compareTo("S") == 0) {
-        updateSharedPreference(status);
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-        Utility().showToast(gatePassResponse[0].text);
-      }
-    } else {
-      Utility().showToast(somethingWentWrong);
-    }
-  }
-
-  updateSharedPreference(String value) async {
-    dynamic response = await HTTP
-        .get(pendingGatePass(sharedPreferences.getString(userID).toString()));
-    if (response != null && response.statusCode == 200) {
-      setState(() {
-        isLoading = false;
-        Utility().setSharedPreference(gatePassDatail, response.body.toString());
-      });
-
-      if (status == approveStatus) {
-        Utility().showToast(gatePassSuccess);
-      } else if (status == rejectStatus) {
-        Utility().showToast(gateRejectPassSuccess);
-      }
-      Navigator.of(context).pop();
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-      Utility().showToast(somethingWentWrong);
-    }
   }
 }

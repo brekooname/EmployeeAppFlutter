@@ -11,6 +11,7 @@ var syncSapResponse = "syncSapResponse";
 var userInfo = "userInfo";
 var gatePassDatail = "gatePassDetail";
 var travelRequest = "travelRequest";
+var cOffRequest = "cOffRequest";
 var vendorGatePas = "vendorGatePas";
 var localConveyanceJourneyStart = "localConveyanceJourneyStart";
 var FromLatitude = "FromLatitude";
@@ -19,3 +20,5 @@ var googleApiKey = "AIzaSyAohhwZ11LRwoxsS8lJ0VHGkA4L-cwjWmw";
 var databaseName ="EmployeeDatabase.db";
 var salarySlipUrl ="https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/employee_payslip.htm";
 
+var fullDayMore = "Full Day or More";
+var halfDay = "Half Day";

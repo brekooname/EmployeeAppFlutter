@@ -154,3 +154,12 @@ createAttendenceCorrectionAPI(String sapCode , String fromDate, String spinnerTy
 sendTravelExpense(String date1 ,String date2 ,String country ,String location, String cost_center,String perno,String trip_details){
   return Uri.parse('${productionUrl}travel_expense_entry.htm?date1=${date1}&date2=${date2}&country=${country}&location=${location}&cost_center=${cost_center}&perno=${perno}&trip_details=${trip_details}');
 }
+getCOffDateListApi(String sapCode){
+  return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/zattendanc_c_off.htm?sap_code=${sapCode}');
+}
+cOffReqApi(String value){
+  return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/c_off_save.htm?post=${value}');
+}
+cOffReqListApi(String sapCode){
+  return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/coff_approval_pending.htm?app_pernr=${sapCode}');
+}
