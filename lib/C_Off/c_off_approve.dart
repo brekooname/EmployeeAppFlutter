@@ -325,7 +325,9 @@ class _coffApproveWidgetState extends State<coffApproveWidget> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    Utility()
+
+
+                   Utility()
                         .checkInternetConnection()
                         .then((connectionResult) {
                       if (connectionResult) {
@@ -394,6 +396,7 @@ class _coffApproveWidgetState extends State<coffApproveWidget> {
       coffRequestResponse saveResponse = coffRequestResponse.fromJson(jsonData);
       print("Json data==>${jsonData}");
       if (saveResponse.status == "true") {
+        widget.cOffApprovalList.removeAt(selectedIndex);
         updateSharedPreference();
       } else {
         Utility().showToast(saveResponse.message);
@@ -413,8 +416,8 @@ class _coffApproveWidgetState extends State<coffApproveWidget> {
       COffApprovalList cOffListRes = COffApprovalList.fromJson(jsonData);
       if (cOffListRes.status == "true") {
         Utility().setSharedPreference(cOffRequest, response.body.toString());
+
         setState(() {
-          widget.cOffApprovalList.remove(selectedIndex);
           isLoading = false;
         });
         if (isApprove) {
