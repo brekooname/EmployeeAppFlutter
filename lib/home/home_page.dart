@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:location/location.dart' as loc;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart' as loc;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/DailyReport/dailyReport.dart';
@@ -33,7 +33,8 @@ import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
 import 'package:shakti_employee_app/task/taskApprove.dart';
 import 'package:shakti_employee_app/task/taskRequest.dart';
 import 'package:shakti_employee_app/theme/color.dart';
-import 'package:shakti_employee_app/travelrequest/model/travelrequestlist.dart'as TR;
+import 'package:shakti_employee_app/travelrequest/model/travelrequestlist.dart'
+    as TR;
 import 'package:shakti_employee_app/travelrequest/travelApprove.dart';
 import 'package:shakti_employee_app/travelrequest/travelrequest.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
@@ -42,6 +43,10 @@ import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../C_Off/c_off_approve.dart';
+import '../C_Off/c_off_request.dart';
+import '../C_Off/model/coffApproveList.dart' as cOffList;
+import '../C_Off/model/coffApproveList.dart';
 import '../database/database_helper.dart';
 import '../leave/LeaveApprove.dart';
 import '../main.dart';
@@ -88,6 +93,7 @@ class _HomePageState extends State<HomePage> {
   List<Pendingod> pendindOdList = [];
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
+  List<cOffList.Response> cOffApprovalList = [];
   List<TR.Response> travelReqList = [];
   List<vendorGatePassPrefix.Response> vendorGatePassList = [];
   List<TravelModel> travelList = [];
@@ -96,18 +102,18 @@ class _HomePageState extends State<HomePage> {
   SyncAndroidToSapResponse? syncAndroidToSapResponse;
   PersonalInfoResponse? personInfo;
   PendingGatePassResponse? gatePassResponse;
+  cOffList.COffApprovalList? cOffApprovalResponse;
   vendorGatePassPrefix.VendorGatePassModel? vendorGatePassModel;
   TR.TravelRequestList? travelRequestList;
   TextEditingController travelModeController = TextEditingController();
   FirestoreDataModel? fireStoreDataModel;
   BackgroundLocationService? backgroundLocationService;
   bool isEmployeeApp = false;
-  var totalWayPoints ="";
+  var totalWayPoints = "";
 
   bool _serviceEnabled = false, gpsEnable = false;
 
   LocationPermission? permission;
-
 
   @override
   void initState() {
@@ -120,7 +126,6 @@ class _HomePageState extends State<HomePage> {
     getNameValue();
     receiveNotification();
   }
-
 
   void receiveNotification() {
     FirebaseMessaging.instance.getInitialMessage().then(
@@ -160,82 +165,85 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-      backgroundLocationService = Provider.of<BackgroundLocationService>(context,listen: true);
+    backgroundLocationService =
+        Provider.of<BackgroundLocationService>(context, listen: true);
 
     // TODO: implement build
-      return Consumer<firestoreAppUpdateNofifier>(
-          builder: (context, value, child) {
-            isEmployeeApp = value.isEmployeeApp;
-        if (value.fireStoreData != null &&
-            value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Utility().clearSharedPreference();
-            Utility().deleteDatabase(databaseName);
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (BuildContext context) => AppUpdateWidget(
-                        appUrl: value.fireStoreData!.employeeAppUrl.toString(),)),
-                    (Route<dynamic> route) => false);
-          });
-        } else {
+    return Consumer<firestoreAppUpdateNofifier>(
+        builder: (context, value, child) {
+      isEmployeeApp = value.isEmployeeApp;
+      if (value.fireStoreData != null &&
+          value.fireStoreData!.minEmployeeAppVersion != value.appVersionCode) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Utility().clearSharedPreference();
+          Utility().deleteDatabase(databaseName);
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (BuildContext context) => AppUpdateWidget(
+                        appUrl: value.fireStoreData!.employeeAppUrl.toString(),
+                      )),
+              (Route<dynamic> route) => false);
+        });
+      } else {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: AppColor.themeColor,
+            elevation: 0,
+            title: robotoTextWidget(
+                textval: value.isEmployeeApp ? appName : appName2,
+                colorval: AppColor.whiteColor,
+                sizeval: 15,
+                fontWeight: FontWeight.w800),
+            iconTheme: const IconThemeData(color: Colors.white),
+            actions: [
+              PopupMenuButton<int>(
+                itemBuilder: (context) => [
+                  // PopupMenuItem 1
+                  PopupMenuItem(
+                    value: 1,
+                    // row with 2 children
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.download_for_offline,
+                          color: AppColor.themeColor,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        robotoTextWidget(
+                            textval: downloadingDataTxt,
+                            colorval: AppColor.themeColor,
+                            sizeval: 16,
+                            fontWeight: FontWeight.w600)
+                      ],
+                    ),
+                  ),
+                ],
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: AppColor.themeColor,
-        elevation: 0,
-        title: robotoTextWidget(
-            textval: value.isEmployeeApp?appName:appName2,
-            colorval: AppColor.whiteColor,
-            sizeval: 15,
-            fontWeight: FontWeight.w800),
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          PopupMenuButton<int>(
-            itemBuilder: (context) => [
-              // PopupMenuItem 1
-                PopupMenuItem(
-                value: 1,
-                // row with 2 children
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.download_for_offline,
-                      color: AppColor.themeColor,
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    robotoTextWidget(
-                        textval: downloadingDataTxt,
-                        colorval: AppColor.themeColor,
-                        sizeval: 16,
-                        fontWeight: FontWeight.w600)
-                  ],
-                ),
+                color: Colors.white,
+                elevation: 2,
+                // on selected we show the dialog box
+                onSelected: (value) {
+                  // if value 1 show dialog
+                  if (value == 1) {
+                    Utility()
+                        .checkInternetConnection()
+                        .then((connectionResult) {
+                      if (connectionResult) {
+                        downloadingData();
+                      } else {
+                        Utility().showInSnackBar(
+                            value: checkInternetConnection, context: context);
+                      }
+                    });
+                  }
+                },
               ),
             ],
-
-            color: Colors.white,
-            elevation: 2,
-            // on selected we show the dialog box
-            onSelected: (value) {
-              // if value 1 show dialog
-              if (value == 1) {
-                Utility().checkInternetConnection().then((connectionResult) {
-                  if (connectionResult) {
-                   downloadingData();
-                  } else {
-                    Utility()
-                        .showInSnackBar(value: checkInternetConnection, context: context);
-                  }
-                });
-              }
-            },
           ),
-        ],
-      ),
-      body: Stack(
+          body: Stack(
             children: [
               SingleChildScrollView(
                 child: Container(
@@ -246,21 +254,22 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(leave),
                       detailWidget(officialDuty),
                       detailWidget(gatePasstxt),
-                      detailWidget(task),
+                      isEmployeeApp
+                          ?   detailWidget(task): const SizedBox(),
+                      isEmployeeApp
+                          ? detailWidget(compensatory_OFF)
+                          : const SizedBox(),
                       detailWidget(travel),
                       localConvenience(),
-                      isEmployeeApp?SizedBox():dailyAndWebReport(travelEx, "assets/svg/request.svg"),
-                      dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
+                      isEmployeeApp
+                          ? dailyAndWebReport(
+                              travelEx, "assets/svg/request.svg"):const SizedBox(),
+                      isEmployeeApp
+                          ?   dailyAndWebReport(dailyReport, "assets/svg/approved.svg"):const SizedBox(),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
                     ],
                   ),
                 ),
-
-
-
-
-
-
               ),
               Center(
                 child: isLoading == true
@@ -271,20 +280,19 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-
-      drawer: Drawer(
-          backgroundColor: AppColor.whiteColor,
-          child: NavigationDrawerWidget(
-            name: nameValue,
-            attendenceList: attendenceList,
-            leaveEmpList: leaveEmpList,
-            odEmpList: odEmpList,
-            personalInfo: personalInfo,
-              isEmployeeApp: isEmployeeApp)),
-    );
-        } return Container(
+          drawer: Drawer(
+              backgroundColor: AppColor.whiteColor,
+              child: NavigationDrawerWidget(
+                  name: nameValue,
+                  attendenceList: attendenceList,
+                  leaveEmpList: leaveEmpList,
+                  odEmpList: odEmpList,
+                  personalInfo: personalInfo,
+                  isEmployeeApp: isEmployeeApp)),
         );
-          });
+      }
+      return Container();
+    });
   }
 
   detailWidget(String title) {
@@ -359,8 +367,8 @@ class _HomePageState extends State<HomePage> {
                   height: MediaQuery.of(context).size.height / 18,
                   color: AppColor.themeColor,
                   alignment: Alignment.center,
-                  child: const robotoTextWidget(
-                      textval: 'Local Convenience',
+                  child: robotoTextWidget(
+                      textval: localConveyance,
                       colorval: Colors.white,
                       sizeval: 12,
                       fontWeight: FontWeight.w600),
@@ -480,7 +488,8 @@ class _HomePageState extends State<HomePage> {
     formattedDate = formatter.format(now);
     sharedPreferences = await SharedPreferences.getInstance();
 
-    if(sharedPreferences.getString(name)!=null && sharedPreferences.getString(name)!.isNotEmpty){
+    if (sharedPreferences.getString(name) != null &&
+        sharedPreferences.getString(name)!.isNotEmpty) {
       setState(() {
         nameValue = sharedPreferences.getString(name)!;
         UserID = sharedPreferences.getString(userID)!;
@@ -493,8 +502,8 @@ class _HomePageState extends State<HomePage> {
             if (connectionResult) {
               downloadingData();
             } else {
-              Utility()
-                  .showInSnackBar(value: checkInternetConnection, context: context);
+              Utility().showInSnackBar(
+                  value: checkInternetConnection, context: context);
             }
           });
         } else {
@@ -505,17 +514,17 @@ class _HomePageState extends State<HomePage> {
           if (connectionResult) {
             downloadingData();
           } else {
-            Utility()
-                .showInSnackBar(value: checkInternetConnection, context: context);
+            Utility().showInSnackBar(
+                value: checkInternetConnection, context: context);
           }
         });
       }
-    }else{
+    } else {
       Utility().clearSharedPreference();
       Utility().deleteDatabase(databaseName);
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) =>  LoginPage()),
-              (route) => false);
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (route) => false);
     }
   }
 
@@ -525,22 +534,16 @@ class _HomePageState extends State<HomePage> {
 
   void getSPArrayList() async {
     if (sharedPreferences.getString(syncSapResponse) != null &&
-        sharedPreferences
-            .getString(syncSapResponse)
-            .toString()
-            .isNotEmpty) {
+        sharedPreferences.getString(syncSapResponse).toString().isNotEmpty) {
       var jsonData =
-      convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
+          convert.jsonDecode(sharedPreferences.getString(syncSapResponse)!);
       syncAndroidToSapResponse = SyncAndroidToSapResponse.fromJson(jsonData);
 
       setListData();
     }
 
     if (sharedPreferences.getString(userInfo) != null &&
-        sharedPreferences
-            .getString(userInfo)
-            .toString()
-            .isNotEmpty) {
+        sharedPreferences.getString(userInfo).toString().isNotEmpty) {
       var jsonData = convert.jsonDecode(sharedPreferences.getString(userInfo)!);
       personInfo = PersonalInfoResponse.fromJson(jsonData);
       setpersonData();
@@ -554,6 +557,16 @@ class _HomePageState extends State<HomePage> {
       setgatePassData();
     }
 
+    sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.getString(vendorGatePas) != null &&
+        sharedPreferences.getString(vendorGatePas).toString().isNotEmpty) {
+      var jsonData =
+          convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
+      vendorGatePassModel =
+          vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData);
+      setVendorgatePassData();
+    }
+
     if (sharedPreferences.getString(travelRequest) != null &&
         sharedPreferences.getString(travelRequest).toString().isNotEmpty) {
       var jsonData =
@@ -562,15 +575,12 @@ class _HomePageState extends State<HomePage> {
       setTravelData();
     }
 
-    sharedPreferences = await SharedPreferences.getInstance();
-    if (sharedPreferences.getString(vendorGatePas) != null &&
-        sharedPreferences.getString(vendorGatePas).toString()
-            .isNotEmpty) {
+    if (sharedPreferences.getString(cOffRequest) != null &&
+        sharedPreferences.getString(cOffRequest).toString().isNotEmpty) {
       var jsonData =
-      convert.jsonDecode(sharedPreferences.getString(vendorGatePas)!);
-      vendorGatePassModel =
-          vendorGatePassPrefix.VendorGatePassModel.fromJson(jsonData);
-      setVendorgatePassData();
+          convert.jsonDecode(sharedPreferences.getString(cOffRequest)!);
+      cOffApprovalResponse = COffApprovalList.fromJson(jsonData);
+      setCOffData();
     }
 
     if (journeyStart == True) {
@@ -584,22 +594,20 @@ class _HomePageState extends State<HomePage> {
         switch (msg) {
           case "Request":
             {
-              if(!isLoading){
+              if (!isLoading) {
                 requestMethod(title);
               }
-
             }
             break;
           case "Approve":
             {
-              if(!isLoading){
+              if (!isLoading) {
                 approvedMethod(title);
               }
-
             }
             break;
           case "Offline":
-            if(!isLoading) {
+            if (!isLoading) {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                       builder: (context) => const OfflineLocalConveyance()),
@@ -607,7 +615,7 @@ class _HomePageState extends State<HomePage> {
             }
             break;
           case "Daily Report":
-            if(!isLoading) {
+            if (!isLoading) {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
                       builder: (context) => DailyReport(
@@ -617,7 +625,7 @@ class _HomePageState extends State<HomePage> {
             }
             break;
           case "Web Report":
-            if(!isLoading)  {
+            if (!isLoading) {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const WebReport()),
                   (route) => true);
@@ -627,14 +635,13 @@ class _HomePageState extends State<HomePage> {
             {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(
-                      builder: (context) => TravelExpensesScreen(
-                      ),),
-                      (route) => true);
+                    builder: (context) => const TravelExpensesScreen(),
+                  ),
+                  (route) => true);
             }
             break;
           case "Close":
-          if(!isLoading)
-            {
+            if (!isLoading) {
               Navigator.of(context)
                   .push(MaterialPageRoute(
                       builder: (context) => TaskApproved(
@@ -681,23 +688,19 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         switch (msg) {
           case "Start":
-            if(!isLoading)  {
-
-                getCurrentLocation();
-                setState(() {
-                  isLoading = true;
-                });
-
+            if (!isLoading) {
+              getCurrentLocation();
+              setState(() {
+                isLoading = true;
+              });
             }
             break;
           case "End":
-            if(!isLoading)   {
-
-                getCurrentLocation();
-                setState(() {
-                  isLoading = true;
-                });
-
+            if (!isLoading) {
+              getCurrentLocation();
+              setState(() {
+                isLoading = true;
+              });
             }
             break;
         }
@@ -796,7 +799,6 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
-
     if (title == "Task") {
       return Visibility(
         visible: pendingTaskList.isEmpty ? false : true,
@@ -821,7 +823,30 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
-
+    if (title == "Compensatory OFF") {
+      return Visibility(
+        visible: cOffApprovalList.isEmpty ? false : true,
+        child: Positioned(
+          left: 30.0,
+          bottom: 30.0,
+          child: Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColor.themeColor,
+            ),
+            width: msg == "Request" ? 0 : 20,
+            height: msg == "Request" ? 0 : 20,
+            child: Center(
+              child: robotoTextWidget(
+                  textval: cOffApprovalList.length.toString(),
+                  colorval: Colors.white,
+                  sizeval: 12,
+                  fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+      );
+    }
     if (title == "Travel Request") {
       return Visibility(
         visible: travelReqList.isEmpty ? false : true,
@@ -890,7 +915,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future getCurrentLocation() async {
-
     if (Platform.isAndroid) {
       var permission = Permission.locationWhenInUse.status;
       if (permission != PermissionStatus.granted) {
@@ -922,7 +946,7 @@ class _HomePageState extends State<HomePage> {
     _serviceEnabled = await location.serviceEnabled();
     gpsEnable = await location.requestService();
 
-    if ( !_serviceEnabled || !gpsEnable) {
+    if (!_serviceEnabled || !gpsEnable) {
       _serviceEnabled = await location.requestService();
     } else {
       Position position = await Geolocator.getCurrentPosition(
@@ -963,7 +987,6 @@ class _HomePageState extends State<HomePage> {
 
   void showJourneyDialogue() {
     if (journeyStart == False) {
-
       showDialog(
         context: context,
         builder: (BuildContext context) => startJourneyPopup(context),
@@ -1007,7 +1030,7 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: robotoTextWidget(
-                    textval: isEmployeeApp?appName:appName2,
+                    textval: isEmployeeApp ? appName : appName2,
                     colorval: AppColor.themeColor,
                     sizeval: 16,
                     fontWeight: FontWeight.bold),
@@ -1071,9 +1094,14 @@ class _HomePageState extends State<HomePage> {
                           endTime: '',
                         );
 
-                        String latlng = "via:" + latlong!.latitude.toString() + "," + latlong!.longitude.toString();
+                        String latlng = "via:" +
+                            latlong!.latitude.toString() +
+                            "," +
+                            latlong!.longitude.toString();
 
-                        WayPointsModel waypoints = WayPointsModel(userId: sharedPreferences.getString(userID).toString(),
+                        WayPointsModel waypoints = WayPointsModel(
+                            userId:
+                                sharedPreferences.getString(userID).toString(),
                             latlng: latlng,
                             createDate: currentDate,
                             createTime: currentTime,
@@ -1081,17 +1109,17 @@ class _HomePageState extends State<HomePage> {
                             endTime: '');
 
                         setState(() {
-                         journeyStart = True;
-                         DatabaseHelper.instance
-                             .insertWaypoints(waypoints.toMapWithoutId());
-                         DatabaseHelper.instance
-                             .insertLocalConveyance(localConveyance.toMapWithoutId());
+                          journeyStart = True;
+                          DatabaseHelper.instance
+                              .insertWaypoints(waypoints.toMapWithoutId());
+                          DatabaseHelper.instance.insertLocalConveyance(
+                              localConveyance.toMapWithoutId());
                           Utility().setSharedPreference(
                               FromLatitude, latlong!.latitude.toString());
-                         Utility().setSharedPreference(
-                             FromLongitude, latlong!.longitude.toString());
-                         Utility().setSharedPreference(
-                             localConveyanceJourneyStart, True);
+                          Utility().setSharedPreference(
+                              FromLongitude, latlong!.longitude.toString());
+                          Utility().setSharedPreference(
+                              localConveyanceJourneyStart, True);
                         });
                         Navigator.of(context).pop();
                       },
@@ -1134,7 +1162,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 5),
                         child: robotoTextWidget(
-                            textval: isEmployeeApp?appName:appName2,
+                            textval: isEmployeeApp ? appName : appName2,
                             colorval: AppColor.themeColor,
                             sizeval: 16,
                             fontWeight: FontWeight.bold),
@@ -1197,7 +1225,8 @@ class _HomePageState extends State<HomePage> {
                                   if (connectionResult) {
                                     setState(() {
                                       isLoading = true;
-                                      syncTravelDataAPI(localConveyanceList,distanceCalculateModel);
+                                      syncTravelDataAPI(localConveyanceList,
+                                          distanceCalculateModel);
                                     });
                                   } else {
                                     Utility().showInSnackBar(
@@ -1283,7 +1312,7 @@ class _HomePageState extends State<HomePage> {
     });
 
     var jsonData;
-    var jsonData1,jsonData2;
+    var jsonData1, jsonData2, jsonData3;
 
     dynamic response = await HTTP.get(
         SyncAndroidToSapAPI(sharedPreferences.getString(userID).toString()));
@@ -1291,7 +1320,7 @@ class _HomePageState extends State<HomePage> {
       jsonData = convert.jsonDecode(response.body);
       SyncAndroidToSapResponse androidToSapResponse =
           SyncAndroidToSapResponse.fromJson(jsonData);
-      if(mounted) {
+      if (mounted) {
         setState(() {
           syncAndroidToSapResponse = androidToSapResponse;
           Utility()
@@ -1350,13 +1379,13 @@ class _HomePageState extends State<HomePage> {
       setVendorgatePassData();
     }
 
-    dynamic response4 = await HTTP.get(
-        getTravelRequestAPIList(sharedPreferences.getString(userID).toString()));
+    dynamic response4 = await HTTP.get(getTravelRequestAPIList(
+        sharedPreferences.getString(userID).toString()));
     if (response4 != null && response4.statusCode == 200) {
       jsonData2 = convert.jsonDecode(response4.body);
       TR.TravelRequestList travelList =
-      TR.TravelRequestList.fromJson(jsonData2);
-      if(travelList.status.compareTo("true") == 0){
+          TR.TravelRequestList.fromJson(jsonData2);
+      if (travelList.status.compareTo("true") == 0) {
         travelRequestList = travelList;
         travelReqList = travelList.response;
         Utility().setSharedPreference(travelRequest, response4.body.toString());
@@ -1365,6 +1394,24 @@ class _HomePageState extends State<HomePage> {
         });
       }
       setTravelData();
+    }
+
+    dynamic response5 = await HTTP
+        .get(cOffReqListApi(sharedPreferences.getString(userID).toString()));
+    if (response5 != null && response5.statusCode == 200) {
+      jsonData3 = convert.jsonDecode(response5.body);
+      cOffList.COffApprovalList cOffListRes =
+          cOffList.COffApprovalList.fromJson(jsonData3);
+      if (cOffListRes.status.compareTo("true") == 0) {
+        cOffApprovalResponse = cOffListRes;
+        cOffApprovalList = cOffListRes.response;
+        print('cOffApprovalList===> ${cOffApprovalResponse!.message}');
+        Utility().setSharedPreference(cOffRequest, response5.body.toString());
+        setState(() {
+          isLoading = false;
+        });
+      }
+      setCOffData();
     }
   }
 
@@ -1420,6 +1467,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void setCOffData() {
+    if (cOffApprovalResponse != null) {
+      setState(() {
+        cOffApprovalList = cOffApprovalResponse!.response;
+      });
+    }
+  }
+
   void requestMethod(String title) {
     switch (title) {
       case "Leave":
@@ -1463,14 +1518,21 @@ class _HomePageState extends State<HomePage> {
               (route) => true);
         }
         break;
+      case "Compensatory OFF":
+        {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (context) => coffRequestWidget(
+                        activeemployeeList: activeEmployeeList,
+                      )),
+              (route) => true);
+        }
+        break;
 
       case "Travel Request":
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) => TravelRequestScreen(
-
-                )),
-                (route) => true);
+            MaterialPageRoute(builder: (context) => TravelRequestScreen()),
+            (route) => true);
         break;
     }
   }
@@ -1505,13 +1567,22 @@ class _HomePageState extends State<HomePage> {
               .then((value) => {getSPArrayList()});
         }
         break;
-      case "Travel Request":
+      case "Compensatory OFF":
         {
-
           Navigator.of(context)
               .push(MaterialPageRoute(
-              builder: (context) =>
-                  TravelApproved(allTravelReqList: travelReqList, )))
+                  builder: (context) =>
+                      coffApproveWidget(cOffApprovalList: cOffApprovalList)))
+              .then((value) => {getSPArrayList()});
+        }
+        break;
+      case "Travel Request":
+        {
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+                  builder: (context) => TravelApproved(
+                        allTravelReqList: travelReqList,
+                      )))
               .then((value) => {getSPArrayList()});
         }
         break;
@@ -1520,26 +1591,24 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> calculateDistance(
       LocalConveyanceModel localConveyanceList) async {
-
     List<WayPointsModel> wayPointList = [];
     List<LocalConveyanceModel> localConveyanceList = [];
 
     List<Map<String, dynamic>> listMap =
-    await DatabaseHelper.instance.queryAllLocalConveyance();
+        await DatabaseHelper.instance.queryAllLocalConveyance();
     listMap.forEach(
-            (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
+        (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
     if (localConveyanceList.isNotEmpty) {
-      List<Map<String, dynamic>> listMap =
-      await DatabaseHelper.instance.queryAllWaypoints(
-          localConveyanceList[localConveyanceList.length - 1]
+      List<Map<String, dynamic>> listMap = await DatabaseHelper.instance
+          .queryAllWaypoints(localConveyanceList[localConveyanceList.length - 1]
               .toMapWithoutId());
 
-      listMap.forEach(
-              (map) => wayPointList.add(WayPointsModel.fromMap(map)));
+      listMap.forEach((map) => wayPointList.add(WayPointsModel.fromMap(map)));
 
-     print('wayPointList======>${wayPointList[wayPointList.length - 1].latlng}');
+      print(
+          'wayPointList======>${wayPointList[wayPointList.length - 1].latlng}');
 
-      String waypoints =wayPointList[wayPointList.length - 1].latlng;
+      String waypoints = wayPointList[wayPointList.length - 1].latlng;
 
       List<String> list = waypoints.split("|");
 
@@ -1547,17 +1616,15 @@ class _HomePageState extends State<HomePage> {
 
       print('list_length====>${list.length}');
 
-      if(list.length>20){
-        double  position = list.length/15;
+      if (list.length > 20) {
+        double position = list.length / 15;
         int pos = position.round();
         print("position=====>$position");
         print("position2222=====>${position.round()}");
 
-
         for (int i = 0; i <= list.length; i++) {
           if (i != 0 && i != list.length - 1) {
             if (totalWayPoints.isEmpty) {
-
               totalWayPoints = list[pos * i];
               print('positi====>${i}======>${list[pos * i]}');
             } else {
@@ -1570,8 +1637,7 @@ class _HomePageState extends State<HomePage> {
             }
           }
         }
-
-      }else {
+      } else {
         for (int i = 0; i <= list.length; i++) {
           if (totalWayPoints.isEmpty) {
             totalWayPoints = list[i];
@@ -1590,42 +1656,41 @@ class _HomePageState extends State<HomePage> {
       String toLatitude = latlong!.latitude.toString();
       String toLongitude = latlong!.longitude.toString();
       dynamic response = await HTTP.get(getDistanceAPI(
-          '${localConveyanceList[localConveyanceList.length-1].fromLatitude},'
-              '${localConveyanceList[localConveyanceList.length-1].fromLongitude}',
-          '$toLatitude,$toLongitude','${totalWayPoints.toString()}'));
+          '${localConveyanceList[localConveyanceList.length - 1].fromLatitude},'
+              '${localConveyanceList[localConveyanceList.length - 1].fromLongitude}',
+          '$toLatitude,$toLongitude',
+          '${totalWayPoints.toString()}'));
       if (response != null && response.statusCode == 200) {
         jsonData = convert.jsonDecode(response.body);
         print('jsonData=====>$jsonData');
         distancePrefix.DistanceCalculateModel distanceCalculateModel =
-        distancePrefix.DistanceCalculateModel.fromJson(jsonData);
+            distancePrefix.DistanceCalculateModel.fromJson(jsonData);
         if (distanceCalculateModel.routes.isNotEmpty &&
             distanceCalculateModel.routes[0].legs.isNotEmpty &&
-            distanceCalculateModel.routes[0].legs[0].distance!.text.isNotEmpty) {
+            distanceCalculateModel
+                .routes[0].legs[0].distance!.text.isNotEmpty) {
           showDialog(
             context: context,
             builder: (BuildContext context) => stopJourneyPopup(
                 context,
                 distanceCalculateModel,
-                localConveyanceList[localConveyanceList.length-1],
+                localConveyanceList[localConveyanceList.length - 1],
                 toLatitude,
                 toLongitude),
           );
         }
       }
-
-    }}
+    }
+  }
 
   Future<void> syncTravelDataAPI(
     LocalConveyanceModel LocalConveyance,
     distancePrefix.DistanceCalculateModel distanceCalculateModel,
   ) async {
-
-
     String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
     String currentTime = DateFormat('HHmmss').format(DateTime.now());
 
     totalWayPoints = totalWayPoints.replaceAll("via:", "");
-
 
     allLatLng = '${LocalConveyance.fromLatitude},'
         '${LocalConveyance.fromLongitude},'
@@ -1670,19 +1735,15 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
-  Future<void> savedOfflineLocalConvance(LocalConveyanceModel localConveyanceList) async {
+  Future<void> savedOfflineLocalConvance(
+      LocalConveyanceModel localConveyanceList) async {
     String currentDate = DateFormat('yyyyMMdd').format(DateTime.now());
     String currentTime = DateFormat('HHmmss').format(DateTime.now());
 
+    List<Map<String, dynamic>> listMap = await DatabaseHelper.instance
+        .queryAllWaypoints(localConveyanceList.toMapWithoutId());
 
-    List<Map<String, dynamic>> listMap =
-    await DatabaseHelper.instance.queryAllWaypoints(
-        localConveyanceList.toMapWithoutId());
-
-    listMap.forEach(
-            (map) => wayPointList.add(WayPointsModel.fromMap(map)));
-
+    listMap.forEach((map) => wayPointList.add(WayPointsModel.fromMap(map)));
 
     LocalConveyanceModel localConveyance = LocalConveyanceModel(
         empId: int.parse(sharedPreferences.getString(userID).toString()),
@@ -1692,7 +1753,7 @@ class _HomePageState extends State<HomePage> {
         toLatitude: latlong!.latitude.toString(),
         toLongitude: latlong!.longitude.toString(),
         fromAddress: localConveyanceList.fromAddress,
-        toAddress:  '',
+        toAddress: '',
         createDate: localConveyanceList.createDate,
         createTime: localConveyanceList.createTime,
         endDate: currentDate,
@@ -1710,11 +1771,9 @@ class _HomePageState extends State<HomePage> {
       journeyStart = False;
       Utility().setSharedPreference(localConveyanceJourneyStart, False);
       Utility().showInSnackBar(value: dataSavedOffline, context: context);
-      DatabaseHelper.instance.updateLocalConveyance(localConveyance.toMapWithoutId());
+      DatabaseHelper.instance
+          .updateLocalConveyance(localConveyance.toMapWithoutId());
       DatabaseHelper.instance.updateWaypoints(waypoints.toMapWithoutId());
-
     });
   }
-
-
 }
