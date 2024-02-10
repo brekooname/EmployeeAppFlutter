@@ -1,36 +1,37 @@
 // ignore_for_file: must_be_immutable
+import 'dart:convert' as convert;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/travelrequest/model/approveStatus.dart';
-import 'package:shakti_employee_app/travelrequest/model/travelrequestlist.dart'as TR;
+import 'package:shakti_employee_app/travelrequest/model/travelrequestlist.dart'
+    as TR;
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shakti_employee_app/webservice/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert' as convert;
 
 import '../provider/firestore_appupdate_notifier.dart';
 import '../theme/string.dart';
 import '../uiwidget/appupdatewidget.dart';
 
-
 class TravelApproved extends StatefulWidget {
-  TravelApproved({Key? key , required this.allTravelReqList }) : super(key: key);
+  TravelApproved({Key? key, required this.allTravelReqList}) : super(key: key);
   List<TR.Response> allTravelReqList = [];
+
   @override
   State<TravelApproved> createState() => _TravelApprovedState();
 }
 
 class _TravelApprovedState extends State<TravelApproved> {
-
   List<TR.Response> travelReqList = [];
   late SharedPreferences sharedPreferences;
   late int selectedIndex;
-  bool isDataLoading = false,isLoading =false, isEmployeeApp=false;
+  bool isDataLoading = false, isLoading = false, isEmployeeApp = false;
 
   @override
   void initState() {
@@ -54,48 +55,47 @@ class _TravelApprovedState extends State<TravelApproved> {
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                   builder: (BuildContext context) => AppUpdateWidget(
-                      appUrl: value.fireStoreData!.employeeAppUrl.toString(), )),
-                  (Route<dynamic> route) => false);
+                        appUrl: value.fireStoreData!.employeeAppUrl.toString(),
+                      )),
+              (Route<dynamic> route) => false);
         });
       } else {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar:  AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.of(context).pop(),
+        return DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              backgroundColor: AppColor.themeColor,
+              title: robotoTextWidget(
+                  textval: TravelApprove,
+                  colorval: AppColor.whiteColor,
+                  sizeval: 16,
+                  fontWeight: FontWeight.w600),
             ),
-            backgroundColor: AppColor.themeColor,
-            title: robotoTextWidget(textval: TravelApprove, colorval: AppColor.whiteColor,
-                sizeval: 18, fontWeight: FontWeight.normal),
-
-        ),
-        body:   Stack(
-          children: [
-            _buildPosts(context),
-            Center(
-              child: isDataLoading == true
-                  ? const CircularProgressIndicator(
-                color: Colors.indigo,
-              )
-                  : const SizedBox(),
+            body: Stack(
+              children: [
+                _buildPosts(context),
+                Center(
+                  child: isDataLoading == true
+                      ? const CircularProgressIndicator(
+                          color: Colors.indigo,
+                        )
+                      : const SizedBox(),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
-      } return Container(
-      );
-        });
+          ),
+        );
+      }
+      return Container();
+    });
   }
 
-
-
-
   Widget _buildPosts(BuildContext context) {
-
-    if ( travelReqList.isEmpty) {
+    if (travelReqList.isEmpty) {
       return NoDataFound();
     }
     return Container(
@@ -126,28 +126,31 @@ class _TravelApprovedState extends State<TravelApproved> {
           child: Container(
               width: 400,
               color: AppColor.whiteColor,
-              padding:  const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(5),
               child: Stack(children: <Widget>[
                 Row(
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        detailWidget( docNo , travelReqList[index].docno.toString()),
+                        detailWidget(
+                            docNo, travelReqList[index].docno.toString()),
                         const SizedBox(
                           height: 2,
                         ),
-                        detailWidget(nametxt,travelReqList[index].empName),
+                        detailWidget(nametxt, travelReqList[index].empName),
                         const SizedBox(
                           height: 2,
                         ),
                         Row(
                           children: [
-                            datedetailWidget(dateFrom , travelReqList[index].travelDateFrom),
+                            datedetailWidget(
+                                dateFrom, travelReqList[index].travelDateFrom),
                             const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( dateTo,travelReqList[index].travelDateTo),
+                            datedetailWidget(
+                                dateTo, travelReqList[index].travelDateTo),
                           ],
                         ),
                         const SizedBox(
@@ -155,59 +158,69 @@ class _TravelApprovedState extends State<TravelApproved> {
                         ),
                         Row(
                           children: [
-                            datedetailWidget(from , travelReqList[index].travelFrom),
+                            datedetailWidget(
+                                from, travelReqList[index].travelFrom),
                             const SizedBox(
                               width: 4,
                             ),
-                            datedetailWidget( to,travelReqList[index].travelTo),
+                            datedetailWidget(to, travelReqList[index].travelTo),
                           ],
                         ),
                         const SizedBox(
                           height: 2,
                         ),
-
-                        detailWidget(remarktxt,travelReqList[index].suggested),
+                        detailWidget(remarktxt, travelReqList[index].suggested),
                         const SizedBox(
                           height: 2,
                         ),
-                        Row(children: [
-                          Container(
-                            width:  MediaQuery.of(context).size.width/2.2,
-                            height: 40,
-                            padding: const EdgeInsets.only(left: 30),
-
-                            child: InkWell(
-                              onTap: (){
-                                selectedIndex = index;
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context, travelReqList[index].docno,travelReqList[index].pernr ,0),
-                                );
-                              },
-                              child: IconWidget('assets/svg/delete.svg' ,rejecttxt),
+                        Row(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.2,
+                              height: 40,
+                              padding: const EdgeInsets.only(left: 30),
+                              child: InkWell(
+                                onTap: () {
+                                  selectedIndex = index;
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        dialogue_removeDevice(
+                                            context,
+                                            travelReqList[index].docno,
+                                            travelReqList[index].pernr,
+                                            0),
+                                  );
+                                },
+                                child: IconWidget(
+                                    'assets/svg/delete.svg', rejecttxt),
+                              ),
                             ),
-                          ),
-                          Container(
-                            width:  MediaQuery.of(context).size.width/2.2,
-                            height: 40,
-                            padding: const EdgeInsets.only(left: 30),
-                            child: InkWell(
-                              onTap: (){
-                                selectedIndex = index;
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) => dialogue_removeDevice(context, travelReqList[index].docno,travelReqList[index].pernr,1),
-                                );
-
-                              },
-                              child: IconWidget('assets/svg/checkmark.svg' ,approvetxt),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2.2,
+                              height: 40,
+                              padding: const EdgeInsets.only(left: 30),
+                              child: InkWell(
+                                onTap: () {
+                                  selectedIndex = index;
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        dialogue_removeDevice(
+                                            context,
+                                            travelReqList[index].docno,
+                                            travelReqList[index].pernr,
+                                            1),
+                                  );
+                                },
+                                child: IconWidget(
+                                    'assets/svg/checkmark.svg', approvetxt),
+                              ),
                             ),
-                          ),
-                        ],),
-
+                          ],
+                        ),
                       ],
                     ),
-
                   ],
                 ),
               ]))),
@@ -222,14 +235,20 @@ class _TravelApprovedState extends State<TravelApproved> {
           width: 32,
           height: 32,
         ),
-        const SizedBox(width: 5,),
-        robotoTextWidget(textval: txt, colorval: Colors.black, sizeval: 16, fontWeight: FontWeight.w600)
+        const SizedBox(
+          width: 5,
+        ),
+        robotoTextWidget(
+            textval: txt,
+            colorval: Colors.black,
+            sizeval: 16,
+            fontWeight: FontWeight.w600)
       ],
     );
   }
 
-  Widget dialogue_removeDevice(BuildContext context, String docNo, String sapCode, int i) {
-
+  Widget dialogue_removeDevice(
+      BuildContext context, String docNo, String sapCode, int i) {
     return AlertDialog(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -237,7 +256,7 @@ class _TravelApprovedState extends State<TravelApproved> {
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Text(
-              isEmployeeApp?appName:appName2,
+              isEmployeeApp ? appName : appName2,
               style: const TextStyle(
                   color: AppColor.themeColor,
                   fontFamily: 'Roboto',
@@ -249,7 +268,7 @@ class _TravelApprovedState extends State<TravelApproved> {
             height: 10,
           ),
           Text(
-            i == 0 ?  travelReject:travelConfirmation,
+            i == 0 ? travelReject : travelConfirmation,
             style: const TextStyle(
                 color: AppColor.themeColor,
                 fontFamily: 'Roboto',
@@ -270,9 +289,10 @@ class _TravelApprovedState extends State<TravelApproved> {
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12), // <-- Radius
-                    ), backgroundColor: AppColor.whiteColor,
+                    ),
+                    backgroundColor: AppColor.whiteColor,
                   ),
-                  child:   robotoTextWidget(
+                  child: robotoTextWidget(
                     textval: cancel,
                     colorval: AppColor.darkGrey,
                     sizeval: 14,
@@ -283,18 +303,19 @@ class _TravelApprovedState extends State<TravelApproved> {
               Flexible(
                 child: ElevatedButton(
                   onPressed: () {
-
                     Navigator.pop(context);
-                    Utility().checkInternetConnection().then((connectionResult) {
+                    Utility()
+                        .checkInternetConnection()
+                        .then((connectionResult) {
                       if (connectionResult) {
-                        if (i == 0){
-                          rejectTravel(docNo,sapCode);
-                        }else {
-                          confirmTravel(docNo,sapCode);
+                        if (i == 0) {
+                          rejectTravel(docNo, sapCode);
+                        } else {
+                          confirmTravel(docNo, sapCode);
                         }
                       } else {
-                        Utility()
-                            .showInSnackBar(value: checkInternetConnection, context: context);
+                        Utility().showInSnackBar(
+                            value: checkInternetConnection, context: context);
                       }
                     });
                   },
@@ -304,13 +325,13 @@ class _TravelApprovedState extends State<TravelApproved> {
                       borderRadius: BorderRadius.circular(12), // <-- Radius
                     ),
                   ),
-                  child:  robotoTextWidget(
+                  child: robotoTextWidget(
                     textval: confirm,
                     colorval: AppColor.whiteColor,
                     sizeval: 14,
                     fontWeight: FontWeight.w600,
                   ),
-                ) ,
+                ),
               ),
             ],
           )
@@ -319,12 +340,12 @@ class _TravelApprovedState extends State<TravelApproved> {
 
   detailWidget(String title, String value) {
     return Container(
-      width:MediaQuery.of(context).size.width/1.1,
+      width: MediaQuery.of(context).size.width / 1.1,
       height: 26,
       child: Row(
         children: [
           robotoTextWidget(
-            textval: title ,
+            textval: title,
             colorval: AppColor.blackColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -333,7 +354,7 @@ class _TravelApprovedState extends State<TravelApproved> {
             width: 10,
           ),
           robotoTextWidget(
-            textval: value ,
+            textval: value,
             colorval: AppColor.themeColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -369,18 +390,18 @@ class _TravelApprovedState extends State<TravelApproved> {
                   sizeval: 14,
                   fontWeight: FontWeight.bold),
             ),
-          ),)
-    );
+          ),
+        ));
   }
 
   datedetailWidget(String title, String value) {
     return Container(
-      width:MediaQuery.of(context).size.width/2.2,
+      width: MediaQuery.of(context).size.width / 2.2,
       height: 30,
       child: Row(
         children: [
           robotoTextWidget(
-            textval: title ,
+            textval: title,
             colorval: AppColor.blackColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -389,7 +410,7 @@ class _TravelApprovedState extends State<TravelApproved> {
             width: 10,
           ),
           robotoTextWidget(
-            textval: value ,
+            textval: value,
             colorval: AppColor.themeColor,
             sizeval: 14.0,
             fontWeight: FontWeight.w600,
@@ -401,97 +422,93 @@ class _TravelApprovedState extends State<TravelApproved> {
 
   Future<void> Init() async {
     sharedPreferences = await SharedPreferences.getInstance();
-
   }
 
   Future<void> confirmTravel(String docNo, String sapCode) async {
-
     setState(() {
-      isLoading  = true;
+      isLoading = true;
     });
 
-    dynamic response = await HTTP.get(sendTravelRequestStatus(docNo,sharedPreferences.getString(userID).toString()  ,sapCode, "A"  ));
-    if (response != null && response.statusCode == 200)   {
+    dynamic response = await HTTP.get(sendTravelRequestStatus(
+        docNo, sharedPreferences.getString(userID).toString(), sapCode, "A"));
+    if (response != null && response.statusCode == 200) {
       var jsonData = convert.jsonDecode(response.body);
-      ApproveStatusResponse approveStatusResponse = ApproveStatusResponse.fromJson(jsonData);
+      ApproveStatusResponse approveStatusResponse =
+          ApproveStatusResponse.fromJson(jsonData);
 
-      if(approveStatusResponse.status.compareTo("true") == 0){
-        updateSharedPreference("0",approveStatusResponse.message);
+      if (approveStatusResponse.status.compareTo("true") == 0) {
+        updateSharedPreference("0", approveStatusResponse.message);
         setState(() {
-          isLoading  = false;
+          isLoading = false;
         });
-
-      }else{
-        Utility().showInSnackBar(value: approveStatusResponse.message, context: context);
+      } else {
+        Utility().showInSnackBar(
+            value: approveStatusResponse.message, context: context);
         setState(() {
-          isLoading  = false;
+          isLoading = false;
         });
       }
-
-    }else{
+    } else {
       Utility().showToast(somethingWentWrong);
       setState(() {
-        isLoading  = false;
+        isLoading = false;
       });
     }
-
   }
 
   Future<void> rejectTravel(String docNo, String sapCode) async {
-
     setState(() {
-      isLoading  = true;
+      isLoading = true;
     });
 
-    dynamic response = await HTTP.get(sendTravelRequestStatus(docNo,sharedPreferences.getString(userID).toString() ,sapCode, "R" ));
-    if (response != null && response.statusCode == 200)  {
+    dynamic response = await HTTP.get(sendTravelRequestStatus(
+        docNo, sharedPreferences.getString(userID).toString(), sapCode, "R"));
+    if (response != null && response.statusCode == 200) {
       var jsonData = convert.jsonDecode(response.body);
-      ApproveStatusResponse approveStatusResponse = ApproveStatusResponse.fromJson(jsonData);
+      ApproveStatusResponse approveStatusResponse =
+          ApproveStatusResponse.fromJson(jsonData);
 
-      if(approveStatusResponse.status.compareTo("true") == 0){
-        updateSharedPreference("1",approveStatusResponse.message);
+      if (approveStatusResponse.status.compareTo("true") == 0) {
+        updateSharedPreference("1", approveStatusResponse.message);
 
         setState(() {
-          isLoading  = false;
+          isLoading = false;
         });
-
-      }else{
-        Utility().showInSnackBar(value: approveStatusResponse.message, context: context);
+      } else {
+        Utility().showInSnackBar(
+            value: approveStatusResponse.message, context: context);
         setState(() {
-          isLoading  = false;
+          isLoading = false;
         });
       }
-
-    }else{
+    } else {
       Utility().showToast(somethingWentWrong);
       setState(() {
-        isLoading  = false;
+        isLoading = false;
       });
     }
   }
 
-  updateSharedPreference(String value,String mess) async {
-
-    dynamic response = await HTTP.get(
-        getTravelRequestAPIList(sharedPreferences.getString(userID).toString()));
+  updateSharedPreference(String value, String mess) async {
+    dynamic response = await HTTP.get(getTravelRequestAPIList(
+        sharedPreferences.getString(userID).toString()));
     if (response != null && response.statusCode == 200) {
       setState(() {
-        isLoading  = false;
+        isLoading = false;
         Utility().setSharedPreference(travelRequest, response.body.toString());
       });
 
-      if(value=="0"){
+      if (value == "0") {
         Utility().showToast(travelConfrimed);
-      }else{
+      } else {
         Utility().showToast(travelRejectSucc);
       }
       Navigator.of(context).pop();
-    }else{
+    } else {
       setState(() {
-        isLoading  = false;
+        isLoading = false;
       });
       Utility().showToast(somethingWentWrong);
     }
   }
- 
 }
