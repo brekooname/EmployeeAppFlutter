@@ -155,15 +155,15 @@ sendTravelExpense(String date1 ,String date2 ,String country ,String location, S
   return Uri.parse('${productionUrl}travel_expense_entry.htm?date1=${date1}&date2=${date2}&country=${country}&location=${location}&cost_center=${cost_center}&perno=${perno}&trip_details=${trip_details}');
 }
 getCOffDateListApi(String sapCode){
-  return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/zattendanc_c_off.htm?sap_code=${sapCode}');
+  return Uri.parse('${productionUrl}zattendanc_c_off.htm?sap_code=${sapCode}');
 }
 cOffReqApi(String value){
-  return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/c_off_save.htm?post=${value}');
+  return Uri.parse('${productionUrl}c_off_save.htm?post=${value}');
 }
 cOffReqListApi(String sapCode){
-  return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/coff_approval_pending.htm?app_pernr=${sapCode}');
+  return Uri.parse('${productionUrl}coff_approval_pending.htm?app_pernr=${sapCode}');
 }
 
 cOffAppRejApi(String value){
-  return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/coff_hod_app_reject.htm?app=$value');
+  return Uri.parse('${productionUrl}coff_hod_app_reject.htm?app=$value');
 }
