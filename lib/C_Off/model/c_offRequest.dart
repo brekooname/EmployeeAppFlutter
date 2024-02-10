@@ -57,6 +57,6 @@ class coffRequest {
 
   @override
   String toString() {
-    return 'coffRequest{pernr: $pernr, coffDate: $coffDate, indz: $indz, iodz: $iodz, totdz: $totdz, applyDate: $applyDate, pernr2: $pernr2, reason: $reason, leavetype: $leavetype}';
+    return 'coffRequest{ pernr: $pernr, coffDate: $coffDate, indz: $indz, iodz: $iodz, totdz: $totdz, applyDate: $applyDate, pernr2: $pernr2, reason: $reason, leavetype: $leavetype}';
   }
 }

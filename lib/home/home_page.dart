@@ -254,17 +254,18 @@ class _HomePageState extends State<HomePage> {
                       detailWidget(leave),
                       detailWidget(officialDuty),
                       detailWidget(gatePasstxt),
-                      detailWidget(task),
+                      isEmployeeApp
+                          ?   detailWidget(task): const SizedBox(),
                       isEmployeeApp
                           ? detailWidget(compensatory_OFF)
                           : const SizedBox(),
                       detailWidget(travel),
                       localConvenience(),
                       isEmployeeApp
-                          ? const SizedBox()
-                          : dailyAndWebReport(
-                              travelEx, "assets/svg/request.svg"),
-                      dailyAndWebReport(dailyReport, "assets/svg/approved.svg"),
+                          ? dailyAndWebReport(
+                              travelEx, "assets/svg/request.svg"):const SizedBox(),
+                      isEmployeeApp
+                          ?   dailyAndWebReport(dailyReport, "assets/svg/approved.svg"):const SizedBox(),
                       dailyAndWebReport(webReport, "assets/svg/report.svg"),
                     ],
                   ),
@@ -798,7 +799,6 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
-
     if (title == "Task") {
       return Visibility(
         visible: pendingTaskList.isEmpty ? false : true,

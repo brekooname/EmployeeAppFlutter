@@ -163,3 +163,7 @@ cOffReqApi(String value){
 cOffReqListApi(String sapCode){
   return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/coff_approval_pending.htm?app_pernr=${sapCode}');
 }
+
+cOffAppRejApi(String value){
+  return Uri.parse('https://spquasrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zhr_emp_app_1/coff_hod_app_reject.htm?app=$value');
+}

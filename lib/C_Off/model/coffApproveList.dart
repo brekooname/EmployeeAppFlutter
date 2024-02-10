@@ -33,6 +33,7 @@ class COffApprovalList {
 }
 
 class Response {
+  String ename;
   String mandt;
   String pernr;
   String coffDate;
@@ -50,8 +51,10 @@ class Response {
   String rej;
   String appRejDat;
   String appRejTims;
+  String leavetype;
 
   Response({
+    required this.ename,
     required this.mandt,
     required this.pernr,
     required this.coffDate,
@@ -69,9 +72,11 @@ class Response {
     required this.rej,
     required this.appRejDat,
     required this.appRejTims,
+    required this.leavetype,
   });
 
   factory Response.fromJson(Map<String, dynamic> json) => Response(
+    ename: json["ename"],
     mandt: json["mandt"],
     pernr: json["pernr"],
     coffDate: json["coff_date"],
@@ -89,9 +94,11 @@ class Response {
     rej: json["rej"],
     appRejDat: json["app_rej_dat"],
     appRejTims: json["app_rej_tims"],
+    leavetype: json["leavetype"],
   );
 
   Map<String, dynamic> toJson() => {
+    "ename": ename,
     "mandt": mandt,
     "pernr": pernr,
     "coff_date": coffDate,
@@ -109,10 +116,11 @@ class Response {
     "rej": rej,
     "app_rej_dat": appRejDat,
     "app_rej_tims": appRejTims,
+    "leavetype": leavetype,
   };
 
   @override
   String toString() {
-    return '{mandt: $mandt, pernr: $pernr, coffDate: $coffDate, applyDate: $applyDate, indz: $indz, iodz: $iodz, totdz: $totdz, pernr2: $pernr2, pernr3: $pernr3, reason: $reason, crtDat: $crtDat, crtTims: $crtTims, appBy: $appBy, app: $app, rej: $rej, appRejDat: $appRejDat, appRejTims: $appRejTims}';
+    return 'Response{ename: $ename, mandt: $mandt, pernr: $pernr, coffDate: $coffDate, applyDate: $applyDate, indz: $indz, iodz: $iodz, totdz: $totdz, pernr2: $pernr2, pernr3: $pernr3, reason: $reason, crtDat: $crtDat, crtTims: $crtTims, appBy: $appBy, app: $app, rej: $rej, appRejDat: $appRejDat, appRejTims: $appRejTims, leavetype: $leavetype}';
   }
 }

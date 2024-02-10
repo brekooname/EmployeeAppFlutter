@@ -6,7 +6,9 @@ import 'package:searchfield/searchfield.dart';
 import 'package:shakti_employee_app/C_Off/model/c_offRequest.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'model/c_offDateListRes.dart' as offDateList;
+import '../DailyReport/model/vendor_gate_pass_model.dart';
+import '../DailyReport/model/vendor_gate_pass_model.dart';
 import '../Util/utility.dart';
 import '../home/model/ScyncAndroidtoSAP.dart';
 import '../theme/color.dart';
@@ -14,8 +16,7 @@ import '../theme/string.dart';
 import '../uiwidget/robotoTextWidget.dart';
 import '../webservice/APIDirectory.dart';
 import '../webservice/constant.dart';
-import 'model/c_offDateListRes.dart' as cOffList;
-import 'model/c_offRequestResponse.dart';
+import 'model/c_offRequestResponse.dart' ;
 
 class coffRequestWidget extends StatefulWidget {
   List<Activeemployee> activeemployeeList = [];
@@ -28,16 +29,16 @@ class coffRequestWidget extends StatefulWidget {
 }
 
 class _coffRequestWidgetState extends State<coffRequestWidget> {
-  List<cOffList.Response> cOffDateList = [];
+  List<offDateList.Response> cOffDateList = [];
   List<coffRequest> cOffRequestList = [];
   TextEditingController reasonController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController responsiblePerson1 = TextEditingController();
   TextEditingController fromTimeController = TextEditingController();
   TextEditingController toTimeController = TextEditingController();
-  
-  String dateFormat = "dd/MM/yyyy", timeFormat = "HH:mm:ss";
-  String? selectedCOffDate, selectedDate, dayTypeSpinner, totalHours;
+  DateTime? parseDate;
+  String dateFormat = "dd/MM/yyyy", timeFormat = "HH:mm:ss", sendDateFormat= "yyyyMMdd";
+  String? selectedCOffDate, selectedDate, dayTypeSpinner, totalHours, sendSelectedDate,sendSelectedCOffDate;
   int? selectedCOffIndex;
   bool isLoading = false;
   bool isLoadingSubmit = false;
@@ -55,6 +56,7 @@ class _coffRequestWidgetState extends State<coffRequestWidget> {
     super.initState();
     setState(() {
       selectedDate = DateFormat(dateFormat).format(DateTime.now());
+      sendSelectedDate=DateFormat(sendDateFormat).format(DateTime.now());
       dateController.text = DateFormat(dateFormat).format(DateTime.now());
     });
     Utility().checkInternetConnection().then((connectionResult) {
@@ -168,7 +170,7 @@ class _coffRequestWidgetState extends State<coffRequestWidget> {
                 totalHours = cOffDateList[1].totdz;
               }
             });
-          },
+            },
         ));
   }
 
@@ -232,6 +234,7 @@ class _coffRequestWidgetState extends State<coffRequestWidget> {
     if (pickedDate != null) {
       setState(() {
         selectedDate = DateFormat(dateFormat).format(pickedDate!);
+        sendSelectedDate=DateFormat(sendDateFormat).format(pickedDate!);
         dateController.text = selectedDate!;
         print("selectedDate ${selectedDate}");
         print("dateController ${dateController.text}");
@@ -512,17 +515,17 @@ class _coffRequestWidgetState extends State<coffRequestWidget> {
         cOffRequestList.clear();
         cOffRequestList.add(coffRequest(
             pernr: sharedPreferences.getString(userID).toString(),
-            coffDate: selectedCOffDate!,
+            coffDate: Utility.convertDateFormat(selectedCOffDate!, "dd.MM.yyyy", sendDateFormat),
             indz: indz,
             iodz: iodz,
             totdz: totdz,
-            applyDate: selectedDate!,
+            applyDate: sendSelectedDate!,
             pernr2: responsiblePerson1.text.toString(),
             reason: reasonController.text.toString(),
             leavetype: dayTypeSpinner!));
-        String value = convert.jsonEncode(cOffRequest).toString();
+        String value = convert.jsonEncode(cOffRequestList).toString();
         print("Parameter Value===>${value.toString()}");
-        cOffReqAPI(value);
+        sendcOffReqAPI(value);
       } else {
         Utility()
             .showInSnackBar(value: checkInternetConnection, context: context);
@@ -540,8 +543,8 @@ class _coffRequestWidgetState extends State<coffRequestWidget> {
     dynamic response = await HTTP.get(getCOffDateListApi(sharedPreferences.getString(userID).toString()));
     if (response != null && response.statusCode == 200) {
       jsonData = convert.jsonDecode(response.body);
-      cOffList.coffDateList cOffDateListResponse =
-          cOffList.coffDateList.fromJson(jsonData);
+      offDateList.CoffDateList cOffDateListResponse =
+      offDateList.CoffDateList.fromJson(jsonData);
 
       if (cOffDateListResponse.status == "true") {
         cOffDateList = cOffDateListResponse.response;
@@ -558,7 +561,7 @@ class _coffRequestWidgetState extends State<coffRequestWidget> {
     }
   }
 
-  Future<void> cOffReqAPI(String value) async {
+  Future<void> sendcOffReqAPI(String value) async {
     setState(() {
       isLoadingSubmit = true;
     });
