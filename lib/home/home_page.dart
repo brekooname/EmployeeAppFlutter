@@ -1382,7 +1382,6 @@ class _HomePageState extends State<HomePage> {
       if (_personalInfo.emp.isNotEmpty) {
         setState(() {
           personInfo = _personalInfo;
-          isLoading = false;
           personalInfo = _personalInfo.emp;
           Utility().setSharedPreference(userInfo, response1.body.toString());
         });
@@ -1399,7 +1398,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         gatePassList = pendingGatePassResponse.data;
         gatePassResponse = pendingGatePassResponse;
-        isLoading = false;
+
         Utility()
             .setSharedPreference(gatePassDatail, response2.body.toString());
       });
@@ -1415,7 +1414,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         vendorGatePassList = vendorGatePass.response;
         vendorGatePassModel = vendorGatePass;
-        isLoading = false;
+
         Utility().setSharedPreference(vendorGatePas, response3.body.toString());
       });
       setVendorgatePassData();
@@ -1431,9 +1430,7 @@ class _HomePageState extends State<HomePage> {
         travelRequestList = travelList;
         travelReqList = travelList.response;
         Utility().setSharedPreference(travelRequest, response4.body.toString());
-        setState(() {
-          isLoading = false;
-        });
+
       }
       setTravelData();
     }
@@ -1449,9 +1446,7 @@ class _HomePageState extends State<HomePage> {
         cOffApprovalList = cOffListRes.response;
         print('cOffApprovalList===> ${cOffApprovalResponse!.message}');
         Utility().setSharedPreference(cOffRequest, response5.body.toString());
-        setState(() {
-          isLoading = false;
-        });
+
       }
       setCOffData();
     }
@@ -1861,5 +1856,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    if(isLoading==true){
+      isLoading = false;
+    }
+
+    super.dispose();
+  }
 
 }
