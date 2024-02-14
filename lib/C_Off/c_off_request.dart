@@ -7,8 +7,7 @@ import 'package:shakti_employee_app/C_Off/model/c_offRequest.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'model/c_offDateListRes.dart' as offDateList;
-import '../DailyReport/model/vendor_gate_pass_model.dart';
-import '../DailyReport/model/vendor_gate_pass_model.dart';
+
 import '../Util/utility.dart';
 import '../home/model/ScyncAndroidtoSAP.dart';
 import '../theme/color.dart';

@@ -7,12 +7,9 @@ const productionUrl = 'https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zh
 const googleDistanceMatrixAPI = 'https://maps.googleapis.com/maps/api/directions/';
 const dashboardAppUrl ='https://spprdsrvr1.shaktipumps.com:8423/sap/bc/bsp/sap/zshakti_dash/';
 
-
-
 userLogin(String sapCode, String password, String api_version,  String api, String app_version, String imei , String os, String fcm_token,String loginUserType) {
   return Uri.parse('${productionUrl}login.htm?pernr=${sapCode}&pass=${password}&api_version=${api_version}&api=${api}&app_version=${app_version}&imei=${imei}&os=${os}&fcm_token=${fcm_token}&islogin=${loginUserType}');
 }
-
 
 forgotpasword(String sapCode ,String moile, String DOB){
   return Uri.parse('${productionUrl}forgot_password.htm?pernr=${sapCode}&mobno=${moile}&dob=${DOB}');
@@ -25,6 +22,7 @@ sendOTPAPI(String mobile, int otp){
 SyncAndroidToSapAPI(String pernr){
   return Uri.parse('${productionUrl}sync_android_to_sap.htm?pernr=${pernr}');
 }
+
 getDistanceAPI(String origin,String destination,String waypoints){
   return Uri.parse('${googleDistanceMatrixAPI}json?origin=$origin&destination=$destination&waypoints=$waypoints&key=$googleApiKey');
 }
@@ -166,4 +164,20 @@ cOffReqListApi(String sapCode){
 
 cOffAppRejApi(String value){
   return Uri.parse('${productionUrl}coff_hod_app_reject.htm?app=$value');
+}
+
+getShiftTypeList( ){
+  return Uri.parse('${productionUrl}shift_data.htm');
+}
+
+sendShiftData(String value) {
+  return Uri.parse('${productionUrl}shift_correct.htm?post=$value');
+}
+
+pendingShiftData(String sapCode){
+  return Uri.parse('${productionUrl}shift_approval.htm?app_pernr=${sapCode}');
+}
+
+shiftApproveAPI(String value){
+ return Uri.parse('${productionUrl}shift_hod_app_rej.htm?app=${value}');
 }
