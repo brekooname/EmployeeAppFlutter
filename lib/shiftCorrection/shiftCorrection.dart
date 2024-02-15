@@ -1,39 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shakti_employee_app/Util/utility.dart';
-import 'package:shakti_employee_app/sidemenu/attendanceCorrection/model/attcorrectionresponse.dart';
+import 'package:shakti_employee_app/shiftCorrection/model/shiftrequestmodel.dart';
+import 'package:shakti_employee_app/shiftCorrection/model/shiftsaveresposne.dart';
+import 'package:shakti_employee_app/shiftCorrection/model/shifttypelistresponse.dart' as ShiftType;
 import 'package:shakti_employee_app/theme/color.dart';
 import 'package:shakti_employee_app/theme/string.dart';
 import 'package:shakti_employee_app/uiwidget/robotoTextWidget.dart';
 import 'package:shakti_employee_app/webservice/APIDirectory.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shakti_employee_app/webservice/HTTP.dart' as HTTP;
 import 'dart:convert' as convert;
-import '../../webservice/constant.dart';
 
-class AttendenceCorrectionScreen extends StatefulWidget {
-  const AttendenceCorrectionScreen({Key? key}) : super(key: key);
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../webservice/constant.dart';
+
+
+class ShiftCorrectionScreen extends StatefulWidget {
+    ShiftCorrectionScreen({Key? key}) : super(key: key);
 
   @override
-  State<AttendenceCorrectionScreen> createState() => _AttendenceCorrectionScreenState();
+  State<ShiftCorrectionScreen> createState() => _ShiftCorrectionScreenState();
 }
 
-class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen> {
-
+class _ShiftCorrectionScreenState extends State<ShiftCorrectionScreen> {
   DateTime datefrom = DateTime.now();
-  String?  selectedFromDate, selectedToDate,attendenceTypeSpinner;
+  int selectedPosition = 0;
+  String?  selectedFromDate, selectedToDate,shiftTypeSpinner,startTime, endTime;
+  List<ShiftType.Response> shiftTypeList =[];
   TextEditingController targetDateController = TextEditingController();
   TextEditingController fromDateController = TextEditingController();
   TextEditingController remark = TextEditingController();
-  String dateTimeFormat = "dd/MM/yyyy";
-  DateTime? pickedDate;  bool isLoading = false;
+  String dateTimeFormat = "dd/MM/yyyy",sendDateFormate = "yyyyMMdd";
+  DateTime? pickedDate;  bool isLoading = false, isSend = false;
+  List<ShiftRequestModel> shiftRequestList = [];
 
-  var attendenceTypeList = [
-    'Present',
-    'First Half Present',
-    'Second Half Present',
-  ];
 
   @override
   void initState() {
@@ -42,13 +43,25 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
     setState(() {
 
       targetDateController.text =
-          DateFormat(dateTimeFormat).format(DateTime.now());
+          DateFormat(sendDateFormate).format(DateTime.now());
 
       selectedFromDate = DateFormat("yyyyMMdd").format(DateTime.now());
       selectedToDate = DateFormat("yyyyMMdd").format(DateTime.now());
       fromDateController.text =
           DateFormat(dateTimeFormat).format(DateTime.now());
+
     });
+
+    Utility().checkInternetConnection().then((connectionResult) {
+      if (connectionResult) {
+        shiftListAPI();
+      } else {
+        Utility()
+            .showInSnackBar(value: checkInternetConnection, context: context);
+      }
+    });
+
+
   }
 
   @override
@@ -60,7 +73,7 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
         backgroundColor: AppColor.themeColor,
         elevation: 0,
         title:   robotoTextWidget(
-            textval: attendanceC,
+            textval: shiftC,
             colorval: AppColor.whiteColor,
             sizeval: 15,
             fontWeight: FontWeight.w800),
@@ -85,14 +98,14 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
                   SizedBox(height: 20,),
 
                   datePickerWidget(fromDateController.text, fromDateController, "0"),
-                  attendenceTypeSpinnerWidget(),
+                  shiftTypeSpinnerWidget(),
                   remarkWidget(),
                   submitWidget(),
                 ],
               ),
             ),
           ),
-
+          isLoading ? Center(child: CircularProgressIndicator()) : SizedBox(),
         ],
       ),
     );
@@ -126,25 +139,25 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
               width: 5,
             ),
             Expanded(
-                child: TextField(
-                  controller: DateController,
-                  maxLines: 1,
-                  showCursor: false,
-                  enabled: false,
-                  textAlign: TextAlign.center,
-                  textAlignVertical: TextAlignVertical.center,
-                  decoration: InputDecoration(
-                      hintText: fromTO,
-                      hintStyle: const TextStyle(color: AppColor.themeColor),
-                      border: InputBorder.none),
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.bold,
-                      color: AppColor.themeColor),
-                  keyboardType: TextInputType.datetime,
-                  textInputAction: TextInputAction.done,
-                ),)
+              child: TextField(
+                controller: DateController,
+                maxLines: 1,
+                showCursor: false,
+                enabled: false,
+                textAlign: TextAlign.center,
+                textAlignVertical: TextAlignVertical.center,
+                decoration: InputDecoration(
+                    hintText: fromTO,
+                    hintStyle: const TextStyle(color: AppColor.themeColor),
+                    border: InputBorder.none),
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.themeColor),
+                keyboardType: TextInputType.datetime,
+                textInputAction: TextInputAction.done,
+              ),)
           ],
         ),
       ),
@@ -168,14 +181,15 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
           selectedFromDate = DateFormat(dateTimeFormat).format(pickedDate!);
           fromDateController.text = formattedDate;
           selectedFromDate = DateFormat("yyyyMMdd").format(pickedDate!);
+          targetDateController.text = DateFormat(sendDateFormate).format(pickedDate!);
         }
       });
     }
   }
 
-  attendenceTypeSpinnerWidget() {
+  shiftTypeSpinnerWidget() {
     return Container(
-        margin: const EdgeInsets.only(top: 10, bottom: 10),
+        margin: const EdgeInsets.only(top: 10),
         height: 55,
         width: MediaQuery.of(context).size.width,
         child: DropdownButtonFormField(
@@ -188,26 +202,32 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
                 ),
               ),
               hintStyle: TextStyle(color: Colors.grey[800], fontSize: 12),
-              hintText: selectAttendence,
+              hintText: selectShiftType,
               fillColor: Colors.white),
-          value: attendenceTypeSpinner ,
+          value: shiftTypeSpinner,
           validator: (value) =>
-          value == null || value.isEmpty ? selectAttendence : "",
-          items: attendenceTypeList
-              .map((dayType) => DropdownMenuItem(
-              value: dayType,
+          value == null || value.isEmpty ? selectShiftType : "",
+          items: shiftTypeList.map((listItem) => DropdownMenuItem(
+              value: listItem.shift,
               child: robotoTextWidget(
-                  textval: dayType,
+                  textval: listItem.shift  +" "+listItem.startTim + " to "+ listItem.endTim,
                   colorval: AppColor.themeColor,
                   sizeval: 12,
-                  fontWeight: FontWeight.bold)))
-              .toList(),
+                  fontWeight: FontWeight.bold))).toList(),
+
           onChanged: (Object? value) {
             setState(() {
-              attendenceTypeSpinner = value.toString();
+              shiftTypeSpinner = value.toString();
+
+              for (int i = 0; i < shiftTypeList.length; i++) {
+                if (shiftTypeList[i].shift == value) {
+                  selectedPosition = i;
+                  break;
+                }
+              }
             });
           },
-        ),);
+        ));
   }
 
   remarkWidget() {
@@ -240,7 +260,7 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
   submitWidget( ) {
     return GestureDetector(
         onTap: () {
-           validation();
+          validation();
         },
         child: Container(
           height: 46,
@@ -250,7 +270,7 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
               borderRadius: BorderRadius.circular(50),
               color: AppColor.themeColor),
           child: Center(
-            child:    isLoading !=true? robotoTextWidget(
+            child:    isSend !=true? robotoTextWidget(
                 textval: submit,
                 colorval: Colors.white,
                 sizeval: 14,
@@ -260,61 +280,101 @@ class _AttendenceCorrectionScreenState extends State<AttendenceCorrectionScreen>
   }
 
   void validation() {
-      if (fromDateController.text.toString().isEmpty) {
-          Utility().showToast(selectFromDate);
-    }else if(attendenceTypeSpinner==null || attendenceTypeSpinner!.isEmpty){
-        attendenceTypeSpinner =null;
-        Utility().showToast(selectAttendence);
-      }else if(remark.text.toString().isEmpty){
-        Utility().showInSnackBar(value: vaildRemark, context: context);
-      }else{
-        Utility().checkInternetConnection().then((connectionResult) {
-          if (connectionResult) {
-            applyAttendenceCorrection();
-          } else {
-            Utility()
-                .showInSnackBar(value: checkInternetConnection, context: context);
-          }
-        });
-      }
+    if (fromDateController.text.toString().isEmpty) {
+      Utility().showToast(selectFromDate);
+    }else if(shiftTypeSpinner==null || shiftTypeSpinner!.isEmpty){
+      shiftTypeSpinner = null;
+      Utility().showInSnackBar(value: selectShift, context: context);
+    }else if(remark.text.toString().isEmpty){
+      Utility().showInSnackBar(value: vaildRemark, context: context);
+    }else{
+      Utility().checkInternetConnection().then((connectionResult) {
+        if (connectionResult) {
+          sendRequest();
+        } else {
+          Utility()
+              .showInSnackBar(value: checkInternetConnection, context: context);
+        }
+      });
+    }
   }
 
-  Future<void> applyAttendenceCorrection()  async {
+  void shiftListAPI() async {
+
     setState(() {
       isLoading = true;
     });
+    var jsonData = null;
 
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-    dynamic response = await HTTP.get(createAttendenceCorrectionAPI(
-        sharedPreferences.getString(userID).toString(),
-        selectedFromDate!,
-        attendenceTypeSpinner.toString(),
-        remark.text.toString(),
-        ));
+    dynamic response = await HTTP.get(getShiftTypeList());
     if (response != null && response.statusCode == 200) {
-      var jsonData = convert.jsonDecode(response.body);
-      AttendenceCorrResponse attendenceCorrResponse = AttendenceCorrResponse.fromJson(jsonData);
+      jsonData = convert.jsonDecode(response.body);
+      ShiftType.ShiftTypeListResponse shiftTypeListResponse =
+      ShiftType.ShiftTypeListResponse.fromJson(jsonData);
 
-      print('attendenceCorrResponse  ${attendenceCorrResponse.toString()}');
+      if (shiftTypeListResponse.status == "true") {
+        shiftTypeList = shiftTypeListResponse.response;
 
-      if (attendenceCorrResponse.status.compareTo("False") != 0) {
-        Utility().showToast(attendenceCorrResponse.message);
         setState(() {
           isLoading = false;
         });
-        Navigator.pop(context);
       } else {
+        Utility().showToast(shiftTypeListResponse.message);
         setState(() {
           isLoading = false;
         });
-        Utility().showToast(attendenceCorrResponse.message);
       }
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-      Utility().showToast(somethingWentWrong);
     }
   }
+
+  Future<void> sendRequest() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    shiftRequestList.clear();
+    shiftRequestList.add(ShiftRequestModel(
+        pernr: sharedPreferences.getString(userID).toString(),
+        begda: targetDateController.text.toString(),
+        shift: shiftTypeSpinner!,
+        shftInnTime: Utility.convertDateFormat(shiftTypeList[selectedPosition].startTim, "hh:mm:ss", "hhmmss"),
+        shftOutTime:Utility.convertDateFormat(shiftTypeList[selectedPosition].endTim, "hh:mm:ss", "hhmmss"),
+        remarkEmp: remark.text.toString()));
+    String value = convert.jsonEncode(shiftRequestList).toString();
+    print("Parameter Value===>${value.toString()}");
+    
+    sendShiftDataToSap(value);
+  }
+
+  void sendShiftDataToSap(String value)  async {
+
+    setState(() {
+      isSend = true;
+    });
+    var jsonData = null;
+
+    dynamic response = await HTTP.get(sendShiftData(value));
+
+    print("response====>${response.toString()}");
+    print("statusCode====>${response.statusCode}");
+    if (response != null && response.statusCode == 200) {
+      jsonData = convert.jsonDecode(response.body);
+      ShiftResponseModel shiftResponseModel =
+      ShiftResponseModel.fromJson(jsonData);
+
+      print("shiftResponseModel====>${shiftResponseModel.toString()}");
+      print("shiftResponseModel====>${shiftResponseModel.status}");
+      if (shiftResponseModel.status == "true") {
+        Utility().showToast(shiftResponseModel.message);
+        Navigator.pop(context);
+        setState(() {
+          isSend = false;
+        });
+      } else {
+        Utility().showToast(shiftResponseModel.message);
+        setState(() {
+          isSend = false;
+        });
+      }
+    }
+  }
+
 }

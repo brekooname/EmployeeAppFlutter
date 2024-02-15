@@ -30,6 +30,10 @@ import 'package:shakti_employee_app/officialDuty/officalRequest.dart';
 import 'package:shakti_employee_app/officialDuty/officialApprove.dart';
 import 'package:shakti_employee_app/provider/BackgroundLocationService.dart';
 import 'package:shakti_employee_app/provider/firestore_appupdate_notifier.dart';
+import 'package:shakti_employee_app/shiftCorrection/model/shiftdatalistModel.dart'as ShiftData;
+import 'package:shakti_employee_app/shiftCorrection/model/shiftdatalistModel.dart';
+import 'package:shakti_employee_app/shiftCorrection/shiftApproveReject.dart';
+import 'package:shakti_employee_app/shiftCorrection/shiftCorrection.dart';
 import 'package:shakti_employee_app/task/taskApprove.dart';
 import 'package:shakti_employee_app/task/taskRequest.dart';
 import 'package:shakti_employee_app/theme/color.dart';
@@ -93,6 +97,7 @@ class _HomePageState extends State<HomePage> {
   List<Pendingod> pendindOdList = [];
   List<Emp> personalInfo = [];
   List<Datum> gatePassList = [];
+  List<ShiftData.Response> shiftDataList = [];
   List<cOffList.Response> cOffApprovalList = [];
   List<TR.Response> travelReqList = [];
   List<vendorGatePassPrefix.Response> vendorGatePassList = [];
@@ -102,6 +107,7 @@ class _HomePageState extends State<HomePage> {
   SyncAndroidToSapResponse? syncAndroidToSapResponse;
   PersonalInfoResponse? personInfo;
   PendingGatePassResponse? gatePassResponse;
+  ShiftDataListModel? shiftDataResponse;
   cOffList.COffApprovalList? cOffApprovalResponse;
   vendorGatePassPrefix.VendorGatePassModel? vendorGatePassModel;
   TR.TravelRequestList? travelRequestList;
@@ -259,6 +265,8 @@ class _HomePageState extends State<HomePage> {
                       isEmployeeApp
                           ? detailWidget(compensatory_OFF)
                           : const SizedBox(),
+                      isEmployeeApp
+                          ?   detailWidget(shiftC): const SizedBox(),
                       detailWidget(travel),
                       localConvenience(),
                       isEmployeeApp
@@ -557,6 +565,13 @@ class _HomePageState extends State<HomePage> {
       setgatePassData();
     }
 
+    if (sharedPreferences.getString(shiftDetail) != null &&
+        sharedPreferences.getString(shiftDetail).toString().isNotEmpty) {
+      var jsonData =
+      convert.jsonDecode(sharedPreferences.getString(shiftDetail)!);
+      shiftDataResponse = ShiftDataListModel.fromJson(jsonData);
+      setShiftDetail();
+    }
     sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.getString(vendorGatePas) != null &&
         sharedPreferences.getString(vendorGatePas).toString().isNotEmpty) {
@@ -847,6 +862,32 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
+
+    if (title == "Shift Correction") {
+      return Visibility(
+        visible: shiftDataList.isEmpty ? false : true,
+        child: Positioned(
+          left: 30.0,
+          bottom: 30.0,
+          child: Container(
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColor.themeColor,
+            ),
+            width: msg == "Request" ? 0 : 20,
+            height: msg == "Request" ? 0 : 20,
+            child: Center(
+              child: robotoTextWidget(
+                  textval: shiftDataList.length.toString(),
+                  colorval: Colors.white,
+                  sizeval: 12,
+                  fontWeight: FontWeight.normal),
+            ),
+          ),
+        ),
+      );
+    }
+
     if (title == "Travel Request") {
       return Visibility(
         visible: travelReqList.isEmpty ? false : true,
@@ -999,6 +1040,7 @@ class _HomePageState extends State<HomePage> {
   Future<List<Map<String, dynamic>>?> getLocalConveyanceData() async {
     List<Map<String, dynamic>> listMap =
         await DatabaseHelper.instance.queryAllLocalConveyance();
+    localConveyanceList.clear();
     setState(() {
       listMap.forEach(
           (map) => localConveyanceList.add(LocalConveyanceModel.fromMap(map)));
@@ -1340,7 +1382,6 @@ class _HomePageState extends State<HomePage> {
       if (_personalInfo.emp.isNotEmpty) {
         setState(() {
           personInfo = _personalInfo;
-          isLoading = false;
           personalInfo = _personalInfo.emp;
           Utility().setSharedPreference(userInfo, response1.body.toString());
         });
@@ -1357,7 +1398,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         gatePassList = pendingGatePassResponse.data;
         gatePassResponse = pendingGatePassResponse;
-        isLoading = false;
+
         Utility()
             .setSharedPreference(gatePassDatail, response2.body.toString());
       });
@@ -1373,7 +1414,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         vendorGatePassList = vendorGatePass.response;
         vendorGatePassModel = vendorGatePass;
-        isLoading = false;
+
         Utility().setSharedPreference(vendorGatePas, response3.body.toString());
       });
       setVendorgatePassData();
@@ -1389,9 +1430,7 @@ class _HomePageState extends State<HomePage> {
         travelRequestList = travelList;
         travelReqList = travelList.response;
         Utility().setSharedPreference(travelRequest, response4.body.toString());
-        setState(() {
-          isLoading = false;
-        });
+
       }
       setTravelData();
     }
@@ -1407,11 +1446,26 @@ class _HomePageState extends State<HomePage> {
         cOffApprovalList = cOffListRes.response;
         print('cOffApprovalList===> ${cOffApprovalResponse!.message}');
         Utility().setSharedPreference(cOffRequest, response5.body.toString());
-        setState(() {
-          isLoading = false;
-        });
+
       }
       setCOffData();
+    }
+
+
+    dynamic response6 = await HTTP.get(pendingShiftData(sharedPreferences.getString(userID).toString()));
+    if (response6 != null && response6.statusCode == 200) {
+      jsonData1 = convert.jsonDecode(response6.body);
+      ShiftDataListModel  shiftDataListModel =
+      ShiftDataListModel.fromJson(jsonData1);
+
+      setState(() {
+        shiftDataList = shiftDataListModel.response;
+        shiftDataResponse = shiftDataListModel;
+        isLoading = false;
+        Utility().setSharedPreference(shiftDetail, response6.body.toString());
+      });
+
+      setShiftDetail();
     }
   }
 
@@ -1446,6 +1500,13 @@ class _HomePageState extends State<HomePage> {
     if (gatePassResponse != null) {
       setState(() {
         gatePassList = gatePassResponse!.data;
+      });
+    }
+  }
+  void setShiftDetail() {
+    if (shiftDataResponse != null) {
+      setState(() {
+        shiftDataList = shiftDataResponse!.response;
       });
       print("DataUpdate2=======>true");
     }
@@ -1528,7 +1589,16 @@ class _HomePageState extends State<HomePage> {
               (route) => true);
         }
         break;
+      case "Shift Correction":
+        {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (context) => ShiftCorrectionScreen(
 
+                  )),
+                  (route) => true);
+        }
+        break;
       case "Travel Request":
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => TravelRequestScreen()),
@@ -1576,6 +1646,15 @@ class _HomePageState extends State<HomePage> {
               .then((value) => {getSPArrayList()});
         }
         break;
+      case "Shift Correction":
+      {
+      Navigator.of(context)
+          .push(MaterialPageRoute(
+          builder: (context) =>
+              ShiftApproved(shiftList: shiftDataList, )))
+          .then((value) => {getSPArrayList()});
+      }
+      break;
       case "Travel Request":
         {
           Navigator.of(context)
@@ -1776,4 +1855,15 @@ class _HomePageState extends State<HomePage> {
       DatabaseHelper.instance.updateWaypoints(waypoints.toMapWithoutId());
     });
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    if(isLoading==true){
+      isLoading = false;
+    }
+
+    super.dispose();
+  }
+
 }
